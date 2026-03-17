@@ -1,0 +1,25 @@
+{
+  "navbar": {
+    "home": "Acasă",
+    "dashboard": "Dashboard",
+    "management": "Management",
+    "assistant": "Asistent",
+    "logout": "Logout"
+  },
+  "footer": {
+    "aboutTitle": "Despre PawPoint",
+    "aboutText": "Platforma ta completă pentru gestionarea animalelor, urmărirea sănătății, programărilor și îngrijirii.",
+    "quickLinks": "Linkuri rapide",
+    "dashboard": "Dashboard",
+    "vaccinations": "Vaccinări",
+    "appointments": "Programări",
+    "support": "Suport",
+    "contactUs": "Contact",
+    "aiAssistant": "Asistent AI",
+    "helpCenter": "Centru de ajutor",
+    "legal": "Legal",
+    "privacyPolicy": "Politica de confidențialitate",
+    "termsOfService": "Termeni și condiții",
+    "copyright": "© 2026 PawPoint. Toate drepturile rezervate."
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "errors": {
+    "fullname": "Introduceți un nume complet (minim 3 caractere).",
+    "emailInvalid": "Introduceți un email valid.",
+    "passwordMin8": "Introduceți o parolă de minim 8 caractere.",
+    "passwordLowerCase": "Parola trebuie să conțină minim un caracter mic.",
+    "passwordUpperCase": "Parola trebuie să conțină minim o literă cu majuscule.",
+    "passwordNumber": "Parola trebuie să conțină minim un număr.",
+    "passwordSpecial": "Parola trebuie să conțină minim un caracter special.",
+    "confirmPassword": "Trebuie să confirmați parola.",
+    "passwordsDontMatch": "Parolele nu coincid."
+  }
+}

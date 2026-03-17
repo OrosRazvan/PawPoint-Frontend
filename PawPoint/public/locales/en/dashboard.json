@@ -1,0 +1,14 @@
+{
+  "title": "Dashboard",
+  "subtitle": "Welcome back! Here's what's happening with your pets.",
+  "quickActions": "Quick Actions",
+  "upcomingEvents": "Upcoming Events",
+  "myPets": "My Pets",
+  "addPet": "Add Pet",
+  "addVaccination": "Add Vaccination",
+  "bookAppointment": "Book Appointment",
+  "addDeworming": "Add Deworming",
+  "addNewPet": "Add New Pet",
+  "annualCheckup": "Annual Checkup",
+  "upcoming": "upcoming"
+}

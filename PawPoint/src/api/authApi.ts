@@ -1,0 +1,80 @@
+import { apiClient } from "./client";
+import {
+  LOGIN_ENDPOINT,
+  REFRESH_ENDPOINT,
+  REGISTER_ENDPOINT,
+  VERIFY_EMAIL_ENDPOINT,
+} from "./endpoints/endpoints";
+
+export type RegisterRequest = {
+  fullName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+};
+
+export type LoginRequest = {
+  email: string;
+  password: string;
+};
+
+export type VerifyEmailRequest = {
+  token: string;
+};
+
+export type RefreshRequest = {
+  refreshToken: string;
+};
+
+export type BackendTokens = {
+  accessToken: string;
+  refreshToken: string;
+  accessExpiresAtUtc?: string;
+  refreshExpiresAtUtc?: string;
+};
+
+export type AuthUserResponse = {
+  userId: number;
+  fullName: string;
+  email: string;
+  tokens: BackendTokens;
+};
+
+export type VerifyEmailResponse = {
+  redirectUrl?: string;
+  message?: string;
+};
+
+export const authApi = {
+  register: async (payload: RegisterRequest) => {
+    const { data } = await apiClient.post<AuthUserResponse>(
+      REGISTER_ENDPOINT,
+      payload
+    );
+    return data;
+  },
+
+  login: async (payload: LoginRequest) => {
+    const { data } = await apiClient.post<AuthUserResponse>(
+      LOGIN_ENDPOINT,
+      payload
+    );
+    return data;
+  },
+
+  verifyEmail: async (payload: VerifyEmailRequest) => {
+    const { data } = await apiClient.post<VerifyEmailResponse>(
+      VERIFY_EMAIL_ENDPOINT,
+      payload
+    );
+    return data;
+  },
+
+  refresh: async (payload: RefreshRequest) => {
+    const { data } = await apiClient.post<BackendTokens>(
+      REFRESH_ENDPOINT,
+      payload
+    );
+    return data;
+  },
+};

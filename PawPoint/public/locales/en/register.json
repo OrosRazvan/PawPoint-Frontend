@@ -1,0 +1,13 @@
+{
+    "errors": {
+        "fullname": "Enter a full name (minimum 3 characters).",
+        "emailInvalid": "Enter a valid email address.",
+        "passwordMin8": "Enter a password with at least 8 characters.",
+        "passwordLowerCase": "The password must contain at least one lowercase letter.",
+        "passwordUpperCase": "The password must contain at least one uppercase letter.",
+        "passwordNumber": "The password must contain at least one number.",
+        "passwordSpecial": "The password must contain at least one special character.",
+        "confirmPassword": "You must confirm the password.",
+        "passwordsDontMatch": "Passwords do not match."
+    }
+}
