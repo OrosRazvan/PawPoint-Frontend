@@ -4,8 +4,12 @@ import { CustomTextField } from "../CustomTextField";
 import { useTranslation } from "react-i18next";
 
 export const PasswordField = () => {
-  const { t } = useTranslation("register", { keyPrefix: "errors" });
-  const { control, formState: { errors } } = useFormContext<RegisterFormValues>();
+  const { t } = useTranslation("register");
+
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext<RegisterFormValues>();
 
   return (
     <Controller
@@ -14,12 +18,14 @@ export const PasswordField = () => {
       render={({ field }) => (
         <CustomTextField
           {...field}
-          label="Password"
+          label={t("auth.password")}
           type="password"
           autoComplete="new-password"
           error={!!errors.password}
           helperText={
-            errors.password?.message ? t(errors.password.message as string) : undefined
+            errors.password?.message
+              ? t(`errors.${errors.password.message as string}`)
+              : undefined
           }
         />
       )}

@@ -1,8 +1,11 @@
 import { Controller, useFormContext } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import type { LoginFormValues } from "../../../../types/loginSchema";
 import { CustomTextField } from "../CustomTextField";
 
 export const EmailField = () => {
+  const { t } = useTranslation();
+
   const {
     control,
     formState: { errors },
@@ -15,7 +18,7 @@ export const EmailField = () => {
       render={({ field }) => (
         <CustomTextField
           {...field}
-          label="Email"
+          label={t("auth.email")}
           type="email"
           autoComplete="email"
           error={!!errors.email}

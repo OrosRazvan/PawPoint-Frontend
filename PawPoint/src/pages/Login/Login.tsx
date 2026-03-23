@@ -3,6 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 import {
   type LoginFormValues,
@@ -24,6 +25,7 @@ export const Login = () => {
   const location = useLocation();
   const { enqueueSnackbar } = useSnackbar();
   const loginMutation = useLogin();
+  const { t } = useTranslation();
 
   const methods = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -55,23 +57,23 @@ export const Login = () => {
     }
 
     if (state?.justRegistered) {
-      enqueueSnackbar("Check your email to verify your account.", {
+      enqueueSnackbar(t("messages.checkEmailVerification"), {
         variant: "info",
       });
     }
 
     if (state?.emailVerified) {
-      enqueueSnackbar("Email verified successfully.", {
+      enqueueSnackbar(t("messages.emailVerified"), {
         variant: "success",
       });
     }
 
     if (state?.verifyError) {
-      enqueueSnackbar("Email verification failed.", {
+      enqueueSnackbar(t("messages.emailVerificationFailed"), {
         variant: "error",
       });
     }
-  }, [location.state, setValue, enqueueSnackbar]);
+  }, [location.state, setValue, enqueueSnackbar, t]);
 
   const onSubmit = async (values: LoginFormValues) => {
     loginMutation.mutate(values, {
@@ -81,14 +83,14 @@ export const Login = () => {
           data.tokens.refreshToken
         );
 
-        enqueueSnackbar("Logged in successfully.", {
+        enqueueSnackbar(t("messages.loginSuccess"), {
           variant: "success",
         });
 
         navigate("/dashboard", { replace: true });
       },
       onError: () => {
-        enqueueSnackbar("Login failed.", {
+        enqueueSnackbar(t("messages.loginFailed"), {
           variant: "error",
         });
       },

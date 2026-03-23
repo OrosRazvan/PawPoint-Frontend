@@ -3,26 +3,13 @@ import type { RegisterFormValues } from "../../../../types/registerSchema";
 import { CustomTextField } from "../CustomTextField";
 import { useTranslation } from "react-i18next";
 
-const FALLBACKS_RO: Record<string, string> = {
-  fullname: "Introduceți un nume complet (minim 3 caractere).",
-};
-
 export const FullNameField = () => {
-  const { t, ready, i18n } = useTranslation("register", { keyPrefix: "errors" });
+  const { t } = useTranslation("register");
 
   const {
     control,
     formState: { errors },
   } = useFormContext<RegisterFormValues>();
-
-  const msgKey = errors.fullname?.message as string | undefined;
-
-  const helper =
-    !msgKey
-      ? ""
-      : ready
-        ? t(msgKey)
-        : (i18n.language?.startsWith("ro") ? FALLBACKS_RO[msgKey] : msgKey) || msgKey;
 
   return (
     <Controller
@@ -31,9 +18,13 @@ export const FullNameField = () => {
       render={({ field }) => (
         <CustomTextField
           {...field}
-          label="Full Name"
-          error={!!msgKey}
-          helperText={helper}
+          label={t("auth.fullName")}
+          error={!!errors.fullname}
+          helperText={
+            errors.fullname?.message
+              ? t(`errors.${errors.fullname.message as string}`)
+              : undefined
+          }
         />
       )}
     />

@@ -1,0 +1,31 @@
+{
+  "auth": {
+    "login": "Login",
+    "email": "Email",
+    "password": "Password",
+    "loginSubtitle": "Enter your credentials to access your account",
+    "noAccount": "Don't have an account?",
+    "register": "Register"
+  },
+  "hero": {
+    "welcome": "Welcome to PawPoint!",
+    "friendlyCare": "Friendly care"
+  },
+  "language": {
+    "english": "EN",
+    "romanian": "RO",
+    "selectEnglish": "English",
+    "selectRomanian": "Română"
+  },
+  "messages": {
+    "checkEmailVerification": "Check your email to verify your account.",
+    "emailVerified": "Email verified successfully.",
+    "emailVerificationFailed": "Email verification failed.",
+    "loginSuccess": "Logged in successfully.",
+    "loginFailed": "Login failed."
+  },
+  "errors": {
+    "emailInvalid": "Enter a valid email address.",
+    "passwordMin8": "Enter a password with at least 8 characters."
+  }
+}

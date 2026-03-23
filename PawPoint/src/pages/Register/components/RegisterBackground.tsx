@@ -1,10 +1,13 @@
 import { Box, Stack, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   children: React.ReactNode;
 };
 
 export const RegisterBackground = ({ children }: Props) => {
+  const { t } = useTranslation("register");
+
   return (
     <Box
       sx={{
@@ -12,10 +15,9 @@ export const RegisterBackground = ({ children }: Props) => {
         width: "100%",
         display: "grid",
         gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-        backgroundColor: "#fbf2ea", // crem ca în poză
+        backgroundColor: "#fbf2ea",
       }}
     >
-      {/* LEFT HERO */}
       <Box
         sx={{
           position: "relative",
@@ -35,7 +37,6 @@ export const RegisterBackground = ({ children }: Props) => {
           }}
         />
 
-        {/* Bottom text */}
         <Stack
           sx={{
             position: "absolute",
@@ -57,11 +58,10 @@ export const RegisterBackground = ({ children }: Props) => {
               letterSpacing: "-0.02em",
             }}
           >
-            Welcome to PawPoint!
+            {t("hero.welcome")}
           </Typography>
         </Stack>
 
-        {/* Small pill top-left (optional) */}
         <Box
           sx={{
             position: "absolute",
@@ -76,11 +76,10 @@ export const RegisterBackground = ({ children }: Props) => {
             fontWeight: 600,
           }}
         >
-          Friendly care
+          {t("hero.friendlyCare")}
         </Box>
       </Box>
 
-      {/* RIGHT SIDE */}
       <Box
         sx={{
           display: "flex",

@@ -1,13 +1,38 @@
 {
-    "errors": {
-        "fullname": "Enter a full name (minimum 3 characters).",
-        "emailInvalid": "Enter a valid email address.",
-        "passwordMin8": "Enter a password with at least 8 characters.",
-        "passwordLowerCase": "The password must contain at least one lowercase letter.",
-        "passwordUpperCase": "The password must contain at least one uppercase letter.",
-        "passwordNumber": "The password must contain at least one number.",
-        "passwordSpecial": "The password must contain at least one special character.",
-        "confirmPassword": "You must confirm the password.",
-        "passwordsDontMatch": "Passwords do not match."
-    }
+  "auth": {
+    "brand": "PawPoint",
+    "signUp": "Sign Up",
+    "fullName": "Full Name",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "registerSubtitle": "Create an account to manage your pets",
+    "haveAccount": "Do you have an account?",
+    "login": "Login"
+  },
+  "hero": {
+    "welcome": "Welcome to PawPoint!",
+    "friendlyCare": "Friendly care"
+  },
+  "language": {
+    "english": "EN",
+    "romanian": "RO",
+    "selectEnglish": "English",
+    "selectRomanian": "Română"
+  },
+  "messages": {
+    "registerSuccess": "Account created. Check your email.",
+    "registerFailed": "Register failed."
+  },
+  "errors": {
+    "fullname": "Enter a full name (minimum 3 characters).",
+    "emailInvalid": "Enter a valid email address.",
+    "passwordMin8": "Enter a password with at least 8 characters.",
+    "passwordLowerCase": "The password must contain at least one lowercase letter.",
+    "passwordUpperCase": "The password must contain at least one uppercase letter.",
+    "passwordNumber": "The password must contain at least one number.",
+    "passwordSpecial": "The password must contain at least one special character.",
+    "confirmPassword": "You must confirm the password.",
+    "passwordsDontMatch": "Passwords do not match."
+  }
 }

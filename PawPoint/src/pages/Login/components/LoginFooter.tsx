@@ -1,8 +1,10 @@
 import { Stack, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
 export const LoginFooter = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <Stack
@@ -12,7 +14,7 @@ export const LoginFooter = () => {
       sx={{ mt: 3 }}
     >
       <Typography sx={{ fontSize: 14, color: "#6b7280" }}>
-        Don&apos;t have an account?
+        {t("auth.noAccount")}
       </Typography>
 
       <Typography
@@ -27,7 +29,7 @@ export const LoginFooter = () => {
           },
         }}
       >
-        Register
+        {t("auth.register")}
       </Typography>
     </Stack>
   );

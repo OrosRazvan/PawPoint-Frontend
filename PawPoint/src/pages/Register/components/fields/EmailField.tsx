@@ -4,8 +4,12 @@ import { CustomTextField } from "../CustomTextField";
 import { useTranslation } from "react-i18next";
 
 export const EmailField = () => {
-  const { t } = useTranslation("register", { keyPrefix: "errors" });
-  const { control, formState: { errors } } = useFormContext<RegisterFormValues>();
+  const { t } = useTranslation("register");
+
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext<RegisterFormValues>();
 
   return (
     <Controller
@@ -14,12 +18,14 @@ export const EmailField = () => {
       render={({ field }) => (
         <CustomTextField
           {...field}
-          label="Email"
+          label={t("auth.email")}
           type="email"
           autoComplete="email"
           error={!!errors.email}
           helperText={
-            errors.email?.message ? t(errors.email.message as string) : undefined
+            errors.email?.message
+              ? t(`errors.${errors.email.message as string}`)
+              : undefined
           }
         />
       )}

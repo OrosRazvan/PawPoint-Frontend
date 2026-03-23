@@ -1,6 +1,9 @@
 import { Stack, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 export const LoginHeader = () => {
+  const { t } = useTranslation();
+
   return (
     <Stack spacing={1}>
       <Typography
@@ -10,7 +13,7 @@ export const LoginHeader = () => {
           color: "#071c42",
         }}
       >
-        Login
+        {t("auth.login")}
       </Typography>
 
       <Typography
@@ -19,7 +22,7 @@ export const LoginHeader = () => {
           color: "#6b7280",
         }}
       >
-        Enter your credentials to access your account
+        {t("auth.loginSubtitle")}
       </Typography>
     </Stack>
   );

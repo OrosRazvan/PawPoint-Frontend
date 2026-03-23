@@ -9,7 +9,7 @@ export const LoginContainer = ({ children }: Props) => {
     <Box
       sx={{
         width: "100%",
-        maxWidth: 460,
+        maxWidth: 520,
       }}
     >
       {children}

@@ -2,6 +2,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
+import { useTranslation } from "react-i18next";
 
 import {
   type RegisterFormValues,
@@ -21,6 +22,7 @@ export const Register = () => {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const registerMutation = useRegister();
+  const { t } = useTranslation("register");
 
   const methods = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -39,13 +41,9 @@ export const Register = () => {
   } = methods;
 
   const onSubmit = async (values: RegisterFormValues) => {
-    console.log("REGISTER SUBMIT", values);
-
     registerMutation.mutate(values, {
-      onSuccess: (data) => {
-        console.log("REGISTER SUCCESS", data);
-
-        enqueueSnackbar("Account created. Check your email.", {
+      onSuccess: () => {
+        enqueueSnackbar(t("messages.registerSuccess"), {
           variant: "success",
         });
 
@@ -57,10 +55,8 @@ export const Register = () => {
           },
         });
       },
-      onError: (error) => {
-        console.error("REGISTER ERROR", error);
-
-        enqueueSnackbar("Register failed.", {
+      onError: () => {
+        enqueueSnackbar(t("messages.registerFailed"), {
           variant: "error",
         });
       },

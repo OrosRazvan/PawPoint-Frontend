@@ -14,8 +14,8 @@ i18n
     load: "languageOnly",            // ✅ IMPORTANT (ro-RO -> ro)
     nonExplicitSupportedLngs: true,  // ✅ optional, dar util
 
-    ns: ["register"],
-    defaultNS: "register",
+    ns: ["login","register"],
+    defaultNS: "login",
 
     backend: { loadPath: "/locales/{{lng}}/{{ns}}.json" },
     interpolation: { escapeValue: false },
