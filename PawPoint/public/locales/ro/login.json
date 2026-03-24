@@ -1,0 +1,31 @@
+{
+  "auth": {
+    "login": "Autentificare",
+    "email": "Email",
+    "password": "Parolă",
+    "loginSubtitle": "Introdu datele de autentificare pentru a accesa contul",
+    "noAccount": "Nu ai cont?",
+    "register": "Înregistrează-te"
+  },
+  "hero": {
+    "welcome": "Bine ai venit la PawPoint!",
+    "friendlyCare": "Îngrijire prietenoasă"
+  },
+  "language": {
+    "english": "EN",
+    "romanian": "RO",
+    "selectEnglish": "English",
+    "selectRomanian": "Română"
+  },
+  "messages": {
+    "checkEmailVerification": "Verifică emailul pentru a-ți confirma contul.",
+    "emailVerified": "Email verificat cu succes.",
+    "emailVerificationFailed": "Verificarea emailului a eșuat.",
+    "loginSuccess": "Autentificare reușită.",
+    "loginFailed": "Autentificarea a eșuat."
+  },
+  "errors": {
+    "emailInvalid": "Introduceți un email valid.",
+    "passwordMin8": "Introduceți o parolă de minim 8 caractere."
+  }
+}

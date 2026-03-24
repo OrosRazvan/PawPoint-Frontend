@@ -1,0 +1,38 @@
+{
+  "auth": {
+    "brand": "PawPoint",
+    "signUp": "Înregistrare",
+    "fullName": "Nume complet",
+    "email": "Email",
+    "password": "Parolă",
+    "confirmPassword": "Confirmă parola",
+    "registerSubtitle": "Creează un cont pentru a-ți gestiona animăluțele",
+    "haveAccount": "Ai deja un cont?",
+    "login": "Autentificare"
+  },
+  "hero": {
+    "welcome": "Bine ai venit la PawPoint!",
+    "friendlyCare": "Îngrijire prietenoasă"
+  },
+  "language": {
+    "english": "EN",
+    "romanian": "RO",
+    "selectEnglish": "English",
+    "selectRomanian": "Română"
+  },
+  "messages": {
+    "registerSuccess": "Cont creat. Verifică emailul.",
+    "registerFailed": "Înregistrarea a eșuat."
+  },
+  "errors": {
+    "fullname": "Introduceți un nume complet (minim 3 caractere).",
+    "emailInvalid": "Introduceți un email valid.",
+    "passwordMin8": "Introduceți o parolă de minim 8 caractere.",
+    "passwordLowerCase": "Parola trebuie să conțină minim un caracter mic.",
+    "passwordUpperCase": "Parola trebuie să conțină minim o literă cu majusculă.",
+    "passwordNumber": "Parola trebuie să conțină minim un număr.",
+    "passwordSpecial": "Parola trebuie să conțină minim un caracter special.",
+    "confirmPassword": "Trebuie să confirmați parola.",
+    "passwordsDontMatch": "Parolele nu coincid."
+  }
+}

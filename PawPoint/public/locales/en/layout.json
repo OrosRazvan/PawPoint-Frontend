@@ -1,0 +1,25 @@
+{
+  "navbar": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "management": "Management",
+    "assistant": "Assistant",
+    "logout": "Logout"
+  },
+  "footer": {
+    "aboutTitle": "About PawPoint",
+    "aboutText": "Your complete pet management platform for tracking health, appointments, and care.",
+    "quickLinks": "Quick Links",
+    "dashboard": "Dashboard",
+    "vaccinations": "Vaccinations",
+    "appointments": "Appointments",
+    "support": "Support",
+    "contactUs": "Contact Us",
+    "aiAssistant": "AI Assistant",
+    "helpCenter": "Help Center",
+    "legal": "Legal",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "copyright": "© 2026 PawPoint. All rights reserved."
+  }
+}
