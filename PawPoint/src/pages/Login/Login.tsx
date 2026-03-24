@@ -10,8 +10,7 @@ import {
   loginSchema,
 } from "../../types/loginSchema";
 import { useLogin } from "../../hooks/useLogin";
-import { tokenStorage } from "../../utils/tokenStorage";
-
+import { setTokens } from "../../auth/tokenStorage";
 import { LoginBackground } from "./components/LoginBackground";
 import { LoginContainer } from "./components/LoginContainer";
 import { LoginCard } from "./components/LoginCard";
@@ -78,10 +77,10 @@ export const Login = () => {
   const onSubmit = async (values: LoginFormValues) => {
     loginMutation.mutate(values, {
       onSuccess: (data) => {
-        tokenStorage.setTokens(
-          data.tokens.accessToken,
-          data.tokens.refreshToken
-        );
+        setTokens({
+          accessToken: data.tokens.accessToken,
+          refreshToken: data.tokens.refreshToken,
+        });
 
         enqueueSnackbar(t("messages.loginSuccess"), {
           variant: "success",
