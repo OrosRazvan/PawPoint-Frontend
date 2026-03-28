@@ -2,21 +2,28 @@ import { Button, Grid } from "@mui/material";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import { SectionCard } from "../cards/SectionCard";
 import { PetCard } from "../cards/PetCard";
-import type { PetItem } from "../../data/dashboardMockData";
+import type { DashboardPet } from "../../types/dashboard";
 
 type Props = {
   title: string;
   addPetLabel: string;
-  pets: PetItem[];
+  pets: DashboardPet[];
+  onAddPet?: () => void;
 };
 
-export const MyPetsSection = ({ title, addPetLabel, pets }: Props) => {
+export const MyPetsSection = ({
+  title,
+  addPetLabel,
+  pets,
+  onAddPet,
+}: Props) => {
   return (
     <SectionCard
       title={title}
       rightSlot={
         <Button
           startIcon={<AddOutlinedIcon />}
+          onClick={onAddPet}
           sx={{
             px: 2.5,
             py: 1.2,
@@ -43,6 +50,7 @@ export const MyPetsSection = ({ title, addPetLabel, pets }: Props) => {
               breed={pet.breed}
               weight={pet.weight}
               imageLetter={pet.imageLetter}
+              imageUrl={pet.imageUrl}
               onView={pet.onView}
               onEdit={pet.onEdit}
               onDelete={pet.onDelete}

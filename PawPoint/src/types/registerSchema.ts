@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { t } from "i18next";
 
 export const registerSchema = z
     .object({
