@@ -2,10 +2,18 @@ import { Stack } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { SectionCard } from "../cards/SectionCard";
 import { EventItem } from "../cards/EventItem";
-import type { UpcomingEventItem } from "../../data/dashboardMockData";
+
+type EventItemModel = {
+  id: string;
+  petName: string;
+  typeLabel: string;
+  statusLabel: string;
+  dateLabel: string;
+  timeLabel: string;
+};
 
 type Props = {
-  events: UpcomingEventItem[];
+  events: EventItemModel[];
 };
 
 export const UpcomingEventsSection = ({ events }: Props) => {
@@ -18,10 +26,10 @@ export const UpcomingEventsSection = ({ events }: Props) => {
           <EventItem
             key={event.id}
             petName={event.petName}
-            typeLabel={t(event.typeKey)}
-            statusLabel={t(event.statusKey)}
-            dateLabel={event.date}
-            timeLabel={event.time}
+            typeLabel={event.typeLabel}
+            statusLabel={event.statusLabel}
+            dateLabel={event.dateLabel}
+            timeLabel={event.timeLabel}
           />
         ))}
       </Stack>

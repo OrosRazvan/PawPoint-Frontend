@@ -1,4 +1,4 @@
-import { Box, IconButton, Paper, Stack, Typography, Button } from "@mui/material";
+import { Box, Paper, Stack, Typography, Button, IconButton } from "@mui/material";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
@@ -8,6 +8,7 @@ type Props = {
   breed: string;
   weight: string;
   imageLetter: string;
+  imageUrl?: string | null;
   onView?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
@@ -18,6 +19,7 @@ export const PetCard = ({
   breed,
   weight,
   imageLetter,
+  imageUrl,
   onView,
   onEdit,
   onDelete,
@@ -27,63 +29,142 @@ export const PetCard = ({
       elevation={0}
       sx={{
         p: 2,
-        borderRadius: 3,
-        border: "1px solid #dddddd",
-        backgroundColor: "#fcfcfc",
+        borderRadius: 4,
+        border: "1px solid #ede8e0",
+        backgroundColor: "#faf8f5",
+        transition: "box-shadow 0.2s ease, transform 0.2s ease",
+        "&:hover": {
+          boxShadow: "0 12px 32px rgba(7,28,66,0.09), 0 2px 8px rgba(7,28,66,0.04)",
+          transform: "translateY(-2px)",
+        },
       }}
     >
+      {/* ── Image / Avatar area ── */}
       <Box
         sx={{
-          height: 240,
+          height: 200,
           borderRadius: 3,
-          backgroundColor: "#e7e8fa",
+          background: imageUrl
+            ? "transparent"
+            : "linear-gradient(135deg, #fbf2ea 0%, #fde8c8 100%)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          color: "#2457ea",
-          fontSize: 48,
-          fontWeight: 800,
           mb: 2,
+          overflow: "hidden",
+          position: "relative",
         }}
       >
-        {imageLetter}
+        {/* Decorative circle behind letter */}
+        {!imageUrl && (
+          <Box
+            sx={{
+              position: "absolute",
+              width: 100,
+              height: 100,
+              borderRadius: "50%",
+              background: "rgba(245,166,35,0.15)",
+            }}
+          />
+        )}
+
+        {imageUrl ? (
+          <Box
+            component="img"
+            src={imageUrl}
+            alt={name}
+            sx={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+            }}
+          />
+        ) : (
+          <Typography
+            sx={{
+              fontSize: 52,
+              fontWeight: 800,
+              color: "#f5a623",
+              lineHeight: 1,
+              position: "relative",
+              zIndex: 1,
+              textShadow: "0 2px 8px rgba(245,166,35,0.25)",
+            }}
+          >
+            {imageLetter}
+          </Typography>
+        )}
       </Box>
 
-      <Stack spacing={0.75}>
+      {/* ── Info ── */}
+      <Stack spacing={0.4} sx={{ mb: 2 }}>
         <Typography
           sx={{
-            fontSize: 20,
-            fontWeight: 700,
+            fontSize: 18,
+            fontWeight: 800,
             color: "#071c42",
+            letterSpacing: "-0.3px",
+            lineHeight: 1.2,
           }}
         >
           {name}
         </Typography>
 
-        <Typography
-          sx={{
-            fontSize: 16,
-            color: "#43556f",
-          }}
-        >
-          {breed} • {weight}
-        </Typography>
+        <Stack direction="row" alignItems="center" spacing={0.8}>
+          <Typography
+            sx={{
+              fontSize: 13,
+              color: "#8a95a3",
+              fontWeight: 500,
+            }}
+          >
+            {breed}
+          </Typography>
+          <Box
+            sx={{
+              width: 3,
+              height: 3,
+              borderRadius: "50%",
+              backgroundColor: "#c9d0da",
+            }}
+          />
+          <Typography
+            sx={{
+              fontSize: 13,
+              color: "#8a95a3",
+              fontWeight: 500,
+            }}
+          >
+            {weight}
+          </Typography>
+        </Stack>
       </Stack>
 
-      <Stack direction="row" spacing={1.5} sx={{ mt: 2 }}>
+      {/* ── Actions ── */}
+      <Stack direction="row" spacing={1} sx={{ mt: 1.5 }}>
         <Button
           fullWidth
-          startIcon={<VisibilityOutlinedIcon />}
+          startIcon={<VisibilityOutlinedIcon sx={{ fontSize: "18px !important" }} />}
           onClick={onView}
           sx={{
-            py: 1.25,
-            borderRadius: 3,
-            backgroundColor: "#edf3fb",
-            color: "#1657ff",
+            py: 1.2,
+            borderRadius: 2.5,
+            background: "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
+            color: "#fff",
             textTransform: "none",
-            fontSize: 16,
+            fontSize: 14,
+            fontWeight: 700,
+            letterSpacing: "-0.1px",
+            boxShadow: "0 4px 12px rgba(245,166,35,0.35)",
+            transition: "all 0.2s ease",
             "&:hover": {
-              backgroundColor: "#e4edf9",
+              background: "linear-gradient(135deg, #f0981a 0%, #e88510 100%)",
+              boxShadow: "0 6px 16px rgba(245,166,35,0.45)",
+              transform: "translateY(-1px)",
+            },
+            "&:active": {
+              transform: "translateY(0)",
+              boxShadow: "0 2px 6px rgba(245,166,35,0.3)",
             },
           }}
         >
@@ -93,27 +174,39 @@ export const PetCard = ({
         <IconButton
           onClick={onEdit}
           sx={{
-            width: 48,
-            height: 48,
+            width: 46,
+            height: 46,
             borderRadius: 2.5,
-            backgroundColor: "#eceff4",
-            color: "#374151",
+            backgroundColor: "#f0f2f7",
+            color: "#4b5563",
+            flexShrink: 0,
+            transition: "all 0.15s ease",
+            "&:hover": {
+              backgroundColor: "#e4e8f0",
+              color: "#071c42",
+            },
           }}
         >
-          <EditOutlinedIcon />
+          <EditOutlinedIcon sx={{ fontSize: 19 }} />
         </IconButton>
 
         <IconButton
           onClick={onDelete}
           sx={{
-            width: 48,
-            height: 48,
+            width: 46,
+            height: 46,
             borderRadius: 2.5,
-            backgroundColor: "#faeded",
-            color: "#ff1e1e",
+            backgroundColor: "#fff0f0",
+            color: "#e53535",
+            flexShrink: 0,
+            transition: "all 0.15s ease",
+            "&:hover": {
+              backgroundColor: "#ffe4e4",
+              color: "#c72b2b",
+            },
           }}
         >
-          <DeleteOutlineOutlinedIcon />
+          <DeleteOutlineOutlinedIcon sx={{ fontSize: 19 }} />
         </IconButton>
       </Stack>
     </Paper>
