@@ -1,6 +1,7 @@
 import { Box, CircularProgress, Typography } from "@mui/material";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { DashboardBackground } from "./components/DashboardBackground";
 import { DashboardContainer } from "./components/DashboardContainer";
 import { DashboardHeader } from "./components/DashboardHeader";
@@ -8,12 +9,24 @@ import { DashboardGrid } from "./components/DashboardGrid";
 import { MyPetsSection } from "./components/sections/MyPetsSection";
 import { useDashboard } from "../../hooks/useDashboard";
 import { AddPetDialog } from "./components/AddPetDialog";
-import type { QuickActionItem } from "./types/dashboard";
+import { EditPetDialog } from "./components/EditPetDialog";
+import { useSnackbar } from "notistack";
+import { useQueryClient } from "@tanstack/react-query";
+import { useDeleteAnimal } from "../../hooks/useDeleteAnimal";
+import type { QuickActionItem, DashboardPet } from "./types/dashboard";
 
 export const Dashboard = () => {
   const { t } = useTranslation(["dashboard"]);
   const { data, isLoading, isError } = useDashboard();
+  const navigate = useNavigate();
+
   const [isAddPetOpen, setIsAddPetOpen] = useState(false);
+  const [isEditPetOpen, setIsEditPetOpen] = useState(false);
+  const [selectedPet, setSelectedPet] = useState<DashboardPet | null>(null);
+
+  const { enqueueSnackbar } = useSnackbar();
+  const queryClient = useQueryClient();
+  const deleteAnimalMutation = useDeleteAnimal();
 
   const quickActions: QuickActionItem[] = useMemo(
     () => [
@@ -53,6 +66,37 @@ export const Dashboard = () => {
     []
   );
 
+  const handleViewPet = (pet: DashboardPet) => {
+    navigate(`/animals/${pet.id}`);
+  };
+
+  const handleOpenEditPet = (pet: DashboardPet) => {
+    setSelectedPet(pet);
+    setIsEditPetOpen(true);
+  };
+
+  const handleCloseEditPet = () => {
+    setIsEditPetOpen(false);
+    setSelectedPet(null);
+  };
+
+  const handleDeletePet = (pet: DashboardPet) => {
+    deleteAnimalMutation.mutate(Number(pet.id), {
+      onSuccess: () => {
+        enqueueSnackbar(t("dashboard:deletePetSuccess"), {
+          variant: "success",
+        });
+
+        queryClient.invalidateQueries({ queryKey: ["dashboardData"] });
+      },
+      onError: () => {
+        enqueueSnackbar(t("dashboard:deletePetError"), {
+          variant: "error",
+        });
+      },
+    });
+  };
+
   return (
     <DashboardBackground>
       <DashboardContainer>
@@ -79,6 +123,10 @@ export const Dashboard = () => {
               addPetLabel={t("dashboard:addPet")}
               pets={data?.pets ?? []}
               onAddPet={() => setIsAddPetOpen(true)}
+              onViewPet={handleViewPet}
+              onEditPet={handleOpenEditPet}
+              onDeletePet={handleDeletePet}
+              isDeleting={deleteAnimalMutation.isPending}
             />
           </>
         )}
@@ -86,6 +134,12 @@ export const Dashboard = () => {
         <AddPetDialog
           open={isAddPetOpen}
           onClose={() => setIsAddPetOpen(false)}
+        />
+
+        <EditPetDialog
+          open={isEditPetOpen}
+          onClose={handleCloseEditPet}
+          pet={selectedPet}
         />
       </DashboardContainer>
     </DashboardBackground>

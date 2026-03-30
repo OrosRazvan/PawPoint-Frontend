@@ -30,5 +30,17 @@
   "rabbit": "Iepure",
   "other": "Altul",
   "male": "Mascul",
-  "female": "Femelă"
+  "female": "Femelă",
+  "deletePetTitle": "Șterge animalul",
+  "deletePetSubtitle": "Această acțiune nu poate fi anulată",
+  "deletePetConfirmMessage": "Toate datele asociate vor fi șterse definitiv și nu pot fi recuperate.",
+  "deletePetConfirm": "Da, șterge",
+  "cancel": "Anulează",
+  "deletePetSuccess": "Animalul a fost șters cu succes.",
+  "deletePetError": "A apărut o eroare la ștergerea animalului.",
+  "editPetDialogTitle": "Modifică animalul",
+  "editPetDialogSubtitle": "Actualizează informațiile animalului tău.",
+  "saveChanges": "Salvează modificările",
+  "updatePetSuccess": "Animalul a fost actualizat cu succes.",
+  "updatePetError": "Nu s-a putut actualiza animalul."
 }
