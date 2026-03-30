@@ -5,6 +5,7 @@ import { Register } from "../pages/Register/Register";
 import { Login } from "../pages/Login/Login";
 import { VerifyEmail } from "../pages/VerifyEmail/VerifyEmail";
 import { Dashboard } from "../pages/Dashboard/Dashboard";
+import { AnimalDetails } from "../pages/AniamlDetails/AnimalDetails";
 import { PublicRoute } from "./PublicRoute";
 import { PrivateRoute } from "./PrivateRoute";
 
@@ -17,6 +18,7 @@ export const AppRoutes = () => {
 
       <Route element={<MainLayout />}>
         <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+        <Route path="/animals/:animalId" element={<PrivateRoute><AnimalDetails /></PrivateRoute>}/>
       </Route>
     </Routes>
   );

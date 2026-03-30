@@ -55,6 +55,13 @@ export type DashboardPet = {
   weight: string;
   imageLetter: string;
   imageUrl?: string | null;
+
+  species?: string;
+  weightKg?: number;
+  birthDate?: string | null;
+  sex?: string | null;
+  microchipNumber?: string | null;
+
   onView?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;

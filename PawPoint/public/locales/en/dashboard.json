@@ -30,5 +30,17 @@
   "rabbit": "Rabbit",
   "other": "Other",
   "male": "Male",
-  "female": "Female"
+  "female": "Female",
+  "deletePetTitle": "Delete pet",
+  "deletePetSubtitle": "This action cannot be undone",
+  "deletePetConfirmMessage": "All associated data will be permanently deleted and cannot be recovered.",
+  "deletePetConfirm": "Yes, delete",
+  "cancel": "Cancel",
+  "deletePetSuccess": "Pet deleted successfully.",
+  "deletePetError": "An error occurred while deleting the pet.",
+  "editPetDialogTitle": "Edit pet",
+  "editPetDialogSubtitle": "Update your pet's information to keep everything organized.",
+  "saveChanges": "Save changes",
+  "updatePetSuccess": "Pet updated successfully.",
+  "updatePetError": "Failed to update pet."
 }

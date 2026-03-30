@@ -40,9 +40,25 @@ const mapAnimalsToPets = (animals: AnimalDto[]): DashboardPet[] => {
     id: String(animal.id),
     name: animal.name,
     breed: animal.breed ?? animal.species ?? "Unknown",
-    weight: typeof animal.weight === "number" ? `${animal.weight} kg` : "—",
+    weight:
+      typeof animal.weightKg === "number"
+        ? `${animal.weightKg} kg`
+        : typeof animal.weight === "number"
+        ? `${animal.weight} kg`
+        : "—",
     imageLetter: getInitial(animal.name),
     imageUrl: animal.profilePictureUrl ?? null,
+
+    species: animal.species ?? "",
+    weightKg:
+      typeof animal.weightKg === "number"
+        ? animal.weightKg
+        : typeof animal.weight === "number"
+        ? animal.weight
+        : undefined,
+    birthDate: animal.birthDate ?? null,
+    sex: animal.sex ?? "",
+    microchipNumber: animal.microchipNumber ?? "",
   }));
 };
 
