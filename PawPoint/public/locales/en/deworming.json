@@ -1,0 +1,43 @@
+{
+  "title": "Deworming",
+  "subtitle": "Track and manage all deworming records",
+  "addButton": "Add Deworming",
+
+  "completed": "Completed",
+  "upcoming": "Upcoming",
+  "empty": "No deworming records found.",
+  "loadError": "Failed to load deworming records.",
+
+  "pet": "Pet",
+  "selectPet": "Select pet",
+  "productName": "Product name",
+  "vetCabinet": "Veterinary cabinet",
+  "selectVetCabinet": "Select veterinary cabinet",
+  "visitDate": "Visit date",
+  "timeSlot": "Time slot",
+  "selectTimeSlot": "Select time slot",
+  "noSlotsAvailable": "No time slots available for the selected date.",
+  "lastDate": "Last date",
+  "nextDate": "Next date",
+  "notes": "Notes",
+
+  "save": "Save",
+  "cancel": "Cancel",
+  "saveChanges": "Save changes",
+  "deleteConfirm": "Delete",
+
+  "addDialogTitle": "Add Deworming",
+  "addDialogSubtitle": "Schedule and manage a new deworming record.",
+  "editDialogTitle": "Edit Deworming",
+  "editDialogSubtitle": "Update the selected deworming record.",
+  "deleteDialogTitle": "Delete Deworming",
+  "deleteDialogSubtitle": "This action cannot be undone.",
+  "deleteConfirmMessage": "Are you sure you want to delete this deworming record?",
+
+  "addSuccess": "Deworming added successfully.",
+  "addError": "Failed to add deworming.",
+  "updateSuccess": "Deworming updated successfully.",
+  "updateError": "Failed to update deworming.",
+  "deleteSuccess": "Deworming deleted successfully.",
+  "deleteError": "Failed to delete deworming."
+}

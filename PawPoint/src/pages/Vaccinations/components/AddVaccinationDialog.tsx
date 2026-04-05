@@ -1,0 +1,504 @@
+import { useEffect, useMemo } from "react";
+import { LoadingButton } from "@mui/lab";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Stack,
+  TextField,
+  Typography,
+  MenuItem,
+  Box,
+  Divider,
+} from "@mui/material";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import VaccinesRoundedIcon from "@mui/icons-material/VaccinesRounded";
+import {
+  Controller,
+  useForm,
+  useWatch,
+  type SubmitHandler,
+} from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { useSnackbar } from "notistack";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { useCreateVaccination } from "../../../hooks/useCreateVaccination";
+import { useVaccinations } from "../../../hooks/useVaccinations";
+import { getAnimals } from "../../../api/getAnimal";
+import { useVetCabinets } from "../../../hooks/useVetCabinets";
+import { useVetAvailability } from "../../../hooks/useVetAvailability";
+import type {
+  VaccinationDto,
+  VaccinationFormValues,
+} from "../types/vaccination";
+
+type Props = {
+  open: boolean;
+  onClose: () => void;
+};
+
+const fieldSx = {
+  "& .MuiOutlinedInput-root": {
+    borderRadius: 2,
+    backgroundColor: "#fff",
+    fontSize: 14,
+    "& fieldset": {
+      borderColor: "#e8e2d9",
+    },
+    "&:hover fieldset": {
+      borderColor: "#f5a623",
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "#f5a623",
+      borderWidth: 1.5,
+    },
+  },
+};
+
+const labelSx = {
+  fontSize: 12,
+  fontWeight: 600,
+  color: "#6b7280",
+  letterSpacing: "0.04em",
+  textTransform: "uppercase" as const,
+  mb: 0.6,
+};
+
+const toDateOnly = (value: Date) => value.toISOString().split("T")[0];
+
+const formatSlotLabel = (start: string, end: string) => {
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+
+  return `${startDate.toLocaleDateString("ro-RO")} • ${startDate.toLocaleTimeString(
+    "ro-RO",
+    { hour: "2-digit", minute: "2-digit" }
+  )} - ${endDate.toLocaleTimeString("ro-RO", {
+    hour: "2-digit",
+    minute: "2-digit",
+  })}`;
+};
+
+const getComparableDate = (item: VaccinationDto) => {
+  const value = item.nextDate ?? item.lastDate ?? "";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? 0 : date.getTime();
+};
+
+export const AddVaccinationDialog = ({ open, onClose }: Props) => {
+  const { t } = useTranslation(["vaccination"]);
+  const { enqueueSnackbar } = useSnackbar();
+  const queryClient = useQueryClient();
+  const createVaccinationMutation = useCreateVaccination();
+
+  const { data: animals = [] } = useQuery({
+    queryKey: ["animals"],
+    queryFn: getAnimals,
+    enabled: open,
+  });
+
+  const { data: cabinets = [] } = useVetCabinets(open);
+  const { data: vaccinations = [] } = useVaccinations();
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    setValue,
+  } = useForm<VaccinationFormValues>({
+    defaultValues: {
+      animalId: "",
+      vaccineName: "",
+      vetCabinetId: "",
+      visitDate: "",
+      vetTimeSlotId: "",
+      lastDate: "",
+      nextDate: "",
+      notes: "",
+    },
+  });
+
+  const selectedAnimalId = useWatch({ control, name: "animalId" });
+  const selectedVaccineName = useWatch({ control, name: "vaccineName" });
+  const selectedCabinetId = useWatch({ control, name: "vetCabinetId" });
+  const selectedVisitDate = useWatch({ control, name: "visitDate" });
+  const currentLastDate = useWatch({ control, name: "lastDate" });
+  const currentNextDate = useWatch({ control, name: "nextDate" });
+
+  const availabilityFrom = useMemo(() => {
+    if (selectedVisitDate) return selectedVisitDate;
+    return toDateOnly(new Date());
+  }, [selectedVisitDate]);
+
+  const availabilityTo = useMemo(() => {
+    const base = selectedVisitDate ? new Date(selectedVisitDate) : new Date();
+    base.setDate(base.getDate() + 1);
+    return toDateOnly(base);
+  }, [selectedVisitDate]);
+
+  const { data: slots = [] } = useVetAvailability({
+    vetCabinetId:
+      typeof selectedCabinetId === "number"
+        ? selectedCabinetId
+        : selectedCabinetId
+        ? Number(selectedCabinetId)
+        : undefined,
+    from: availabilityFrom,
+    to: availabilityTo,
+    enabled: open && !!selectedCabinetId && !!selectedVisitDate,
+  });
+
+  const matchingPreviousVaccination = useMemo(() => {
+    if (!selectedAnimalId || !selectedVaccineName.trim()) return null;
+
+    const filtered = vaccinations
+      .filter(
+        (item) =>
+          item.animalId === Number(selectedAnimalId) &&
+          item.vaccineName.trim().toLowerCase() ===
+            selectedVaccineName.trim().toLowerCase()
+      )
+      .sort((a, b) => getComparableDate(b) - getComparableDate(a));
+
+    return filtered[0] ?? null;
+  }, [vaccinations, selectedAnimalId, selectedVaccineName]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    if (!matchingPreviousVaccination) return;
+
+    if (!currentLastDate) {
+      setValue(
+        "lastDate",
+        matchingPreviousVaccination.lastDate
+          ? matchingPreviousVaccination.lastDate.split("T")[0]
+          : ""
+      );
+    }
+
+    if (!currentNextDate) {
+      setValue(
+        "nextDate",
+        matchingPreviousVaccination.nextDate
+          ? matchingPreviousVaccination.nextDate.split("T")[0]
+          : ""
+      );
+    }
+  }, [
+    open,
+    matchingPreviousVaccination,
+    currentLastDate,
+    currentNextDate,
+    setValue,
+  ]);
+
+  const onSubmit: SubmitHandler<VaccinationFormValues> = (values) => {
+    if (!values.animalId || !values.vetCabinetId || !values.vetTimeSlotId) {
+      return;
+    }
+
+    createVaccinationMutation.mutate(
+      {
+        animalId: Number(values.animalId),
+        vaccineName: values.vaccineName.trim(),
+        vetCabinetId: Number(values.vetCabinetId),
+        vetTimeSlotId: Number(values.vetTimeSlotId),
+        lastDate: values.lastDate
+          ? `${values.lastDate}T00:00:00.000Z`
+          : undefined,
+        nextDate: values.nextDate
+          ? `${values.nextDate}T00:00:00.000Z`
+          : undefined,
+        notes: values.notes.trim() || undefined,
+      },
+      {
+        onSuccess: () => {
+          enqueueSnackbar(t("vaccination:addSuccess"), {
+            variant: "success",
+          });
+
+          queryClient.invalidateQueries({ queryKey: ["vaccinations"] });
+          queryClient.invalidateQueries({ queryKey: ["dashboardData"] });
+
+          reset();
+          onClose();
+        },
+        onError: () => {
+          enqueueSnackbar(t("vaccination:addError"), {
+            variant: "error",
+          });
+        },
+      }
+    );
+  };
+
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: 4,
+          overflow: "hidden",
+          backgroundColor: "#faf8f5",
+        },
+      }}
+    >
+      <DialogTitle sx={{ p: 0 }}>
+        <Box
+          sx={{
+            px: 3.5,
+            pt: 3,
+            pb: 2.5,
+            background: "linear-gradient(135deg, #fbf2ea 0%, #fdf7ef 100%)",
+          }}
+        >
+          <Stack direction="row" justifyContent="space-between">
+            <Stack direction="row" spacing={2} alignItems="center">
+              <Box
+                sx={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 2.5,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background:
+                    "linear-gradient(135deg, #f5a623 0%, #f0911a 100%)",
+                  color: "#fff",
+                }}
+              >
+                <VaccinesRoundedIcon sx={{ fontSize: 22 }} />
+              </Box>
+
+              <Box>
+                <Typography
+                  sx={{
+                    fontSize: 19,
+                    fontWeight: 800,
+                    color: "#071c42",
+                  }}
+                >
+                  {t("vaccination:addDialogTitle")}
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: 13,
+                    color: "#8a95a3",
+                    mt: 0.4,
+                  }}
+                >
+                  {t("vaccination:addDialogSubtitle")}
+                </Typography>
+              </Box>
+            </Stack>
+
+            <IconButton
+              onClick={onClose}
+              size="small"
+              sx={{
+                color: "#9ca3af",
+                backgroundColor: "rgba(0,0,0,0.04)",
+                borderRadius: 2,
+                width: 32,
+                height: 32,
+              }}
+            >
+              <CloseRoundedIcon sx={{ fontSize: 18 }} />
+            </IconButton>
+          </Stack>
+        </Box>
+
+        <Divider sx={{ borderColor: "#ede8e0" }} />
+      </DialogTitle>
+
+      <DialogContent sx={{ px: 3.5, pt: 3, pb: 3.5 }}>
+        <Stack component="form" spacing={2} onSubmit={handleSubmit(onSubmit)}>
+          <Box>
+            <Typography sx={labelSx}>{t("vaccination:pet")}</Typography>
+            <Controller
+              name="animalId"
+              control={control}
+              render={({ field }) => (
+                <TextField {...field} fullWidth select sx={fieldSx}>
+                  <MenuItem value="" disabled>
+                    {t("vaccination:selectPet")}
+                  </MenuItem>
+                  {animals.map((animal) => (
+                    <MenuItem key={animal.id} value={animal.id}>
+                      {animal.name}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              )}
+            />
+          </Box>
+
+          <Box>
+            <Typography sx={labelSx}>{t("vaccination:vaccineName")}</Typography>
+            <Controller
+              name="vaccineName"
+              control={control}
+              render={({ field }) => (
+                <TextField {...field} fullWidth sx={fieldSx} />
+              )}
+            />
+          </Box>
+
+          <Box>
+            <Typography sx={labelSx}>{t("vaccination:vetCabinet")}</Typography>
+            <Controller
+              name="vetCabinetId"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  select
+                  sx={fieldSx}
+                  onChange={(e) => {
+                    field.onChange(e.target.value);
+                    setValue("vetTimeSlotId", "");
+                  }}
+                >
+                  <MenuItem value="" disabled>
+                    {t("vaccination:selectVetCabinet")}
+                  </MenuItem>
+                  {cabinets.map((cabinet) => (
+                    <MenuItem key={cabinet.id} value={cabinet.id}>
+                      {cabinet.name}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              )}
+            />
+          </Box>
+
+          <Box>
+            <Typography sx={labelSx}>{t("vaccination:visitDate")}</Typography>
+            <Controller
+              name="visitDate"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  type="date"
+                  fullWidth
+                  sx={fieldSx}
+                  inputProps={{
+                    min: toDateOnly(new Date()),
+                    max: toDateOnly(
+                      new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+                    ),
+                  }}
+                  onChange={(e) => {
+                    field.onChange(e.target.value);
+                    setValue("vetTimeSlotId", "");
+                  }}
+                />
+              )}
+            />
+          </Box>
+
+          <Box>
+            <Typography sx={labelSx}>{t("vaccination:timeSlot")}</Typography>
+            <Controller
+              name="vetTimeSlotId"
+              control={control}
+              render={({ field }) => (
+                <TextField {...field} fullWidth select sx={fieldSx}>
+                  <MenuItem value="" disabled>
+                    {t("vaccination:selectTimeSlot")}
+                  </MenuItem>
+                  {Array.isArray(slots) &&
+                    slots.map((slot) => (
+                      <MenuItem key={slot.id} value={slot.id}>
+                        {formatSlotLabel(slot.startTimeUtc, slot.endTimeUtc)}
+                      </MenuItem>
+                    ))}
+                </TextField>
+              )}
+            />
+            {Array.isArray(slots) &&
+              slots.length === 0 &&
+              selectedCabinetId &&
+              selectedVisitDate && (
+                <Typography
+                  sx={{
+                    mt: 1,
+                    fontSize: 12,
+                    color: "#b45309",
+                  }}
+                >
+                  {t("vaccination:noSlotsAvailable")}
+                </Typography>
+              )}
+          </Box>
+
+          <Box>
+            <Typography sx={labelSx}>{t("vaccination:lastDate")}</Typography>
+            <Controller
+              name="lastDate"
+              control={control}
+              render={({ field }) => (
+                <TextField {...field} type="date" fullWidth sx={fieldSx} />
+              )}
+            />
+          </Box>
+
+          <Box>
+            <Typography sx={labelSx}>{t("vaccination:nextDate")}</Typography>
+            <Controller
+              name="nextDate"
+              control={control}
+              render={({ field }) => (
+                <TextField {...field} type="date" fullWidth sx={fieldSx} />
+              )}
+            />
+          </Box>
+
+          <Box>
+            <Typography sx={labelSx}>{t("vaccination:notes")}</Typography>
+            <Controller
+              name="notes"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  multiline
+                  minRows={3}
+                  sx={fieldSx}
+                />
+              )}
+            />
+          </Box>
+
+          <Divider sx={{ borderColor: "#ede8e0", mt: 1, mb: 1 }} />
+
+          <LoadingButton
+            type="submit"
+            loading={createVaccinationMutation.isPending}
+            variant="contained"
+            fullWidth
+            sx={{
+              py: 1.5,
+              borderRadius: 2.5,
+              textTransform: "none",
+              fontWeight: 700,
+              fontSize: 15,
+              background: "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
+              color: "#fff",
+            }}
+          >
+            {t("vaccination:save")}
+          </LoadingButton>
+        </Stack>
+      </DialogContent>
+    </Dialog>
+  );
+};

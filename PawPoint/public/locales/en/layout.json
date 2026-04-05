@@ -3,6 +3,9 @@
     "home": "Home",
     "dashboard": "Dashboard",
     "management": "Management",
+    "vaccinations": "Vaccinations",
+    "appointments": "Appointments",
+    "deworming": "Deworming",
     "assistant": "Assistant",
     "logout": "Logout"
   },
