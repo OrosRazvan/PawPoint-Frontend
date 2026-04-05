@@ -1,0 +1,43 @@
+{
+  "title": "Deparazitări",
+  "subtitle": "Gestionează toate înregistrările de deparazitare",
+  "addButton": "Adaugă deparazitare",
+
+  "completed": "Finalizate",
+  "upcoming": "Programate",
+  "empty": "Nu există înregistrări de deparazitare.",
+  "loadError": "Nu s-au putut încărca deparazitările.",
+
+  "pet": "Animal",
+  "selectPet": "Selectează animalul",
+  "productName": "Nume produs",
+  "vetCabinet": "Cabinet veterinar",
+  "selectVetCabinet": "Selectează cabinetul",
+  "visitDate": "Data vizitei",
+  "timeSlot": "Interval orar",
+  "selectTimeSlot": "Selectează intervalul orar",
+  "noSlotsAvailable": "Nu există intervale disponibile pentru data selectată.",
+  "lastDate": "Ultima dată",
+  "nextDate": "Data următoare",
+  "notes": "Notițe",
+
+  "save": "Salvează",
+  "cancel": "Anulează",
+  "saveChanges": "Salvează modificările",
+  "deleteConfirm": "Șterge",
+
+  "addDialogTitle": "Adaugă deparazitare",
+  "addDialogSubtitle": "Programează și gestionează o nouă deparazitare.",
+  "editDialogTitle": "Editează deparazitarea",
+  "editDialogSubtitle": "Actualizează înregistrarea selectată.",
+  "deleteDialogTitle": "Șterge deparazitarea",
+  "deleteDialogSubtitle": "Această acțiune nu poate fi anulată.",
+  "deleteConfirmMessage": "Sigur vrei să ștergi această înregistrare de deparazitare?",
+
+  "addSuccess": "Deparazitarea a fost adăugată cu succes.",
+  "addError": "Deparazitarea nu a putut fi adăugată.",
+  "updateSuccess": "Deparazitarea a fost actualizată cu succes.",
+  "updateError": "Deparazitarea nu a putut fi actualizată.",
+  "deleteSuccess": "Deparazitarea a fost ștearsă cu succes.",
+  "deleteError": "Deparazitarea nu a putut fi ștearsă."
+}

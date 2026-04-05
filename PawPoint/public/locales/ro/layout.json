@@ -3,6 +3,9 @@
     "home": "Acasă",
     "dashboard": "Dashboard",
     "management": "Management",
+    "vaccinations": "Vaccinări",
+    "appointments": "Programări",
+    "deworming": "Deparazitare",
     "assistant": "Asistent",
     "logout": "Logout"
   },
