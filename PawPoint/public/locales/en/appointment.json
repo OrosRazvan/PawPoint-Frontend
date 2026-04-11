@@ -1,0 +1,65 @@
+{
+  "title": "Appointments",
+  "subtitle": "Manage and book veterinary appointments",
+  "addButton": "Book Appointment",
+  "upcoming": "Upcoming",
+  "completed": "Completed",
+  "empty": "No appointments found.",
+  "loadError": "Failed to load appointments.",
+
+  "bookPageTitle": "Schedule a Visit",
+
+  "step1": "Choose the veterinarian",
+  "step2": "Choose the date & time",
+  "step3": "Confirmation",
+
+  "service": "Service",
+  "sort": "Sort",
+  "rating": "Rating",
+  "workingHours": "Schedule",
+  "price": "Price",
+  "select": "Select",
+  "next": "Next",
+  "back": "Back",
+
+  "consult": "Consult",
+  "grooming": "Grooming",
+  "checkup": "Checkup",
+
+  "sortPriceAsc": "Price ↑",
+  "sortPriceDesc": "Price ↓",
+  "sortRatingAsc": "Rating ↑",
+  "sortRatingDesc": "Rating ↓",
+
+  "loadCabinetsError": "Failed to load veterinary cabinets.",
+  "workingHoursValue": "9am to 8pm",
+
+  "availabilityTitle": "Availability",
+  "availabilityLoadError": "Failed to load availability.",
+  "availableHours": "Available hours",
+  "availableHoursFor": "Available hours for {{date}}:",
+  "selectDayPrompt": "Select a day to see the available hours.",
+  "noHoursOnDay": "No available hours on this day.",
+  "noCabinetSelected": "No cabinet selected",
+  "backToStep1": "Back to step 1",
+
+  "calendarAvailable": "Available",
+  "calendarLimited": "Limited / full day",
+  "calendarUnavailable": "Unavailable",
+  "calendarNoSlots": "no slots",
+  "calendarSlots": "{{count}} slots",
+
+  "summary": "Summary",
+  "veterinarian": "Veterinarian",
+  "animal": "Animal",
+  "date": "Date",
+  "time": "Time",
+  "estimatedPrice": "Estimated Price",
+  "selectPet": "Select a pet",
+  "loadAnimalsError": "Failed to load animals.",
+  "missingAppointmentData": "Missing appointment data",
+  "notification24h": "Receive a notification 24h in advance",
+  "active": "Active",
+  "confirmAppointment": "Confirm Appointment",
+  "confirming": "Confirming..."
+}

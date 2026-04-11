@@ -128,7 +128,10 @@ export const NavbarNav = () => {
         </MenuItem>
 
         <MenuItem
-          onClick={() => setManagementAnchor(null)}
+          onClick={() => {
+            setManagementAnchor(null);
+            navigate("/appointments");
+          }}
           sx={{ borderRadius: 2, py: 1.2 }}
         >
           <Stack direction="row" spacing={1.5} alignItems="center">

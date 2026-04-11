@@ -10,6 +10,10 @@ import { AnimalDetails } from "../pages/AniamlDetails/AnimalDetails";
 import { PublicRoute } from "./PublicRoute";
 import { PrivateRoute } from "./PrivateRoute";
 import { Deworming } from "../pages/Deworming/Deworming";
+import { Appointments } from "../pages/Appointments/Appointment";
+import { BookAppointmentStep1 } from "../pages/Appointments/BookAppointmentStep1";
+import { BookAppointmentStep2 } from "../pages/Appointments/BookAppointmentStep2";
+import { BookAppointmentStep3 } from "../pages/Appointments/BookAppointmentStep3";
 
 export const AppRoutes = () => {
   return (
@@ -22,6 +26,13 @@ export const AppRoutes = () => {
         <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
         <Route path="/vaccinations" element={<PrivateRoute><Vaccinations /></PrivateRoute>} />
         <Route path="/deworming" element={<PrivateRoute><Deworming /></PrivateRoute>} />
+        <Route path="/appointments" element={<PrivateRoute><Appointments /></PrivateRoute>} />
+        <Route path="/appointments/book" element={<PrivateRoute><BookAppointmentStep1 /></PrivateRoute>} />
+        <Route path="/appointments/book/date-time" element={<PrivateRoute><BookAppointmentStep2 /></PrivateRoute>} />
+        <Route
+          path="/appointments/book/confirmation"
+          element={<PrivateRoute><BookAppointmentStep3 /></PrivateRoute>}
+        />
         <Route path="/animals/:animalId" element={<PrivateRoute><AnimalDetails /></PrivateRoute>}/>
       </Route>
     </Routes>
