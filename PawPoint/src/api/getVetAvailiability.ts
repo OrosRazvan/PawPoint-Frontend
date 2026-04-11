@@ -1,6 +1,6 @@
 import { apiClient } from "./client";
-import { GET_VET_AVAILABILITY_ENDPOINT } from "./endpoints/endpoints";
-import type { VetAvailabilitySlotDto } from "../pages/Vaccinations/types/vaccination";
+import { GET_APPOINTMENT_VET_AVAILABILITY_ENDPOINT } from "./endpoints/endpoints";
+import type { VetAvailabilitySlotDto } from "../pages/Appointments/types/appointment";
 
 type Params = {
   vetCabinetId: number;
@@ -27,13 +27,11 @@ export const getVetAvailability = async ({
   to,
 }: Params): Promise<VetAvailabilitySlotDto[]> => {
   const { data } = await apiClient.get<AvailabilityResponse>(
-    `${GET_VET_AVAILABILITY_ENDPOINT}/${vetCabinetId}`,
+    `${GET_APPOINTMENT_VET_AVAILABILITY_ENDPOINT}/${vetCabinetId}`,
     {
       params: { from, to },
     }
   );
-
-  console.log("AVAILABILITY RAW:", data);
 
   if (Array.isArray(data)) {
     return data;

@@ -1,0 +1,65 @@
+{
+  "title": "Programări",
+  "subtitle": "Gestionează și rezervă programări veterinare",
+  "addButton": "Rezervă programare",
+  "upcoming": "Următoare",
+  "completed": "Finalizate",
+  "empty": "Nu există programări.",
+  "loadError": "Programările nu au putut fi încărcate.",
+
+  "bookPageTitle": "Programează o vizită",
+
+  "step1": "Alege veterinarul",
+  "step2": "Alege data și ora",
+  "step3": "Confirmare",
+
+  "service": "Serviciu",
+  "sort": "Sortare",
+  "rating": "Rating",
+  "workingHours": "Program",
+  "price": "Preț",
+  "select": "Selectează",
+  "next": "Continuă",
+  "back": "Înapoi",
+
+  "consult": "Consultație",
+  "grooming": "Toaletare",
+  "checkup": "Control",
+
+  "sortPriceAsc": "Preț ↑",
+  "sortPriceDesc": "Preț ↓",
+  "sortRatingAsc": "Rating ↑",
+  "sortRatingDesc": "Rating ↓",
+
+  "loadCabinetsError": "Cabinetele veterinare nu au putut fi încărcate.",
+  "workingHoursValue": "9:00 - 20:00",
+
+  "availabilityTitle": "Disponibilitate",
+  "availabilityLoadError": "Disponibilitatea nu a putut fi încărcată.",
+  "availableHours": "Ore disponibile",
+  "availableHoursFor": "Ore disponibile pentru {{date}}:",
+  "selectDayPrompt": "Selectează o zi pentru a vedea orele disponibile.",
+  "noHoursOnDay": "Nu există ore disponibile în această zi.",
+  "noCabinetSelected": "Nu a fost selectat niciun cabinet",
+  "backToStep1": "Înapoi la pasul 1",
+
+  "calendarAvailable": "Disponibil",
+  "calendarLimited": "Limitat / zi plină",
+  "calendarUnavailable": "Indisponibil",
+  "calendarNoSlots": "fără sloturi",
+  "calendarSlots": "{{count}} sloturi",
+
+  "summary": "Sumar",
+  "veterinarian": "Veterinar",
+  "animal": "Animal",
+  "date": "Data",
+  "time": "Ora",
+  "estimatedPrice": "Preț estimat",
+  "selectPet": "Selectează un animal",
+  "loadAnimalsError": "Animalele nu au putut fi încărcate.",
+  "missingAppointmentData": "Lipsesc datele programării",
+  "notification24h": "Primește o notificare cu 24h înainte",
+  "active": "Activ",
+  "confirmAppointment": "Confirmă programarea",
+  "confirming": "Se confirmă..."
+}

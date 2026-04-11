@@ -26,3 +26,9 @@ export const UPDATE_DEWORMING_ENDPOINT = "/Deworming/update";
 export const DELETE_DEWORMING_ENDPOINT = "/Deworming/delete";
 export const GET_DEWORMING_VET_CABINETS_ENDPOINT = "/Deworming/vet-cabinets";
 export const GET_DEWORMING_VET_AVAILABILITY_ENDPOINT = "/Deworming/availability";
+
+export const GET_APPOINTMENT_BY_ID_ENDPOINT = "/Appointment";
+export const CREATE_APPOINTMENT_ENDPOINT = "/Appointment/create";
+export const UPDATE_APPOINTMENT_ENDPOINT = "/Appointment/update";
+export const GET_APPOINTMENT_VET_CABINETS_ENDPOINT = "/Appointment/vet-cabinets";
+export const GET_APPOINTMENT_VET_AVAILABILITY_ENDPOINT = "/Appointment/availability";
