@@ -1,0 +1,40 @@
+{
+  "title": "Profile",
+  "accountInformation": "Account Information",
+  "fullName": "Full Name",
+  "email": "Email",
+  "phone": "Phone",
+  "changePassword": "Change Password",
+  "logout": "Logout",
+  "recentActivity": "Recent Activity",
+  "noRecentActivity": "No recent activity found.",
+  "appointment": "Appointment",
+  "vaccination": "Vaccination",
+  "deworming": "Deworming",
+  "atClinic": "at {{clinic}}",
+  "nameUpdatedSuccess": "Name updated successfully.",
+  "nameUpdatedError": "Failed to update name.",
+  "phoneUpdatedSuccess": "Phone updated successfully.",
+  "phoneUpdatedError": "Failed to update phone.",
+  "changePasswordTitle": "Change Password",
+  "changePasswordSubtitle": "Update your password to keep your account secure.",
+  "currentPassword": "Current Password",
+  "newPassword": "New Password",
+  "confirmPassword": "Confirm New Password",
+  "backToLoginText": "Want to go back?",
+  "backToLogin": "Login",
+  "profile": {
+    "changePassword": "Change Password",
+    "changePasswordTitle": "Change Password",
+    "changePasswordSubtitle": "Update your password to keep your account secure.",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm New Password",
+    "backToLoginText": "Want to go back?",
+    "backToDashboard": "Dashboard"
+  },
+  "messages": {
+    "passwordChangedSuccess": "Password changed successfully. Please log in again.",
+    "passwordChangedFailed": "Failed to change password."
+  }
+}

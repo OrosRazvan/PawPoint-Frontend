@@ -1,0 +1,40 @@
+{
+  "title": "Profil",
+  "accountInformation": "Informațiile contului",
+  "fullName": "Nume complet",
+  "email": "Email",
+  "phone": "Telefon",
+  "changePassword": "Schimbă parola",
+  "logout": "Logout",
+  "recentActivity": "Activitate recentă",
+  "noRecentActivity": "Nu există activitate recentă.",
+  "appointment": "Programare",
+  "vaccination": "Vaccinare",
+  "deworming": "Deparazitare",
+  "atClinic": "la {{clinic}}",
+  "nameUpdatedSuccess": "Numele a fost actualizat cu succes.",
+  "nameUpdatedError": "Numele nu a putut fi actualizat.",
+  "phoneUpdatedSuccess": "Telefonul a fost actualizat cu succes.",
+  "phoneUpdatedError": "Telefonul nu a putut fi actualizat.",
+  "changePasswordTitle": "Schimbă parola",
+  "changePasswordSubtitle": "Actualizează parola pentru a-ți păstra contul în siguranță.",
+  "currentPassword": "Parola curentă",
+  "newPassword": "Parola nouă",
+  "confirmPassword": "Confirmă parola nouă",
+  "backToLoginText": "Vrei să revii?",
+  "backToLogin": "Autentificare", 
+  "profile": {
+    "changePassword": "Schimbă parola",
+    "changePasswordTitle": "Schimbă parola",
+    "changePasswordSubtitle": "Actualizează parola pentru a-ți păstra contul în siguranță.",
+    "currentPassword": "Parola curentă",
+    "newPassword": "Parola nouă",
+    "confirmPassword": "Confirmă parola nouă",
+    "backToLoginText": "Vrei să revii?",
+    "backToDashboard": "Dashboard"
+  },
+  "messages": {
+    "passwordChangedSuccess": "Parola a fost schimbată cu succes. Te rugăm să te autentifici din nou.",
+    "passwordChangedFailed": "Parola nu a putut fi schimbată."
+  }
+}

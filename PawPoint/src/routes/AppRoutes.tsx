@@ -14,6 +14,9 @@ import { Appointments } from "../pages/Appointments/Appointment";
 import { BookAppointmentStep1 } from "../pages/Appointments/BookAppointmentStep1";
 import { BookAppointmentStep2 } from "../pages/Appointments/BookAppointmentStep2";
 import { BookAppointmentStep3 } from "../pages/Appointments/BookAppointmentStep3";
+import { Profile } from "../pages/Profile/Profile";
+import { ChangePassword } from "../pages/Profile/ChangePassword";
+import { Notifications } from "../pages/Notifications/Notifications";
 
 export const AppRoutes = () => {
   return (
@@ -21,6 +24,15 @@ export const AppRoutes = () => {
       <Route path="/" element={<PublicRoute><Register /></PublicRoute>} />
       <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/verify-email" element={<VerifyEmail />} />
+
+      <Route
+          path="/change-password"
+          element={
+            <PrivateRoute>
+              <ChangePassword />
+            </PrivateRoute>
+          }
+        />
 
       <Route element={<MainLayout />}>
         <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
@@ -33,7 +45,9 @@ export const AppRoutes = () => {
           path="/appointments/book/confirmation"
           element={<PrivateRoute><BookAppointmentStep3 /></PrivateRoute>}
         />
+        <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
         <Route path="/animals/:animalId" element={<PrivateRoute><AnimalDetails /></PrivateRoute>}/>
+        <Route path="/notifications" element={<PrivateRoute><Notifications /></PrivateRoute>} />
       </Route>
     </Routes>
   );

@@ -32,3 +32,11 @@ export const CREATE_APPOINTMENT_ENDPOINT = "/Appointment/create";
 export const UPDATE_APPOINTMENT_ENDPOINT = "/Appointment/update";
 export const GET_APPOINTMENT_VET_CABINETS_ENDPOINT = "/Appointment/vet-cabinets";
 export const GET_APPOINTMENT_VET_AVAILABILITY_ENDPOINT = "/Appointment/availability";
+
+export const GET_USER_PROFILE_ENDPOINT = "/users/profile";
+export const UPDATE_USER_PROFILE_ENDPOINT = "/users/profile";
+export const CHANGE_PASSWORD_ENDPOINT = "/users/password";
+
+export const GET_NOTIFICATIONS_ENDPOINT = "/notifications";
+export const MARK_NOTIFICATION_READ_ENDPOINT = "/notifications";
+export const DELETE_NOTIFICATION_ENDPOINT = "/notifications";
