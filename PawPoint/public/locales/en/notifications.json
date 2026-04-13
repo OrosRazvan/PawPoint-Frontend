@@ -1,0 +1,10 @@
+{
+  "title": "Notifications",
+  "empty": "No notifications found.",
+  "loadError": "Failed to load notifications.",
+  "seeAll": "See all notifications",
+  "markAsRead": "Mark as read",
+  "delete": "Delete",
+  "unreadCount_one": "{{count}} unread",
+  "unreadCount_other": "{{count}} unread"
+}
