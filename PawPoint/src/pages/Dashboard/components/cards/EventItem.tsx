@@ -1,5 +1,7 @@
 import { Box, Chip, Paper, Stack, Typography } from "@mui/material";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
+import { useSettings } from "../../../../hooks/useSettings";
+import { scaleFont } from "../../../../utils/fontScale";
 
 type Props = {
   petName: string;
@@ -16,6 +18,8 @@ export const EventItem = ({
   dateLabel,
   timeLabel,
 }: Props) => {
+  const { data: settings } = useSettings();
+
   return (
     <Paper
       elevation={0}
@@ -47,7 +51,7 @@ export const EventItem = ({
             <Stack direction="row" spacing={1} alignItems="center">
               <Typography
                 sx={{
-                  fontSize: 18,
+                  fontSize: scaleFont(18, settings?.textSize),
                   fontWeight: 700,
                   color: "#071c42",
                 }}
@@ -69,7 +73,7 @@ export const EventItem = ({
 
             <Typography
               sx={{
-                fontSize: 16,
+                fontSize: scaleFont(16, settings?.textSize),
                 color: "#43556f",
               }}
             >
@@ -81,7 +85,7 @@ export const EventItem = ({
         <Stack alignItems="flex-end">
           <Typography
             sx={{
-              fontSize: 18,
+              fontSize: scaleFont(18, settings?.textSize),
               fontWeight: 700,
               color: "#071c42",
             }}
@@ -91,7 +95,7 @@ export const EventItem = ({
 
           <Typography
             sx={{
-              fontSize: 16,
+              fontSize: scaleFont(16, settings?.textSize),
               color: "#43556f",
             }}
           >

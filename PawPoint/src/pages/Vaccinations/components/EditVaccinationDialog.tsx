@@ -19,6 +19,8 @@ import { useTranslation } from "react-i18next";
 import { useSnackbar } from "notistack";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUpdateVaccination } from "../../../hooks/useUpdateVaccination";
+import { useSettings } from "../../../hooks/useSettings";
+import { scaleFont } from "../../../utils/fontScale";
 import type { VaccinationCardItem } from "../types/vaccination";
 
 type Props = {
@@ -34,38 +36,39 @@ type FormValues = {
   notes: string;
 };
 
-const fieldSx = {
-  "& .MuiOutlinedInput-root": {
-    borderRadius: 2,
-    backgroundColor: "#fff",
-    fontSize: 14,
-    "& fieldset": {
-      borderColor: "#e8e2d9",
-    },
-    "&:hover fieldset": {
-      borderColor: "#f5a623",
-    },
-    "&.Mui-focused fieldset": {
-      borderColor: "#f5a623",
-      borderWidth: 1.5,
-    },
-  },
-};
-
-const labelSx = {
-  fontSize: 12,
-  fontWeight: 600,
-  color: "#6b7280",
-  letterSpacing: "0.04em",
-  textTransform: "uppercase" as const,
-  mb: 0.6,
-};
-
 export const EditVaccinationDialog = ({ open, item, onClose }: Props) => {
   const { t } = useTranslation(["vaccination"]);
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
   const updateVaccinationMutation = useUpdateVaccination();
+  const { data: settings } = useSettings();
+
+  const fieldSx = {
+    "& .MuiOutlinedInput-root": {
+      borderRadius: 2,
+      backgroundColor: "#fff",
+      fontSize: scaleFont(14, settings?.textSize),
+      "& fieldset": {
+        borderColor: "#e8e2d9",
+      },
+      "&:hover fieldset": {
+        borderColor: "#f5a623",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#f5a623",
+        borderWidth: 1.5,
+      },
+    },
+  };
+
+  const labelSx = {
+    fontSize: scaleFont(12, settings?.textSize),
+    fontWeight: 600,
+    color: "#6b7280",
+    letterSpacing: "0.04em",
+    textTransform: "uppercase" as const,
+    mb: 0.6,
+  };
 
   const { control, handleSubmit, reset } = useForm<FormValues>({
     defaultValues: {
@@ -160,10 +163,22 @@ export const EditVaccinationDialog = ({ open, item, onClose }: Props) => {
               </Box>
 
               <Box>
-                <Typography sx={{ fontSize: 19, fontWeight: 800, color: "#071c42" }}>
+                <Typography
+                  sx={{
+                    fontSize: scaleFont(19, settings?.textSize),
+                    fontWeight: 800,
+                    color: "#071c42",
+                  }}
+                >
                   {t("vaccination:editDialogTitle")}
                 </Typography>
-                <Typography sx={{ fontSize: 13, color: "#8a95a3", mt: 0.4 }}>
+                <Typography
+                  sx={{
+                    fontSize: scaleFont(13, settings?.textSize),
+                    color: "#8a95a3",
+                    mt: 0.4,
+                  }}
+                >
                   {t("vaccination:editDialogSubtitle")}
                 </Typography>
               </Box>
@@ -244,7 +259,7 @@ export const EditVaccinationDialog = ({ open, item, onClose }: Props) => {
                 borderRadius: 2.5,
                 textTransform: "none",
                 fontWeight: 700,
-                fontSize: 15,
+                fontSize: scaleFont(15, settings?.textSize),
                 color: "#4b5563",
                 backgroundColor: "#f0f2f7",
               }}
@@ -262,7 +277,7 @@ export const EditVaccinationDialog = ({ open, item, onClose }: Props) => {
                 borderRadius: 2.5,
                 textTransform: "none",
                 fontWeight: 700,
-                fontSize: 15,
+                fontSize: scaleFont(15, settings?.textSize),
                 background: "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
                 color: "#fff",
               }}

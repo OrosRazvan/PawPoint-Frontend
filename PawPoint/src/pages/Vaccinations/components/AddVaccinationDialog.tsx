@@ -28,6 +28,8 @@ import { useVaccinations } from "../../../hooks/useVaccinations";
 import { getAnimals } from "../../../api/getAnimal";
 import { useVetCabinets } from "../../../hooks/useVetCabinets";
 import { useVetAvailability } from "../../../hooks/useVetAvailability";
+import { useSettings } from "../../../hooks/useSettings";
+import { scaleFont } from "../../../utils/fontScale";
 import type {
   VaccinationDto,
   VaccinationFormValues,
@@ -38,40 +40,42 @@ type Props = {
   onClose: () => void;
 };
 
-const fieldSx = {
-  "& .MuiOutlinedInput-root": {
-    borderRadius: 2,
-    backgroundColor: "#fff",
-    fontSize: 14,
-    "& fieldset": {
-      borderColor: "#e8e2d9",
-    },
-    "&:hover fieldset": {
-      borderColor: "#f5a623",
-    },
-    "&.Mui-focused fieldset": {
-      borderColor: "#f5a623",
-      borderWidth: 1.5,
-    },
-  },
-};
-
-const labelSx = {
-  fontSize: 12,
-  fontWeight: 600,
-  color: "#6b7280",
-  letterSpacing: "0.04em",
-  textTransform: "uppercase" as const,
-  mb: 0.6,
-};
+type AppDateFormat = "DD/MM/YYYY" | "MM/DD/YYYY" | "YYYY-MM-DD";
 
 const toDateOnly = (value: Date) => value.toISOString().split("T")[0];
 
-const formatSlotLabel = (start: string, end: string) => {
+const formatDateBySettings = (
+  value?: string | Date | null,
+  format: AppDateFormat = "DD/MM/YYYY"
+) => {
+  if (!value) return "—";
+
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return "—";
+
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+
+  switch (format) {
+    case "MM/DD/YYYY":
+      return `${month}/${day}/${year}`;
+    case "YYYY-MM-DD":
+      return `${year}-${month}-${day}`;
+    default:
+      return `${day}/${month}/${year}`;
+  }
+};
+
+const formatSlotLabel = (
+  start: string,
+  end: string,
+  dateFormat: AppDateFormat
+) => {
   const startDate = new Date(start);
   const endDate = new Date(end);
 
-  return `${startDate.toLocaleDateString("ro-RO")} • ${startDate.toLocaleTimeString(
+  return `${formatDateBySettings(startDate, dateFormat)} • ${startDate.toLocaleTimeString(
     "ro-RO",
     { hour: "2-digit", minute: "2-digit" }
   )} - ${endDate.toLocaleTimeString("ro-RO", {
@@ -91,6 +95,36 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
   const createVaccinationMutation = useCreateVaccination();
+  const { data: settings } = useSettings();
+
+  const dateFormat: AppDateFormat = settings?.dateFormat ?? "DD/MM/YYYY";
+
+  const fieldSx = {
+    "& .MuiOutlinedInput-root": {
+      borderRadius: 2,
+      backgroundColor: "#fff",
+      fontSize: scaleFont(14, settings?.textSize),
+      "& fieldset": {
+        borderColor: "#e8e2d9",
+      },
+      "&:hover fieldset": {
+        borderColor: "#f5a623",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#f5a623",
+        borderWidth: 1.5,
+      },
+    },
+  };
+
+  const labelSx = {
+    fontSize: scaleFont(12, settings?.textSize),
+    fontWeight: 600,
+    color: "#6b7280",
+    letterSpacing: "0.04em",
+    textTransform: "uppercase" as const,
+    mb: 0.6,
+  };
 
   const { data: animals = [] } = useQuery({
     queryKey: ["animals"],
@@ -166,7 +200,6 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
 
   useEffect(() => {
     if (!open) return;
-
     if (!matchingPreviousVaccination) return;
 
     if (!currentLastDate) {
@@ -278,7 +311,7 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
               <Box>
                 <Typography
                   sx={{
-                    fontSize: 19,
+                    fontSize: scaleFont(19, settings?.textSize),
                     fontWeight: 800,
                     color: "#071c42",
                   }}
@@ -287,7 +320,7 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
                 </Typography>
                 <Typography
                   sx={{
-                    fontSize: 13,
+                    fontSize: scaleFont(13, settings?.textSize),
                     color: "#8a95a3",
                     mt: 0.4,
                   }}
@@ -417,7 +450,7 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
                   {Array.isArray(slots) &&
                     slots.map((slot) => (
                       <MenuItem key={slot.id} value={slot.id}>
-                        {formatSlotLabel(slot.startTimeUtc, slot.endTimeUtc)}
+                        {formatSlotLabel(slot.startTimeUtc, slot.endTimeUtc, dateFormat)}
                       </MenuItem>
                     ))}
                 </TextField>
@@ -430,7 +463,7 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
                 <Typography
                   sx={{
                     mt: 1,
-                    fontSize: 12,
+                    fontSize: scaleFont(12, settings?.textSize),
                     color: "#b45309",
                   }}
                 >
@@ -490,7 +523,7 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
               borderRadius: 2.5,
               textTransform: "none",
               fontWeight: 700,
-              fontSize: 15,
+              fontSize: scaleFont(15, settings?.textSize),
               background: "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
               color: "#fff",
             }}

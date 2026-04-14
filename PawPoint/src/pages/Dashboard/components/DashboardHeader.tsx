@@ -1,4 +1,6 @@
 import { Stack, Typography } from "@mui/material";
+import { useSettings } from "../../../hooks/useSettings";
+import { scaleFont } from "../../../utils/fontScale";
 
 type Props = {
   title: string;
@@ -6,11 +8,16 @@ type Props = {
 };
 
 export const DashboardHeader = ({ title, subtitle }: Props) => {
+  const { data: settings } = useSettings();
+
   return (
     <Stack spacing={1} sx={{ mb: 4 }}>
       <Typography
         sx={{
-          fontSize: { xs: 34, md: 42 },
+          fontSize: {
+            xs: scaleFont(34, settings?.textSize),
+            md: scaleFont(42, settings?.textSize),
+          },
           fontWeight: 800,
           lineHeight: 1.1,
           color: "#0b1f44",
@@ -21,7 +28,7 @@ export const DashboardHeader = ({ title, subtitle }: Props) => {
 
       <Typography
         sx={{
-          fontSize: 18,
+          fontSize: scaleFont(18, settings?.textSize),
           color: "#3f5878",
         }}
       >

@@ -13,6 +13,8 @@ import { useSnackbar } from "notistack";
 import { useQueryClient } from "@tanstack/react-query";
 import { useDewormings } from "../../hooks/useDewormings";
 import { useDeleteDeworming } from "../../hooks/useDeleteDeworming";
+import { useSettings } from "../../hooks/useSettings";
+import { scaleFont } from "../../utils/fontScale";
 import { DewormingCard } from "./components/DewormingCard";
 import { AddDewormingDialog } from "./components/AddDewormingDialog";
 import { EditDewormingDialog } from "./components/EditDewormingDialog";
@@ -60,6 +62,7 @@ export const Deworming = () => {
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
   const deleteDewormingMutation = useDeleteDeworming();
+  const { data: settings } = useSettings();
 
   const { data = [], isLoading, isError } = useDewormings();
 
@@ -112,7 +115,10 @@ export const Deworming = () => {
           <Box>
             <Typography
               sx={{
-                fontSize: { xs: 34, md: 42 },
+                fontSize: {
+                  xs: scaleFont(34, settings?.textSize),
+                  md: scaleFont(42, settings?.textSize),
+                },
                 fontWeight: 800,
                 lineHeight: 1.1,
                 color: "#0b1f44",
@@ -124,7 +130,7 @@ export const Deworming = () => {
             <Typography
               sx={{
                 mt: 1.5,
-                fontSize: 18,
+                fontSize: scaleFont(18, settings?.textSize),
                 color: "#5f7087",
               }}
             >
@@ -141,7 +147,7 @@ export const Deworming = () => {
               borderRadius: 2.5,
               color: "#fff",
               textTransform: "none",
-              fontSize: 14,
+              fontSize: scaleFont(14, settings?.textSize),
               fontWeight: 700,
               letterSpacing: "-0.1px",
               background: "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
@@ -167,7 +173,7 @@ export const Deworming = () => {
               <Box>
                 <Typography
                   sx={{
-                    fontSize: 24,
+                    fontSize: scaleFont(24, settings?.textSize),
                     fontWeight: 700,
                     color: "#071c42",
                     mb: 3,
@@ -190,7 +196,7 @@ export const Deworming = () => {
               <Box>
                 <Typography
                   sx={{
-                    fontSize: 24,
+                    fontSize: scaleFont(24, settings?.textSize),
                     fontWeight: 700,
                     color: "#071c42",
                     mb: 3,
@@ -214,7 +220,9 @@ export const Deworming = () => {
             )}
 
             {completedItems.length === 0 && upcomingItems.length === 0 && (
-              <Typography sx={{ color: "#667085" }}>
+              <Typography
+                sx={{ color: "#667085", fontSize: scaleFont(16, settings?.textSize) }}
+              >
                 {t("deworming:empty")}
               </Typography>
             )}

@@ -14,6 +14,8 @@ import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
 import { LoadingButton } from "@mui/lab";
 import { useTranslation } from "react-i18next";
 import type { DashboardPet } from "../types/dashboard";
+import { useSettings } from "../../../hooks/useSettings";
+import { scaleFont } from "../../../utils/fontScale";
 
 type Props = {
   open: boolean;
@@ -31,6 +33,7 @@ export const DeletePetDialog = ({
   isLoading,
 }: Props) => {
   const { t } = useTranslation(["dashboard"]);
+  const { data: settings } = useSettings();
 
   return (
     <Dialog
@@ -48,7 +51,6 @@ export const DeletePetDialog = ({
         },
       }}
     >
-      {/* ── Header ── */}
       <DialogTitle sx={{ p: 0 }}>
         <Box
           sx={{
@@ -77,7 +79,6 @@ export const DeletePetDialog = ({
             justifyContent="space-between"
           >
             <Stack direction="row" spacing={2} alignItems="center">
-              {/* Icon badge */}
               <Box
                 sx={{
                   width: 48,
@@ -99,7 +100,7 @@ export const DeletePetDialog = ({
               <Box>
                 <Typography
                   sx={{
-                    fontSize: 19,
+                    fontSize: scaleFont(19, settings?.textSize),
                     fontWeight: 800,
                     color: "#071c42",
                     lineHeight: 1.2,
@@ -110,7 +111,7 @@ export const DeletePetDialog = ({
                 </Typography>
                 <Typography
                   sx={{
-                    fontSize: 13,
+                    fontSize: scaleFont(13, settings?.textSize),
                     color: "#8a95a3",
                     mt: 0.4,
                     fontWeight: 400,
@@ -145,24 +146,22 @@ export const DeletePetDialog = ({
         <Divider sx={{ borderColor: "#ede8e0" }} />
       </DialogTitle>
 
-      {/* ── Body ── */}
-     <DialogContent
+      <DialogContent
         sx={{
-            px: 3.5,
-            pb: 3.5,
-            "&.MuiDialogContent-root": {
+          px: 3.5,
+          pb: 3.5,
+          "&.MuiDialogContent-root": {
             pt: 5,
-            },
-            "&.MuiDialogContent-root:first-of-type": {
+          },
+          "&.MuiDialogContent-root:first-of-type": {
             pt: 2,
-            },
+          },
         }}
-        >
+      >
         <Stack spacing={3}>
-          {/* Pet preview pill */}
           {pet && (
             <Box
-                sx={{
+              sx={{
                 mt: 1,
                 display: "flex",
                 alignItems: "center",
@@ -172,9 +171,8 @@ export const DeletePetDialog = ({
                 borderRadius: 3,
                 border: "1px solid #ede8e0",
                 backgroundColor: "#fff",
-                }}
+              }}
             >
-              {/* Avatar */}
               <Box
                 sx={{
                   width: 48,
@@ -185,7 +183,7 @@ export const DeletePetDialog = ({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: 22,
+                  fontSize: scaleFont(22, settings?.textSize),
                   fontWeight: 800,
                   color: "#f5a623",
                   overflow: "hidden",
@@ -206,7 +204,7 @@ export const DeletePetDialog = ({
               <Box>
                 <Typography
                   sx={{
-                    fontSize: 15,
+                    fontSize: scaleFont(15, settings?.textSize),
                     fontWeight: 700,
                     color: "#071c42",
                     letterSpacing: "-0.2px",
@@ -214,14 +212,19 @@ export const DeletePetDialog = ({
                 >
                   {pet.name}
                 </Typography>
-                <Typography sx={{ fontSize: 13, color: "#8a95a3", mt: 0.2 }}>
+                <Typography
+                  sx={{
+                    fontSize: scaleFont(13, settings?.textSize),
+                    color: "#8a95a3",
+                    mt: 0.2,
+                  }}
+                >
                   {pet.breed} · {pet.weight}
                 </Typography>
               </Box>
             </Box>
           )}
 
-          {/* Warning message */}
           <Box
             sx={{
               px: 2,
@@ -246,19 +249,17 @@ export const DeletePetDialog = ({
             />
             <Typography
               sx={{
-                fontSize: 13.5,
+                fontSize: scaleFont(13.5, settings?.textSize),
                 color: "#7a3030",
                 lineHeight: 1.65,
               }}
             >
-              {t("dashboard:deletePetConfirmMessage") ??
-                t("dashboard:deletePetConfirmMessage")}
+              {t("dashboard:deletePetConfirmMessage")}
             </Typography>
           </Box>
 
           <Divider sx={{ borderColor: "#ede8e0" }} />
 
-          {/* Buttons */}
           <Stack direction="row" spacing={1.5}>
             <Button
               fullWidth
@@ -268,7 +269,7 @@ export const DeletePetDialog = ({
                 borderRadius: 2.5,
                 textTransform: "none",
                 fontWeight: 600,
-                fontSize: 14,
+                fontSize: scaleFont(14, settings?.textSize),
                 color: "#4b5563",
                 backgroundColor: "#f0f2f7",
                 boxShadow: "none",
@@ -290,7 +291,7 @@ export const DeletePetDialog = ({
                 borderRadius: 2.5,
                 textTransform: "none",
                 fontWeight: 700,
-                fontSize: 14,
+                fontSize: scaleFont(14, settings?.textSize),
                 letterSpacing: "-0.1px",
                 background: "linear-gradient(135deg, #e53535 0%, #c72b2b 100%)",
                 color: "#fff",

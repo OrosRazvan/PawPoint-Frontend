@@ -1,5 +1,7 @@
 import { Button, Stack, Typography } from "@mui/material";
 import type { ReactNode } from "react";
+import { useSettings } from "../../../../hooks/useSettings";
+import { scaleFont } from "../../../../utils/fontScale";
 
 type Props = {
   label: string;
@@ -16,6 +18,8 @@ export const QuickActionButton = ({
   backgroundColor,
   onClick,
 }: Props) => {
+  const { data: settings } = useSettings();
+
   return (
     <Button
       fullWidth
@@ -38,7 +42,7 @@ export const QuickActionButton = ({
         {icon}
         <Typography
           sx={{
-            fontSize: 18,
+            fontSize: scaleFont(18, settings?.textSize),
             fontWeight: 600,
             color: textColor,
           }}
