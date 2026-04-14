@@ -17,6 +17,7 @@ import { BookAppointmentStep3 } from "../pages/Appointments/BookAppointmentStep3
 import { Profile } from "../pages/Profile/Profile";
 import { ChangePassword } from "../pages/Profile/ChangePassword";
 import { Notifications } from "../pages/Notifications/Notifications";
+import { Settings } from "../pages/Settings/Settings";
 
 export const AppRoutes = () => {
   return (
@@ -48,6 +49,7 @@ export const AppRoutes = () => {
         <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
         <Route path="/animals/:animalId" element={<PrivateRoute><AnimalDetails /></PrivateRoute>}/>
         <Route path="/notifications" element={<PrivateRoute><Notifications /></PrivateRoute>} />
+        <Route path="/settings" element={<PrivateRoute><Settings/></PrivateRoute>} />
       </Route>
     </Routes>
   );

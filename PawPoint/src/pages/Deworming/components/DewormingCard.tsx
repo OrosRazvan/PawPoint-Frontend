@@ -10,6 +10,8 @@ import {
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import { useSettings } from "../../../hooks/useSettings";
+import { scaleFont } from "../../../utils/fontScale";
 import type { DewormingCardItem } from "../types/deworming";
 import { DewormingTypeLabels } from "../types/deworming";
 
@@ -19,13 +21,29 @@ type Props = {
   onDelete?: () => void;
 };
 
-const formatDate = (value?: string | null) => {
+type AppDateFormat = "DD/MM/YYYY" | "MM/DD/YYYY" | "YYYY-MM-DD";
+
+const formatDateBySettings = (
+  value?: string | Date | null,
+  format: AppDateFormat = "DD/MM/YYYY"
+) => {
   if (!value) return "—";
 
-  const date = new Date(value);
+  const date = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
 
-  return date.toLocaleDateString("ro-RO");
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+
+  switch (format) {
+    case "MM/DD/YYYY":
+      return `${month}/${day}/${year}`;
+    case "YYYY-MM-DD":
+      return `${year}-${month}-${day}`;
+    default:
+      return `${day}/${month}/${year}`;
+  }
 };
 
 const formatDewormingType = (value: number) => {
@@ -34,6 +52,9 @@ const formatDewormingType = (value: number) => {
 
 export const DewormingCard = ({ item, onEdit, onDelete }: Props) => {
   const isCompleted = item.status === "completed";
+  const { data: settings } = useSettings();
+
+  const dateFormat: AppDateFormat = settings?.dateFormat ?? "DD/MM/YYYY";
 
   return (
     <Paper
@@ -55,7 +76,7 @@ export const DewormingCard = ({ item, onEdit, onDelete }: Props) => {
           <Box>
             <Typography
               sx={{
-                fontSize: 18,
+                fontSize: scaleFont(18, settings?.textSize),
                 fontWeight: 800,
                 color: "#071c42",
                 lineHeight: 1.2,
@@ -67,7 +88,7 @@ export const DewormingCard = ({ item, onEdit, onDelete }: Props) => {
             <Typography
               sx={{
                 mt: 1,
-                fontSize: 13,
+                fontSize: scaleFont(13, settings?.textSize),
                 color: "#7b8794",
                 fontWeight: 500,
               }}
@@ -83,7 +104,7 @@ export const DewormingCard = ({ item, onEdit, onDelete }: Props) => {
               height: 30,
               borderRadius: 999,
               fontWeight: 700,
-              fontSize: 12,
+              fontSize: scaleFont(12, settings?.textSize),
               textTransform: "lowercase",
               backgroundColor: isCompleted ? "#dff4f1" : "#f8ecd8",
               color: isCompleted ? "#57cfc8" : "#f5a623",
@@ -98,19 +119,25 @@ export const DewormingCard = ({ item, onEdit, onDelete }: Props) => {
             />
             <Typography
               sx={{
-                fontSize: 13,
+                fontSize: scaleFont(13, settings?.textSize),
                 color: "#667085",
               }}
             >
               {isCompleted
-                ? `Done: ${formatDate(item.date ?? item.slotStartTimeUtc)}`
-                : `Scheduled: ${formatDate(item.slotStartTimeUtc)}`}
+                ? `Done: ${formatDateBySettings(
+                    item.date ?? item.slotStartTimeUtc,
+                    dateFormat
+                  )}`
+                : `Scheduled: ${formatDateBySettings(
+                    item.slotStartTimeUtc,
+                    dateFormat
+                  )}`}
             </Typography>
           </Stack>
 
           <Typography
             sx={{
-              fontSize: 13,
+              fontSize: scaleFont(13, settings?.textSize),
               color: "#8a95a3",
             }}
           >
@@ -119,16 +146,16 @@ export const DewormingCard = ({ item, onEdit, onDelete }: Props) => {
 
           <Typography
             sx={{
-              fontSize: 13,
+              fontSize: scaleFont(13, settings?.textSize),
               color: "#8a95a3",
             }}
           >
-            Next due: {formatDate(item.nextDate)}
+            Next due: {formatDateBySettings(item.nextDate, dateFormat)}
           </Typography>
 
           <Typography
             sx={{
-              fontSize: 13,
+              fontSize: scaleFont(13, settings?.textSize),
               color: "#8a95a3",
             }}
           >

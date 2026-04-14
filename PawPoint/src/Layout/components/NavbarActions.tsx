@@ -29,6 +29,8 @@ export const NavbarActions = () => {
       </IconButton>
 
       <IconButton
+        component={Link}
+        to="/settings"
         sx={{ color: "#6b7280", display: { xs: "none", md: "inline-flex" } }}
       >
         <SettingsOutlinedIcon />

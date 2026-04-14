@@ -10,3 +10,4 @@ export const getNotificationBadgeMode = (): NotificationBadgeMode => {
 export const setNotificationBadgeMode = (mode: NotificationBadgeMode) => {
   localStorage.setItem(KEY, mode);
 };
+

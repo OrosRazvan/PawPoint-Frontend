@@ -11,9 +11,10 @@ import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAppointments } from "../../hooks/useAppointments";
+import { useSettings } from "../../hooks/useSettings";
+import { scaleFont } from "../../utils/fontScale";
 import { AppointmentCard } from "./components/AppointmentCard";
 import type { AppointmentCardItem, AppointmentDto } from "./types/appointment";
-
 
 const resolveStatus = (item: AppointmentDto): "completed" | "upcoming" => {
   const slotValue = item.slotStartTimeUtc ?? item.startTimeUtc ?? "";
@@ -51,6 +52,7 @@ const mapAppointments = (items: AppointmentDto[]): AppointmentCardItem[] => {
 export const Appointments = () => {
   const { t } = useTranslation(["appointment"]);
   const navigate = useNavigate();
+  const { data: settings } = useSettings();
 
   const { data = [], isLoading, isError } = useAppointments();
 
@@ -78,7 +80,10 @@ export const Appointments = () => {
           <Box>
             <Typography
               sx={{
-                fontSize: { xs: 34, md: 42 },
+                fontSize: {
+                  xs: scaleFont(34, settings?.textSize),
+                  md: scaleFont(42, settings?.textSize),
+                },
                 fontWeight: 800,
                 lineHeight: 1.1,
                 color: "#0b1f44",
@@ -90,7 +95,7 @@ export const Appointments = () => {
             <Typography
               sx={{
                 mt: 1.5,
-                fontSize: 18,
+                fontSize: scaleFont(18, settings?.textSize),
                 color: "#5f7087",
               }}
             >
@@ -107,7 +112,7 @@ export const Appointments = () => {
               borderRadius: 2.5,
               color: "#fff",
               textTransform: "none",
-              fontSize: 14,
+              fontSize: scaleFont(14, settings?.textSize),
               fontWeight: 700,
               letterSpacing: "-0.1px",
               background: "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
@@ -133,7 +138,7 @@ export const Appointments = () => {
               <Box>
                 <Typography
                   sx={{
-                    fontSize: 24,
+                    fontSize: scaleFont(24, settings?.textSize),
                     fontWeight: 700,
                     color: "#071c42",
                     mb: 3,
@@ -145,20 +150,20 @@ export const Appointments = () => {
                 <Grid container spacing={3}>
                   {upcomingItems.map((item) => (
                     <Grid key={item.id} size={{ xs: 12, md: 4 }}>
-                        <AppointmentCard
+                      <AppointmentCard
                         item={item}
                         onEdit={() =>
-                            navigate("/appointments/book", {
+                          navigate("/appointments/book", {
                             state: {
-                                mode: "edit",
-                                appointmentId: item.id,
-                                appointment: item,
+                              mode: "edit",
+                              appointmentId: item.id,
+                              appointment: item,
                             },
-                            })
+                          })
                         }
-                        />
+                      />
                     </Grid>
-                    ))}
+                  ))}
                 </Grid>
               </Box>
             )}
@@ -167,7 +172,7 @@ export const Appointments = () => {
               <Box>
                 <Typography
                   sx={{
-                    fontSize: 24,
+                    fontSize: scaleFont(24, settings?.textSize),
                     fontWeight: 700,
                     color: "#071c42",
                     mb: 3,
@@ -187,7 +192,9 @@ export const Appointments = () => {
             )}
 
             {completedItems.length === 0 && upcomingItems.length === 0 && (
-              <Typography sx={{ color: "#667085" }}>
+              <Typography
+                sx={{ color: "#667085", fontSize: scaleFont(16, settings?.textSize) }}
+              >
                 {t("appointment:empty")}
               </Typography>
             )}

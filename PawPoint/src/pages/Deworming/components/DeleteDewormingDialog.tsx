@@ -13,6 +13,8 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
 import { LoadingButton } from "@mui/lab";
 import { useTranslation } from "react-i18next";
+import { useSettings } from "../../../hooks/useSettings";
+import { scaleFont } from "../../../utils/fontScale";
 import type { DewormingCardItem } from "../types/deworming";
 import { DewormingTypeLabels } from "../types/deworming";
 
@@ -36,6 +38,7 @@ export const DeleteDewormingDialog = ({
   isLoading,
 }: Props) => {
   const { t } = useTranslation(["deworming"]);
+  const { data: settings } = useSettings();
 
   return (
     <Dialog
@@ -78,10 +81,22 @@ export const DeleteDewormingDialog = ({
               </Box>
 
               <Box>
-                <Typography sx={{ fontSize: 19, fontWeight: 800, color: "#071c42" }}>
+                <Typography
+                  sx={{
+                    fontSize: scaleFont(19, settings?.textSize),
+                    fontWeight: 800,
+                    color: "#071c42",
+                  }}
+                >
                   {t("deworming:deleteDialogTitle")}
                 </Typography>
-                <Typography sx={{ fontSize: 13, color: "#8a95a3", mt: 0.4 }}>
+                <Typography
+                  sx={{
+                    fontSize: scaleFont(13, settings?.textSize),
+                    color: "#8a95a3",
+                    mt: 0.4,
+                  }}
+                >
                   {t("deworming:deleteDialogSubtitle")}
                 </Typography>
               </Box>
@@ -122,10 +137,22 @@ export const DeleteDewormingDialog = ({
               }}
             >
               <Box>
-                <Typography sx={{ fontSize: 15, fontWeight: 700, color: "#071c42" }}>
+                <Typography
+                  sx={{
+                    fontSize: scaleFont(15, settings?.textSize),
+                    fontWeight: 700,
+                    color: "#071c42",
+                  }}
+                >
                   {item.animalName}
                 </Typography>
-                <Typography sx={{ fontSize: 13, color: "#8a95a3", mt: 0.2 }}>
+                <Typography
+                  sx={{
+                    fontSize: scaleFont(13, settings?.textSize),
+                    color: "#8a95a3",
+                    mt: 0.2,
+                  }}
+                >
                   {formatDewormingType(item.type)}
                 </Typography>
               </Box>
@@ -143,7 +170,7 @@ export const DeleteDewormingDialog = ({
           >
             <Typography
               sx={{
-                fontSize: 13.5,
+                fontSize: scaleFont(13.5, settings?.textSize),
                 color: "#7a3030",
                 lineHeight: 1.65,
               }}
@@ -163,7 +190,7 @@ export const DeleteDewormingDialog = ({
                 borderRadius: 2.5,
                 textTransform: "none",
                 fontWeight: 600,
-                fontSize: 14,
+                fontSize: scaleFont(14, settings?.textSize),
                 color: "#4b5563",
                 backgroundColor: "#f0f2f7",
               }}
@@ -181,7 +208,7 @@ export const DeleteDewormingDialog = ({
                 borderRadius: 2.5,
                 textTransform: "none",
                 fontWeight: 700,
-                fontSize: 14,
+                fontSize: scaleFont(14, settings?.textSize),
                 background: "linear-gradient(135deg, #e53535 0%, #c72b2b 100%)",
                 color: "#fff",
               }}

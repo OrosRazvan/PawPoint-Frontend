@@ -29,50 +29,12 @@ import {
 } from "../../../types/createAnimalSchema";
 import { useCreateAnimal } from "../../../hooks/useCreateAnimal";
 import { useQueryClient } from "@tanstack/react-query";
+import { useSettings } from "../../../hooks/useSettings";
+import { scaleFont } from "../../../utils/fontScale";
 
 type Props = {
   open: boolean;
   onClose: () => void;
-};
-
-const fieldSx = {
-  "& .MuiOutlinedInput-root": {
-    borderRadius: 2,
-    backgroundColor: "#fff",
-    fontSize: 14,
-    transition: "box-shadow 0.2s ease",
-    "& fieldset": {
-      borderColor: "#e8e2d9",
-    },
-    "&:hover fieldset": {
-      borderColor: "#f5a623",
-    },
-    "&.Mui-focused fieldset": {
-      borderColor: "#f5a623",
-      borderWidth: 1.5,
-    },
-    "&.Mui-focused": {
-      boxShadow: "0 0 0 3px rgba(245,166,35,0.12)",
-    },
-  },
-  "& .MuiInputBase-input::placeholder": {
-    color: "#aaa",
-    opacity: 1,
-    fontSize: 14,
-  },
-  "& .MuiFormHelperText-root": {
-    marginLeft: 0,
-    fontSize: 12,
-  },
-};
-
-const labelSx = {
-  fontSize: 12,
-  fontWeight: 600,
-  color: "#6b7280",
-  letterSpacing: "0.04em",
-  textTransform: "uppercase" as const,
-  mb: 0.6,
 };
 
 export const AddPetDialog = ({ open, onClose }: Props) => {
@@ -80,6 +42,47 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
   const { enqueueSnackbar } = useSnackbar();
   const createAnimalMutation = useCreateAnimal();
   const queryClient = useQueryClient();
+  const { data: settings } = useSettings();
+
+  const fieldSx = {
+    "& .MuiOutlinedInput-root": {
+      borderRadius: 2,
+      backgroundColor: "#fff",
+      fontSize: scaleFont(14, settings?.textSize),
+      transition: "box-shadow 0.2s ease",
+      "& fieldset": {
+        borderColor: "#e8e2d9",
+      },
+      "&:hover fieldset": {
+        borderColor: "#f5a623",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#f5a623",
+        borderWidth: 1.5,
+      },
+      "&.Mui-focused": {
+        boxShadow: "0 0 0 3px rgba(245,166,35,0.12)",
+      },
+    },
+    "& .MuiInputBase-input::placeholder": {
+      color: "#aaa",
+      opacity: 1,
+      fontSize: scaleFont(14, settings?.textSize),
+    },
+    "& .MuiFormHelperText-root": {
+      marginLeft: 0,
+      fontSize: scaleFont(12, settings?.textSize),
+    },
+  };
+
+  const labelSx = {
+    fontSize: scaleFont(12, settings?.textSize),
+    fontWeight: 600,
+    color: "#6b7280",
+    letterSpacing: "0.04em",
+    textTransform: "uppercase" as const,
+    mb: 0.6,
+  };
 
   const {
     control,
@@ -100,37 +103,37 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
   });
 
   const onSubmit: SubmitHandler<CreateAnimalFormValues> = (values) => {
-  createAnimalMutation.mutate(
-    {
-      name: values.name.trim(),
-      species: values.species.trim(),
-      breed: values.breed?.trim() || undefined,
-      weightKg: values.weightKg,
-      birthDate: values.birthDate
-        ? new Date(`${values.birthDate}T00:00:00Z`).toISOString()
-        : undefined,
-      sex: values.sex || undefined,
-      microchipNumber: values.microchipNumber?.trim() || undefined,
-    },
-    {
-      onSuccess: () => {
-        enqueueSnackbar(t("dashboard:addPetSuccess"), {
-            variant: "success",
-        });
-
-        queryClient.invalidateQueries({ queryKey: ["dashboardData"] });
-
-        reset();
-        onClose();
-        },
-      onError: () => {
-        enqueueSnackbar(t("dashboard:addPetError"), {
-          variant: "error",
-        });
+    createAnimalMutation.mutate(
+      {
+        name: values.name.trim(),
+        species: values.species.trim(),
+        breed: values.breed?.trim() || undefined,
+        weightKg: values.weightKg,
+        birthDate: values.birthDate
+          ? new Date(`${values.birthDate}T00:00:00Z`).toISOString()
+          : undefined,
+        sex: values.sex || undefined,
+        microchipNumber: values.microchipNumber?.trim() || undefined,
       },
-    }
-  );
-};
+      {
+        onSuccess: () => {
+          enqueueSnackbar(t("dashboard:addPetSuccess"), {
+            variant: "success",
+          });
+
+          queryClient.invalidateQueries({ queryKey: ["dashboardData"] });
+
+          reset();
+          onClose();
+        },
+        onError: () => {
+          enqueueSnackbar(t("dashboard:addPetError"), {
+            variant: "error",
+          });
+        },
+      }
+    );
+  };
 
   return (
     <Dialog
@@ -197,7 +200,7 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
               <Box>
                 <Typography
                   sx={{
-                    fontSize: 19,
+                    fontSize: scaleFont(19, settings?.textSize),
                     fontWeight: 800,
                     color: "#071c42",
                     lineHeight: 1.2,
@@ -208,7 +211,7 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
                 </Typography>
                 <Typography
                   sx={{
-                    fontSize: 13,
+                    fontSize: scaleFont(13, settings?.textSize),
                     color: "#8a95a3",
                     mt: 0.4,
                     fontWeight: 400,
@@ -245,7 +248,6 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
 
       <DialogContent sx={{ px: 3.5, pt: 3, pb: 3.5 }}>
         <Stack component="form" spacing={0} onSubmit={handleSubmit(onSubmit)}>
-          {/* Name */}
           <Box sx={{ mb: 2, pt: 0.4 }}>
             <Typography sx={labelSx}>{t("dashboard:petName")}</Typography>
             <Controller
@@ -268,7 +270,6 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
             />
           </Box>
 
-          {/* Species + Sex */}
           <Grid container spacing={1.5} sx={{ mb: 2 }}>
             <Grid size={{ xs: 7 }}>
               <Typography sx={labelSx}>{t("dashboard:species")}</Typography>
@@ -292,7 +293,10 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
                     <MenuItem
                       value=""
                       disabled
-                      sx={{ fontSize: 14, color: "#aaa" }}
+                      sx={{
+                        fontSize: scaleFont(14, settings?.textSize),
+                        color: "#aaa",
+                      }}
                     >
                       {t("dashboard:species")}
                     </MenuItem>
@@ -322,7 +326,10 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
                     <MenuItem
                       value=""
                       disabled
-                      sx={{ fontSize: 14, color: "#aaa" }}
+                      sx={{
+                        fontSize: scaleFont(14, settings?.textSize),
+                        color: "#aaa",
+                      }}
                     >
                       {t("dashboard:sex")}
                     </MenuItem>
@@ -334,7 +341,6 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
             </Grid>
           </Grid>
 
-          {/* Breed */}
           <Box sx={{ mb: 2 }}>
             <Typography sx={labelSx}>{t("dashboard:breed")}</Typography>
             <Controller
@@ -351,7 +357,6 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
             />
           </Box>
 
-          {/* Weight + Birth date */}
           <Grid container spacing={1.5} sx={{ mb: 2 }}>
             <Grid size={{ xs: 5 }}>
               <Typography sx={labelSx}>{t("dashboard:weightKg")}</Typography>
@@ -392,7 +397,6 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
             </Grid>
           </Grid>
 
-          {/* Microchip */}
           <Box sx={{ mb: 3 }}>
             <Typography sx={labelSx}>{t("dashboard:microchipNumber")}</Typography>
             <Controller
@@ -421,7 +425,7 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
               borderRadius: 2.5,
               textTransform: "none",
               fontWeight: 700,
-              fontSize: 15,
+              fontSize: scaleFont(15, settings?.textSize),
               letterSpacing: "-0.1px",
               background: "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
               color: "#fff",

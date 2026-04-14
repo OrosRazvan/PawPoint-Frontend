@@ -1,7 +1,16 @@
-import { Box, Paper, Stack, Typography, Button, IconButton } from "@mui/material";
+import {
+  Box,
+  Paper,
+  Stack,
+  Typography,
+  Button,
+  IconButton,
+} from "@mui/material";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import { useSettings } from "../../../../hooks/useSettings";
+import { scaleFont } from "../../../../utils/fontScale";
 
 type Props = {
   name: string;
@@ -24,6 +33,8 @@ export const PetCard = ({
   onEdit,
   onDelete,
 }: Props) => {
+  const { data: settings } = useSettings();
+
   return (
     <Paper
       elevation={0}
@@ -34,12 +45,12 @@ export const PetCard = ({
         backgroundColor: "#faf8f5",
         transition: "box-shadow 0.2s ease, transform 0.2s ease",
         "&:hover": {
-          boxShadow: "0 12px 32px rgba(7,28,66,0.09), 0 2px 8px rgba(7,28,66,0.04)",
+          boxShadow:
+            "0 12px 32px rgba(7,28,66,0.09), 0 2px 8px rgba(7,28,66,0.04)",
           transform: "translateY(-2px)",
         },
       }}
     >
-      {/* ── Image / Avatar area ── */}
       <Box
         sx={{
           height: 200,
@@ -55,7 +66,6 @@ export const PetCard = ({
           position: "relative",
         }}
       >
-        {/* Decorative circle behind letter */}
         {!imageUrl && (
           <Box
             sx={{
@@ -82,7 +92,7 @@ export const PetCard = ({
         ) : (
           <Typography
             sx={{
-              fontSize: 52,
+              fontSize: scaleFont(52, settings?.textSize),
               fontWeight: 800,
               color: "#f5a623",
               lineHeight: 1,
@@ -96,11 +106,10 @@ export const PetCard = ({
         )}
       </Box>
 
-      {/* ── Info ── */}
       <Stack spacing={0.4} sx={{ mb: 2 }}>
         <Typography
           sx={{
-            fontSize: 18,
+            fontSize: scaleFont(18, settings?.textSize),
             fontWeight: 800,
             color: "#071c42",
             letterSpacing: "-0.3px",
@@ -113,7 +122,7 @@ export const PetCard = ({
         <Stack direction="row" alignItems="center" spacing={0.8}>
           <Typography
             sx={{
-              fontSize: 13,
+              fontSize: scaleFont(13, settings?.textSize),
               color: "#8a95a3",
               fontWeight: 500,
             }}
@@ -130,7 +139,7 @@ export const PetCard = ({
           />
           <Typography
             sx={{
-              fontSize: 13,
+              fontSize: scaleFont(13, settings?.textSize),
               color: "#8a95a3",
               fontWeight: 500,
             }}
@@ -140,11 +149,12 @@ export const PetCard = ({
         </Stack>
       </Stack>
 
-      {/* ── Actions ── */}
       <Stack direction="row" spacing={1} sx={{ mt: 1.5 }}>
         <Button
           fullWidth
-          startIcon={<VisibilityOutlinedIcon sx={{ fontSize: "18px !important" }} />}
+          startIcon={
+            <VisibilityOutlinedIcon sx={{ fontSize: "18px !important" }} />
+          }
           onClick={onView}
           sx={{
             py: 1.2,
@@ -152,7 +162,7 @@ export const PetCard = ({
             background: "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
             color: "#fff",
             textTransform: "none",
-            fontSize: 14,
+            fontSize: scaleFont(14, settings?.textSize),
             fontWeight: 700,
             letterSpacing: "-0.1px",
             boxShadow: "0 4px 12px rgba(245,166,35,0.35)",

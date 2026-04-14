@@ -40,3 +40,6 @@ export const CHANGE_PASSWORD_ENDPOINT = "/users/password";
 export const GET_NOTIFICATIONS_ENDPOINT = "/notifications";
 export const MARK_NOTIFICATION_READ_ENDPOINT = "/notifications";
 export const DELETE_NOTIFICATION_ENDPOINT = "/notifications";
+
+export const GET_SETTINGS_ENDPOINT = "/settings";
+export const UPDATE_SETTINGS_ENDPOINT = "/settings";

@@ -14,6 +14,8 @@ import { useTranslation } from "react-i18next";
 import { useAnimals } from "../../hooks/useAnimals";
 import { useCreateAppointment } from "../../hooks/useCreateAppointment";
 import { useUpdateAppointment } from "../../hooks/useUpdateAppointment";
+import { useSettings } from "../../hooks/useSettings";
+import { scaleFont } from "../../utils/fontScale";
 import type {
   AnimalDto,
   VetCabinetDto,
@@ -40,18 +42,29 @@ type LocationState = {
   selectedSlot: VetAvailabilitySlotDto;
 };
 
-const formatDate = (value?: string | null) => {
+type AppDateFormat = "DD/MM/YYYY" | "MM/DD/YYYY" | "YYYY-MM-DD";
+
+const formatDateBySettings = (
+  value?: string | Date | null,
+  format: AppDateFormat = "DD/MM/YYYY"
+) => {
   if (!value) return "—";
 
-  const date = new Date(value);
+  const date = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
 
-  return date.toLocaleDateString(undefined, {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+
+  switch (format) {
+    case "MM/DD/YYYY":
+      return `${month}/${day}/${year}`;
+    case "YYYY-MM-DD":
+      return `${year}-${month}-${day}`;
+    default:
+      return `${day}/${month}/${year}`;
+  }
 };
 
 const formatTime = (value?: string | null) => {
@@ -94,6 +107,9 @@ export const BookAppointmentStep3 = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation("appointment");
+  const { data: settings } = useSettings();
+
+  const dateFormat: AppDateFormat = settings?.dateFormat ?? "DD/MM/YYYY";
 
   const state = (location.state ?? null) as LocationState | null;
 
@@ -146,7 +162,7 @@ export const BookAppointmentStep3 = () => {
         }}
       >
         <Stack spacing={2} alignItems="center">
-          <Typography sx={{ fontSize: 24, fontWeight: 700 }}>
+          <Typography sx={{ fontSize: scaleFont(24, settings?.textSize), fontWeight: 700 }}>
             {t("missingAppointmentData")}
           </Typography>
 
@@ -160,6 +176,7 @@ export const BookAppointmentStep3 = () => {
               backgroundColor: "#f7ae1a",
               color: "#111827",
               fontWeight: 700,
+              fontSize: scaleFont(14, settings?.textSize),
               "&:hover": {
                 backgroundColor: "#f3a400",
               },
@@ -239,7 +256,10 @@ export const BookAppointmentStep3 = () => {
       <Stack spacing={4}>
         <Typography
           sx={{
-            fontSize: { xs: 34, md: 44 },
+            fontSize: {
+              xs: scaleFont(34, settings?.textSize),
+              md: scaleFont(44, settings?.textSize),
+            },
             fontWeight: 800,
             color: "#111827",
             lineHeight: 1.05,
@@ -260,7 +280,7 @@ export const BookAppointmentStep3 = () => {
               fontWeight: 600,
               textAlign: "center",
               border: "1px solid #ebe7e1",
-              fontSize: 18,
+              fontSize: scaleFont(18, settings?.textSize),
             }}
           >
             {`1. ${t("step1")}`}
@@ -277,7 +297,7 @@ export const BookAppointmentStep3 = () => {
               fontWeight: 600,
               textAlign: "center",
               border: "1px solid #ebe7e1",
-              fontSize: 18,
+              fontSize: scaleFont(18, settings?.textSize),
             }}
           >
             {`2. ${t("step2")}`}
@@ -294,7 +314,7 @@ export const BookAppointmentStep3 = () => {
               fontWeight: 700,
               textAlign: "center",
               boxShadow: "0 8px 20px rgba(0,0,0,0.06)",
-              fontSize: 18,
+              fontSize: scaleFont(18, settings?.textSize),
             }}
           >
             {`3. ${t("step3")}`}
@@ -314,7 +334,10 @@ export const BookAppointmentStep3 = () => {
           <Stack spacing={4}>
             <Typography
               sx={{
-                fontSize: { xs: 28, md: 34 },
+                fontSize: {
+                  xs: scaleFont(28, settings?.textSize),
+                  md: scaleFont(34, settings?.textSize),
+                },
                 fontWeight: 800,
                 color: "#111827",
               }}
@@ -329,12 +352,16 @@ export const BookAppointmentStep3 = () => {
                 alignItems="center"
                 spacing={2}
               >
-                <Typography sx={{ fontSize: 18, color: "#5f7087" }}>
+                <Typography sx={{ fontSize: scaleFont(18, settings?.textSize), color: "#5f7087" }}>
                   {t("veterinarian")}
                 </Typography>
 
                 <Typography
-                  sx={{ fontSize: 18, fontWeight: 700, color: "#111827" }}
+                  sx={{
+                    fontSize: scaleFont(18, settings?.textSize),
+                    fontWeight: 700,
+                    color: "#111827",
+                  }}
                 >
                   {selectedCabinet.name}
                 </Typography>
@@ -348,12 +375,16 @@ export const BookAppointmentStep3 = () => {
                 alignItems="center"
                 spacing={2}
               >
-                <Typography sx={{ fontSize: 18, color: "#5f7087" }}>
+                <Typography sx={{ fontSize: scaleFont(18, settings?.textSize), color: "#5f7087" }}>
                   {t("service")}
                 </Typography>
 
                 <Typography
-                  sx={{ fontSize: 18, fontWeight: 700, color: "#111827" }}
+                  sx={{
+                    fontSize: scaleFont(18, settings?.textSize),
+                    fontWeight: 700,
+                    color: "#111827",
+                  }}
                 >
                   {getServiceLabel(serviceType, t)}
                 </Typography>
@@ -367,7 +398,7 @@ export const BookAppointmentStep3 = () => {
                 alignItems={{ xs: "stretch", md: "center" }}
                 spacing={2}
               >
-                <Typography sx={{ fontSize: 18, color: "#5f7087" }}>
+                <Typography sx={{ fontSize: scaleFont(18, settings?.textSize), color: "#5f7087" }}>
                   {t("animal")}
                 </Typography>
 
@@ -390,6 +421,7 @@ export const BookAppointmentStep3 = () => {
                       "& .MuiOutlinedInput-root": {
                         borderRadius: 2.5,
                         backgroundColor: "#fff",
+                        fontSize: scaleFont(14, settings?.textSize),
                         "& fieldset": {
                           borderColor: "#ded8cf",
                         },
@@ -400,10 +432,16 @@ export const BookAppointmentStep3 = () => {
                       },
                     }}
                   >
-                    <MenuItem value="">{t("selectPet")}</MenuItem>
+                    <MenuItem value="" sx={{ fontSize: scaleFont(14, settings?.textSize) }}>
+                      {t("selectPet")}
+                    </MenuItem>
 
                     {animals.map((animal: AnimalDto) => (
-                      <MenuItem key={animal.id} value={animal.id}>
+                      <MenuItem
+                        key={animal.id}
+                        value={animal.id}
+                        sx={{ fontSize: scaleFont(14, settings?.textSize) }}
+                      >
                         {animal.name}
                       </MenuItem>
                     ))}
@@ -419,14 +457,18 @@ export const BookAppointmentStep3 = () => {
                 alignItems="center"
                 spacing={2}
               >
-                <Typography sx={{ fontSize: 18, color: "#5f7087" }}>
+                <Typography sx={{ fontSize: scaleFont(18, settings?.textSize), color: "#5f7087" }}>
                   {t("date")}
                 </Typography>
 
                 <Typography
-                  sx={{ fontSize: 18, fontWeight: 700, color: "#111827" }}
+                  sx={{
+                    fontSize: scaleFont(18, settings?.textSize),
+                    fontWeight: 700,
+                    color: "#111827",
+                  }}
                 >
-                  {formatDate(selectedSlot.startTimeUtc)}
+                  {formatDateBySettings(selectedSlot.startTimeUtc, dateFormat)}
                 </Typography>
               </Stack>
             </Box>
@@ -438,12 +480,16 @@ export const BookAppointmentStep3 = () => {
                 alignItems="center"
                 spacing={2}
               >
-                <Typography sx={{ fontSize: 18, color: "#5f7087" }}>
+                <Typography sx={{ fontSize: scaleFont(18, settings?.textSize), color: "#5f7087" }}>
                   {t("time")}
                 </Typography>
 
                 <Typography
-                  sx={{ fontSize: 18, fontWeight: 700, color: "#111827" }}
+                  sx={{
+                    fontSize: scaleFont(18, settings?.textSize),
+                    fontWeight: 700,
+                    color: "#111827",
+                  }}
                 >
                   {formatTime(selectedSlot.startTimeUtc)}
                 </Typography>
@@ -457,12 +503,16 @@ export const BookAppointmentStep3 = () => {
                 alignItems="center"
                 spacing={2}
               >
-                <Typography sx={{ fontSize: 18, color: "#5f7087" }}>
+                <Typography sx={{ fontSize: scaleFont(18, settings?.textSize), color: "#5f7087" }}>
                   {t("estimatedPrice")}
                 </Typography>
 
                 <Typography
-                  sx={{ fontSize: 18, fontWeight: 700, color: "#111827" }}
+                  sx={{
+                    fontSize: scaleFont(18, settings?.textSize),
+                    fontWeight: 700,
+                    color: "#111827",
+                  }}
                 >
                   {formatPrice(estimatedPrice)}
                 </Typography>
@@ -484,7 +534,7 @@ export const BookAppointmentStep3 = () => {
               >
                 <Typography
                   sx={{
-                    fontSize: 16,
+                    fontSize: scaleFont(16, settings?.textSize),
                     fontWeight: 700,
                     color: "#111827",
                   }}
@@ -500,7 +550,7 @@ export const BookAppointmentStep3 = () => {
                     backgroundColor: "#4cc9c0",
                     color: "#111827",
                     fontWeight: 700,
-                    fontSize: 14,
+                    fontSize: scaleFont(14, settings?.textSize),
                   }}
                 >
                   {t("active")}
@@ -522,7 +572,7 @@ export const BookAppointmentStep3 = () => {
                   py: 1.55,
                   borderRadius: 2.5,
                   textTransform: "none",
-                  fontSize: 18,
+                  fontSize: scaleFont(18, settings?.textSize),
                   fontWeight: 700,
                   backgroundColor: "#e8e2d9",
                   color: "#111827",
@@ -543,7 +593,7 @@ export const BookAppointmentStep3 = () => {
                   py: 1.55,
                   borderRadius: 2.5,
                   textTransform: "none",
-                  fontSize: 18,
+                  fontSize: scaleFont(18, settings?.textSize),
                   fontWeight: 700,
                   backgroundColor:
                     selectedAnimal && !isCreating && !isUpdating

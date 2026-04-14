@@ -17,6 +17,8 @@ import { useTranslation } from "react-i18next";
 import { useNotifications } from "../hooks/useNotifications";
 import { useMarkNotificationRead } from "../hooks/useMarkNotificationRead";
 import { useNotificationRealtime } from "../hooks/useNotificationRealtime";
+import { useSettings } from "../hooks/useSettings";
+import { filterNotificationsForNavbar } from "../utils/filterNotificationsBySettings";
 import type { NotificationDto } from "../pages/Notifications/types/notification";
 
 const formatDate = (value: string) => {
@@ -69,18 +71,46 @@ export const NotificationsDropdown = ({ showCount = true }: Props) => {
     pageSize: 20,
   });
 
+  const { data: settings } = useSettings();
   const { mutate: markAsRead } = useMarkNotificationRead();
 
   const allNotifications = useMemo(() => extractNotifications(data), [data]);
+
+  const navbarNotifications = useMemo(
+    () => filterNotificationsForNavbar(allNotifications, settings),
+    [allNotifications, settings]
+  );
+
   const notifications = useMemo(
-    () => allNotifications.slice(0, 3),
+    () => navbarNotifications.slice(0, 4),
+    [navbarNotifications]
+  );
+
+  const unreadEnabledCount = useMemo(
+    () => navbarNotifications.filter((item) => !item.isRead).length,
+    [navbarNotifications]
+  );
+
+  const anyUnreadAtAll = useMemo(
+    () => allNotifications.some((item) => !item.isRead),
     [allNotifications]
   );
 
-  const unreadCount = useMemo(
-    () => allNotifications.filter((item) => !item.isRead).length,
-    [allNotifications]
-  );
+  const allCategoriesOff =
+    !!settings?.enableNotifications &&
+    !settings?.vaccinationNotifications &&
+    !settings?.appointmentNotifications &&
+    !settings?.dewormingNotifications;
+
+  const showDotOnly =
+    settings?.enableNotifications &&
+    (settings?.notificationBadgeMode === "dot" || allCategoriesOff);
+
+  const badgeInvisible = !settings?.enableNotifications
+    ? true
+    : showDotOnly
+    ? !anyUnreadAtAll
+    : unreadEnabledCount === 0;
 
   const open = Boolean(anchorEl);
 
@@ -92,10 +122,17 @@ export const NotificationsDropdown = ({ showCount = true }: Props) => {
       >
         <Badge
           color="error"
-          badgeContent={showCount ? unreadCount : undefined}
-          variant={showCount ? "standard" : unreadCount > 0 ? "dot" : "standard"}
+          badgeContent={
+            showCount &&
+            settings?.enableNotifications &&
+            !showDotOnly &&
+            unreadEnabledCount > 0
+              ? unreadEnabledCount
+              : undefined
+          }
+          variant={showDotOnly ? "dot" : "standard"}
           overlap="circular"
-          invisible={showCount ? unreadCount === 0 : unreadCount === 0}
+          invisible={badgeInvisible}
         >
           <NotificationsNoneOutlinedIcon />
         </Badge>
@@ -124,9 +161,9 @@ export const NotificationsDropdown = ({ showCount = true }: Props) => {
               {t("notifications:title")}
             </Typography>
 
-            {unreadCount > 0 && (
+            {settings?.enableNotifications && !showDotOnly && unreadEnabledCount > 0 && (
               <Chip
-                label={t("notifications:unreadCount", { count: unreadCount })}
+                label={t("notifications:unreadCount", { count: unreadEnabledCount })}
                 size="small"
                 sx={{
                   backgroundColor: "#fde8e8",
@@ -235,6 +272,9 @@ export const NotificationsDropdown = ({ showCount = true }: Props) => {
               fontWeight: 700,
               color: "#071c42",
               backgroundColor: "#f6efe4",
+              "&:hover": {
+                backgroundColor: "#efe4d2",
+              },
             }}
           >
             {t("notifications:seeAll")}

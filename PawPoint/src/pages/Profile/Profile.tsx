@@ -13,7 +13,7 @@ import EditRoundedIcon from "@mui/icons-material/EditRounded";
 import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
 import VaccinesRoundedIcon from "@mui/icons-material/VaccinesRounded";
 import BugReportRoundedIcon from "@mui/icons-material/BugReportRounded";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSnackbar } from "notistack";
 import { useNavigate } from "react-router-dom";
 import { useUserProfile } from "../../hooks/useUserProfile";
@@ -21,6 +21,8 @@ import { useUpdateUserProfile } from "../../hooks/useUpdateUserProfile";
 import { useAppointments } from "../../hooks/useAppointments";
 import { useVaccinations } from "../../hooks/useVaccinations";
 import { useDewormings } from "../../hooks/useDewormings";
+import { useSettings } from "../../hooks/useSettings";
+import { scaleFont } from "../../utils/fontScale";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import { clearTokens } from "../../auth/tokenStorage";
 import { useTranslation } from "react-i18next";
@@ -33,6 +35,8 @@ type ActivityItem = {
   clinic: string;
 };
 
+type AppDateFormat = "DD/MM/YYYY" | "MM/DD/YYYY" | "YYYY-MM-DD";
+
 const pageBg = "#f8f4ef";
 
 const cardSx = {
@@ -42,17 +46,27 @@ const cardSx = {
   boxShadow: "0 10px 24px rgba(0,0,0,0.05)",
 };
 
-const formatActivityDate = (value?: string | null) => {
+const formatDateBySettings = (
+  value?: string | Date | null,
+  format: AppDateFormat = "DD/MM/YYYY"
+) => {
   if (!value) return "—";
 
-  const date = new Date(value);
+  const date = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
 
-  return date.toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+
+  switch (format) {
+    case "MM/DD/YYYY":
+      return `${month}/${day}/${year}`;
+    case "YYYY-MM-DD":
+      return `${year}-${month}-${day}`;
+    default:
+      return `${day}/${month}/${year}`;
+  }
 };
 
 const getInitial = (name?: string | null) => {
@@ -69,6 +83,7 @@ export const Profile = () => {
   const { data: appointments = [] } = useAppointments();
   const { data: vaccinations = [] } = useVaccinations();
   const { data: dewormings = [] } = useDewormings();
+  const { data: settings } = useSettings();
 
   const { mutate: updateProfile, isPending: isUpdatingProfile } =
     useUpdateUserProfile();
@@ -89,13 +104,15 @@ export const Profile = () => {
   const navigate = useNavigate();
   const { t } = useTranslation("profile");
 
+  const dateFormat: AppDateFormat = settings?.dateFormat ?? "DD/MM/YYYY";
+
   const handleLogout = () => {
     clearTokens();
     sessionStorage.clear();
     window.location.replace("/login");
   };
 
-  useMemo(() => {
+  useEffect(() => {
     setFullName(safeProfile.fullName ?? "");
     setPhoneNumber(safeProfile.phoneNumber ?? "");
   }, [safeProfile.fullName, safeProfile.phoneNumber]);
@@ -218,7 +235,10 @@ export const Profile = () => {
       <Stack spacing={4}>
         <Typography
           sx={{
-            fontSize: { xs: 34, md: 42 },
+            fontSize: {
+              xs: scaleFont(34, settings?.textSize),
+              md: scaleFont(42, settings?.textSize),
+            },
             fontWeight: 800,
             color: "#0b1f44",
             lineHeight: 1.1,
@@ -247,7 +267,7 @@ export const Profile = () => {
                     sx={{
                       width: 120,
                       height: 120,
-                      fontSize: 40,
+                      fontSize: scaleFont(40, settings?.textSize),
                     }}
                   />
                 ) : (
@@ -255,7 +275,7 @@ export const Profile = () => {
                     sx={{
                       width: 120,
                       height: 120,
-                      fontSize: 40,
+                      fontSize: scaleFont(40, settings?.textSize),
                       fontWeight: 800,
                       background:
                         "linear-gradient(135deg, #5f86ff 0%, #8b2cff 100%)",
@@ -268,7 +288,7 @@ export const Profile = () => {
                 <Box sx={{ textAlign: "center" }}>
                   <Typography
                     sx={{
-                      fontSize: 22,
+                      fontSize: scaleFont(22, settings?.textSize),
                       fontWeight: 800,
                       color: "#071c42",
                     }}
@@ -279,7 +299,7 @@ export const Profile = () => {
                   <Typography
                     sx={{
                       mt: 1,
-                      fontSize: 16,
+                      fontSize: scaleFont(16, settings?.textSize),
                       color: "#5f7087",
                     }}
                   >
@@ -291,7 +311,7 @@ export const Profile = () => {
               <Box sx={{ borderTop: "1px solid #ebe3da", pt: 3 }}>
                 <Typography
                   sx={{
-                    fontSize: 18,
+                    fontSize: scaleFont(18, settings?.textSize),
                     fontWeight: 800,
                     color: "#071c42",
                     mb: 3,
@@ -304,7 +324,7 @@ export const Profile = () => {
                   <Box>
                     <Typography
                       sx={{
-                        fontSize: 15,
+                        fontSize: scaleFont(15, settings?.textSize),
                         fontWeight: 700,
                         color: "#425466",
                         mb: 1,
@@ -323,6 +343,7 @@ export const Profile = () => {
                           "& .MuiOutlinedInput-root": {
                             borderRadius: 2.5,
                             backgroundColor: "#fff",
+                            fontSize: scaleFont(14, settings?.textSize),
                           },
                         }}
                       />
@@ -352,7 +373,7 @@ export const Profile = () => {
                   <Box>
                     <Typography
                       sx={{
-                        fontSize: 15,
+                        fontSize: scaleFont(15, settings?.textSize),
                         fontWeight: 700,
                         color: "#425466",
                         mb: 1,
@@ -369,6 +390,7 @@ export const Profile = () => {
                         "& .MuiOutlinedInput-root": {
                           borderRadius: 2.5,
                           backgroundColor: "#fff",
+                          fontSize: scaleFont(14, settings?.textSize),
                         },
                       }}
                     />
@@ -377,7 +399,7 @@ export const Profile = () => {
                   <Box>
                     <Typography
                       sx={{
-                        fontSize: 15,
+                        fontSize: scaleFont(15, settings?.textSize),
                         fontWeight: 700,
                         color: "#425466",
                         mb: 1,
@@ -396,6 +418,7 @@ export const Profile = () => {
                           "& .MuiOutlinedInput-root": {
                             borderRadius: 2.5,
                             backgroundColor: "#fff",
+                            fontSize: scaleFont(14, settings?.textSize),
                           },
                         }}
                       />
@@ -425,37 +448,37 @@ export const Profile = () => {
                   <Button
                     onClick={() => navigate("/change-password")}
                     sx={{
-                        mt: 1,
-                        py: 1.7,
-                        borderRadius: 2.5,
-                        backgroundColor: "#efefef",
-                        color: "#071c42",
-                        textTransform: "none",
-                        fontSize: 16,
-                        fontWeight: 700,
+                      mt: 1,
+                      py: 1.7,
+                      borderRadius: 2.5,
+                      backgroundColor: "#efefef",
+                      color: "#071c42",
+                      textTransform: "none",
+                      fontSize: scaleFont(16, settings?.textSize),
+                      fontWeight: 700,
                     }}
-                    >
+                  >
                     {t("changePassword")}
-                    </Button>
+                  </Button>
 
                   <Button
                     startIcon={<LogoutOutlinedIcon />}
                     onClick={handleLogout}
                     sx={{
-                        py: 1.7,
-                        borderRadius: 2.5,
-                        backgroundColor: "#fde8e8",
-                        color: "#ff6b63",
-                        textTransform: "none",
-                        fontSize: 16,
-                        fontWeight: 700,
-                        "&:hover": {
+                      py: 1.7,
+                      borderRadius: 2.5,
+                      backgroundColor: "#fde8e8",
+                      color: "#ff6b63",
+                      textTransform: "none",
+                      fontSize: scaleFont(16, settings?.textSize),
+                      fontWeight: 700,
+                      "&:hover": {
                         backgroundColor: "#fbdede",
-                        },
+                      },
                     }}
-                    >
+                  >
                     {t("logout")}
-                    </Button>
+                  </Button>
                 </Stack>
               </Box>
             </Stack>
@@ -471,7 +494,7 @@ export const Profile = () => {
             <Stack spacing={3}>
               <Typography
                 sx={{
-                  fontSize: 24,
+                  fontSize: scaleFont(24, settings?.textSize),
                   fontWeight: 800,
                   color: "#071c42",
                 }}
@@ -540,7 +563,7 @@ export const Profile = () => {
                           <Box>
                             <Typography
                               sx={{
-                                fontSize: 18,
+                                fontSize: scaleFont(18, settings?.textSize),
                                 fontWeight: 800,
                                 color: "#071c42",
                               }}
@@ -551,17 +574,17 @@ export const Profile = () => {
                             <Typography
                               sx={{
                                 mt: 1,
-                                fontSize: 15,
+                                fontSize: scaleFont(15, settings?.textSize),
                                 color: "#5f7087",
                               }}
                             >
-                              {formatActivityDate(item.dateValue)}
+                              {formatDateBySettings(item.dateValue, dateFormat)}
                             </Typography>
 
                             <Typography
                               sx={{
                                 mt: 0.6,
-                                fontSize: 15,
+                                fontSize: scaleFont(15, settings?.textSize),
                                 color: "#425466",
                               }}
                             >
@@ -576,7 +599,7 @@ export const Profile = () => {
                             borderRadius: 999,
                             backgroundColor: "#f2f4f7",
                             color: "#425466",
-                            fontSize: 13,
+                            fontSize: scaleFont(13, settings?.textSize),
                           }}
                         />
                       </Stack>
@@ -585,7 +608,12 @@ export const Profile = () => {
                 })}
 
                 {activityItems.length === 0 && (
-                  <Typography sx={{ color: "#667085" }}>
+                  <Typography
+                    sx={{
+                      color: "#667085",
+                      fontSize: scaleFont(16, settings?.textSize),
+                    }}
+                  >
                     {t("noRecentActivity")}
                   </Typography>
                 )}

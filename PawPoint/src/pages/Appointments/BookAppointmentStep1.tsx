@@ -14,6 +14,8 @@ import StarRoundedIcon from "@mui/icons-material/StarRounded";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAppointmentVetCabinets } from "../../hooks/useAppointmentVetCabinets";
+import { useSettings } from "../../hooks/useSettings";
+import { scaleFont } from "../../utils/fontScale";
 
 const pageBg = "#f8f4ef";
 
@@ -23,40 +25,6 @@ const sortOptions = [
   { value: "ratingAsc", labelKey: "sortRatingAsc" },
   { value: "ratingDesc", labelKey: "sortRatingDesc" },
 ];
-
-const fieldSx = {
-  minWidth: 170,
-  "& .MuiOutlinedInput-root": {
-    borderRadius: 2.5,
-    backgroundColor: "#fff",
-    "& fieldset": {
-      borderColor: "#ded8cf",
-    },
-    "&.Mui-focused fieldset": {
-      borderColor: "#f5a623",
-      borderWidth: 1.5,
-    },
-  },
-};
-
-const cardSx = (selected: boolean) => ({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  gap: 3,
-  px: 4,
-  py: 4,
-  borderRadius: 3,
-  border: selected ? "2px solid #f5a623" : "1px solid #e4ddd4",
-  backgroundColor: selected ? "#f6dfab" : "#faf8f5",
-  transition: "all 0.2s ease",
-  cursor: "pointer",
-});
-
-const formatPrice = (value?: number) => {
-  if (value == null) return "—";
-  return `${value} RON`;
-};
 
 type Step1LocationState = {
   mode?: "create" | "edit";
@@ -74,6 +42,42 @@ export const BookAppointmentStep1 = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation("appointment");
+  const { data: settings } = useSettings();
+
+  const fieldSx = {
+    minWidth: 170,
+    "& .MuiOutlinedInput-root": {
+      borderRadius: 2.5,
+      backgroundColor: "#fff",
+      fontSize: scaleFont(14, settings?.textSize),
+      "& fieldset": {
+        borderColor: "#ded8cf",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#f5a623",
+        borderWidth: 1.5,
+      },
+    },
+  };
+
+  const cardSx = (selected: boolean) => ({
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 3,
+    px: 4,
+    py: 4,
+    borderRadius: 3,
+    border: selected ? "2px solid #f5a623" : "1px solid #e4ddd4",
+    backgroundColor: selected ? "#f6dfab" : "#faf8f5",
+    transition: "all 0.2s ease",
+    cursor: "pointer",
+  });
+
+  const formatPrice = (value?: number) => {
+    if (value == null) return "—";
+    return `${value} RON`;
+  };
 
   const navState = (location.state ?? null) as Step1LocationState | null;
 
@@ -157,7 +161,10 @@ export const BookAppointmentStep1 = () => {
       <Stack spacing={4}>
         <Typography
           sx={{
-            fontSize: { xs: 34, md: 44 },
+            fontSize: {
+              xs: scaleFont(34, settings?.textSize),
+              md: scaleFont(44, settings?.textSize),
+            },
             fontWeight: 800,
             color: "#111827",
             lineHeight: 1.05,
@@ -178,7 +185,7 @@ export const BookAppointmentStep1 = () => {
               fontWeight: 700,
               textAlign: "center",
               boxShadow: "0 8px 20px rgba(0,0,0,0.06)",
-              fontSize: 18,
+              fontSize: scaleFont(18, settings?.textSize),
             }}
           >
             {`1. ${t("step1")}`}
@@ -195,7 +202,7 @@ export const BookAppointmentStep1 = () => {
               fontWeight: 600,
               textAlign: "center",
               border: "1px solid #ebe7e1",
-              fontSize: 18,
+              fontSize: scaleFont(18, settings?.textSize),
             }}
           >
             {`2. ${t("step2")}`}
@@ -212,7 +219,7 @@ export const BookAppointmentStep1 = () => {
               fontWeight: 600,
               textAlign: "center",
               border: "1px solid #ebe7e1",
-              fontSize: 18,
+              fontSize: scaleFont(18, settings?.textSize),
             }}
           >
             {`3. ${t("step3")}`}
@@ -239,7 +246,7 @@ export const BookAppointmentStep1 = () => {
               <Stack direction="row" spacing={2} alignItems="center">
                 <Typography
                   sx={{
-                    fontSize: 18,
+                    fontSize: scaleFont(18, settings?.textSize),
                     fontWeight: 600,
                     color: "#111827",
                     minWidth: 56,
@@ -250,7 +257,7 @@ export const BookAppointmentStep1 = () => {
 
                 <Typography
                   sx={{
-                    fontSize: 18,
+                    fontSize: scaleFont(18, settings?.textSize),
                     fontWeight: 600,
                     color: "#111827",
                     minWidth: 56,
@@ -263,7 +270,7 @@ export const BookAppointmentStep1 = () => {
               <Stack direction="row" spacing={2} alignItems="center">
                 <Typography
                   sx={{
-                    fontSize: 18,
+                    fontSize: scaleFont(18, settings?.textSize),
                     fontWeight: 600,
                     color: "#111827",
                     minWidth: 36,
@@ -282,7 +289,11 @@ export const BookAppointmentStep1 = () => {
                   sx={fieldSx}
                 >
                   {sortOptions.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
+                    <MenuItem
+                      key={option.value}
+                      value={option.value}
+                      sx={{ fontSize: scaleFont(14, settings?.textSize) }}
+                    >
                       {t(option.labelKey)}
                     </MenuItem>
                   ))}
@@ -334,7 +345,7 @@ export const BookAppointmentStep1 = () => {
                         <Box sx={{ minWidth: 0 }}>
                           <Typography
                             sx={{
-                              fontSize: 22,
+                              fontSize: scaleFont(22, settings?.textSize),
                               fontWeight: 800,
                               color: "#111827",
                               lineHeight: 1.2,
@@ -351,7 +362,7 @@ export const BookAppointmentStep1 = () => {
                           >
                             <Typography
                               sx={{
-                                fontSize: 16,
+                                fontSize: scaleFont(16, settings?.textSize),
                                 color: "#5f7087",
                               }}
                             >
@@ -366,7 +377,7 @@ export const BookAppointmentStep1 = () => {
                           <Typography
                             sx={{
                               mt: 0.8,
-                              fontSize: 16,
+                              fontSize: scaleFont(16, settings?.textSize),
                               color: "#5f7087",
                             }}
                           >
@@ -377,7 +388,7 @@ export const BookAppointmentStep1 = () => {
                             <Typography
                               sx={{
                                 mt: 0.8,
-                                fontSize: 15,
+                                fontSize: scaleFont(15, settings?.textSize),
                                 color: "#6b7280",
                               }}
                             >
@@ -398,7 +409,7 @@ export const BookAppointmentStep1 = () => {
                           py: 1.3,
                           borderRadius: 2.5,
                           textTransform: "none",
-                          fontSize: 18,
+                          fontSize: scaleFont(18, settings?.textSize),
                           fontWeight: 700,
                           color: "#111827",
                           backgroundColor: "#f7ae1a",
@@ -424,7 +435,7 @@ export const BookAppointmentStep1 = () => {
                       py: 1.55,
                       borderRadius: 2.5,
                       textTransform: "none",
-                      fontSize: 18,
+                      fontSize: scaleFont(18, settings?.textSize),
                       fontWeight: 700,
                       backgroundColor: selectedCabinet ? "#f7ae1a" : "#f4d28a",
                       color: selectedCabinet ? "#111827" : "#8c7a4e",

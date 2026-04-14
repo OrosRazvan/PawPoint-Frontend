@@ -5,6 +5,8 @@ import { SectionCard } from "../cards/SectionCard";
 import { PetCard } from "../cards/PetCard";
 import { DeletePetDialog } from "../DeletePetDialog";
 import type { DashboardPet } from "../../types/dashboard";
+import { useSettings } from "../../../../hooks/useSettings";
+import { scaleFont } from "../../../../utils/fontScale";
 
 type Props = {
   title: string;
@@ -28,6 +30,7 @@ export const MyPetsSection = ({
   isDeleting,
 }: Props) => {
   const [petToDelete, setPetToDelete] = useState<DashboardPet | null>(null);
+  const { data: settings } = useSettings();
 
   const handleDeleteConfirm = () => {
     if (petToDelete) {
@@ -50,7 +53,7 @@ export const MyPetsSection = ({
               borderRadius: 2.5,
               color: "#fff",
               textTransform: "none",
-              fontSize: 14,
+              fontSize: scaleFont(14, settings?.textSize),
               fontWeight: 700,
               letterSpacing: "-0.1px",
               background: "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",

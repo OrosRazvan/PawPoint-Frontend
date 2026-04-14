@@ -32,6 +32,8 @@ import {
 } from "../../../types/createAnimalSchema";
 import { useUpdateAnimal } from "../../../hooks/useUpdateAnimal";
 import type { DashboardPet } from "../types/dashboard";
+import { useSettings } from "../../../hooks/useSettings";
+import { scaleFont } from "../../../utils/fontScale";
 
 type Props = {
   open: boolean;
@@ -39,51 +41,52 @@ type Props = {
   pet: DashboardPet | null;
 };
 
-const fieldSx = {
-  "& .MuiOutlinedInput-root": {
-    borderRadius: 2,
-    backgroundColor: "#fff",
-    fontSize: 14,
-    transition: "box-shadow 0.2s ease",
-    "& fieldset": {
-      borderColor: "#e8e2d9",
-    },
-    "&:hover fieldset": {
-      borderColor: "#f5a623",
-    },
-    "&.Mui-focused fieldset": {
-      borderColor: "#f5a623",
-      borderWidth: 1.5,
-    },
-    "&.Mui-focused": {
-      boxShadow: "0 0 0 3px rgba(245,166,35,0.12)",
-    },
-  },
-  "& .MuiInputBase-input::placeholder": {
-    color: "#aaa",
-    opacity: 1,
-    fontSize: 14,
-  },
-  "& .MuiFormHelperText-root": {
-    marginLeft: 0,
-    fontSize: 12,
-  },
-};
-
-const labelSx = {
-  fontSize: 12,
-  fontWeight: 600,
-  color: "#6b7280",
-  letterSpacing: "0.04em",
-  textTransform: "uppercase" as const,
-  mb: 0.6,
-};
-
 export const EditPetDialog = ({ open, onClose, pet }: Props) => {
   const { t } = useTranslation(["dashboard"]);
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
   const updateAnimalMutation = useUpdateAnimal();
+  const { data: settings } = useSettings();
+
+  const fieldSx = {
+    "& .MuiOutlinedInput-root": {
+      borderRadius: 2,
+      backgroundColor: "#fff",
+      fontSize: scaleFont(14, settings?.textSize),
+      transition: "box-shadow 0.2s ease",
+      "& fieldset": {
+        borderColor: "#e8e2d9",
+      },
+      "&:hover fieldset": {
+        borderColor: "#f5a623",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#f5a623",
+        borderWidth: 1.5,
+      },
+      "&.Mui-focused": {
+        boxShadow: "0 0 0 3px rgba(245,166,35,0.12)",
+      },
+    },
+    "& .MuiInputBase-input::placeholder": {
+      color: "#aaa",
+      opacity: 1,
+      fontSize: scaleFont(14, settings?.textSize),
+    },
+    "& .MuiFormHelperText-root": {
+      marginLeft: 0,
+      fontSize: scaleFont(12, settings?.textSize),
+    },
+  };
+
+  const labelSx = {
+    fontSize: scaleFont(12, settings?.textSize),
+    fontWeight: 600,
+    color: "#6b7280",
+    letterSpacing: "0.04em",
+    textTransform: "uppercase" as const,
+    mb: 0.6,
+  };
 
   const {
     control,
@@ -218,7 +221,7 @@ export const EditPetDialog = ({ open, onClose, pet }: Props) => {
               <Box>
                 <Typography
                   sx={{
-                    fontSize: 19,
+                    fontSize: scaleFont(19, settings?.textSize),
                     fontWeight: 800,
                     color: "#071c42",
                     lineHeight: 1.2,
@@ -229,7 +232,7 @@ export const EditPetDialog = ({ open, onClose, pet }: Props) => {
                 </Typography>
                 <Typography
                   sx={{
-                    fontSize: 13,
+                    fontSize: scaleFont(13, settings?.textSize),
                     color: "#8a95a3",
                     mt: 0.4,
                     fontWeight: 400,
@@ -311,7 +314,10 @@ export const EditPetDialog = ({ open, onClose, pet }: Props) => {
                     <MenuItem
                       value=""
                       disabled
-                      sx={{ fontSize: 14, color: "#aaa" }}
+                      sx={{
+                        fontSize: scaleFont(14, settings?.textSize),
+                        color: "#aaa",
+                      }}
                     >
                       {t("dashboard:species")}
                     </MenuItem>
@@ -341,7 +347,10 @@ export const EditPetDialog = ({ open, onClose, pet }: Props) => {
                     <MenuItem
                       value=""
                       disabled
-                      sx={{ fontSize: 14, color: "#aaa" }}
+                      sx={{
+                        fontSize: scaleFont(14, settings?.textSize),
+                        color: "#aaa",
+                      }}
                     >
                       {t("dashboard:sex")}
                     </MenuItem>
@@ -435,7 +444,7 @@ export const EditPetDialog = ({ open, onClose, pet }: Props) => {
                 borderRadius: 2.5,
                 textTransform: "none",
                 fontWeight: 700,
-                fontSize: 15,
+                fontSize: scaleFont(15, settings?.textSize),
                 color: "#4b5563",
                 backgroundColor: "#f0f2f7",
                 "&:hover": {
@@ -456,7 +465,7 @@ export const EditPetDialog = ({ open, onClose, pet }: Props) => {
                 borderRadius: 2.5,
                 textTransform: "none",
                 fontWeight: 700,
-                fontSize: 15,
+                fontSize: scaleFont(15, settings?.textSize),
                 letterSpacing: "-0.1px",
                 background: "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
                 color: "#fff",
