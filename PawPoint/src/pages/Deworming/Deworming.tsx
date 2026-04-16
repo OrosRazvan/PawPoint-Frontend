@@ -98,12 +98,12 @@ export const Deworming = () => {
 
   return (
     <Box
-      sx={{
+      sx={(theme) => ({
         minHeight: "100vh",
-        backgroundColor: "#f8f4ef",
+        backgroundColor: theme.palette.background.default,
         px: { xs: 2, sm: 3, md: 5 },
         py: { xs: 3, md: 5 },
-      }}
+      })}
     >
       <Stack spacing={5}>
         <Stack
@@ -114,25 +114,25 @@ export const Deworming = () => {
         >
           <Box>
             <Typography
-              sx={{
+              sx={(theme) => ({
                 fontSize: {
                   xs: scaleFont(34, settings?.textSize),
                   md: scaleFont(42, settings?.textSize),
                 },
                 fontWeight: 800,
                 lineHeight: 1.1,
-                color: "#0b1f44",
-              }}
+                color: theme.palette.text.primary,
+              })}
             >
               {t("deworming:title")}
             </Typography>
 
             <Typography
-              sx={{
+              sx={(theme) => ({
                 mt: 1.5,
                 fontSize: scaleFont(18, settings?.textSize),
-                color: "#5f7087",
-              }}
+                color: theme.palette.text.secondary,
+              })}
             >
               {t("deworming:subtitle")}
             </Typography>
@@ -172,12 +172,12 @@ export const Deworming = () => {
             {completedItems.length > 0 && (
               <Box>
                 <Typography
-                  sx={{
+                  sx={(theme) => ({
                     fontSize: scaleFont(24, settings?.textSize),
                     fontWeight: 700,
-                    color: "#071c42",
+                    color: theme.palette.text.primary,
                     mb: 3,
-                  }}
+                  })}
                 >
                   {t("deworming:completed")}
                 </Typography>
@@ -195,12 +195,12 @@ export const Deworming = () => {
             {upcomingItems.length > 0 && (
               <Box>
                 <Typography
-                  sx={{
+                  sx={(theme) => ({
                     fontSize: scaleFont(24, settings?.textSize),
                     fontWeight: 700,
-                    color: "#071c42",
+                    color: theme.palette.text.primary,
                     mb: 3,
-                  }}
+                  })}
                 >
                   {t("deworming:upcoming")}
                 </Typography>
@@ -221,7 +221,10 @@ export const Deworming = () => {
 
             {completedItems.length === 0 && upcomingItems.length === 0 && (
               <Typography
-                sx={{ color: "#667085", fontSize: scaleFont(16, settings?.textSize) }}
+                sx={(theme) => ({
+                  color: theme.palette.text.secondary,
+                  fontSize: scaleFont(16, settings?.textSize),
+                })}
               >
                 {t("deworming:empty")}
               </Typography>

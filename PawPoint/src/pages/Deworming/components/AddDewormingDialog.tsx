@@ -12,6 +12,7 @@ import {
   Box,
   Divider,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import BugReportOutlinedIcon from "@mui/icons-material/BugReportOutlined";
 import {
@@ -29,9 +30,7 @@ import { useDewormingVetCabinets } from "../../../hooks/useDewormingVetCabinets"
 import { useDewormingAvailability } from "../../../hooks/useDewormingAvailability";
 import { useSettings } from "../../../hooks/useSettings";
 import { scaleFont } from "../../../utils/fontScale";
-import type {
-  DewormingFormValues,
-} from "../types/deworming";
+import type { DewormingFormValues } from "../types/deworming";
 
 type Props = {
   open: boolean;
@@ -98,32 +97,39 @@ export const AddDewormingDialog = ({ open, onClose }: Props) => {
 
   const dateFormat: AppDateFormat = settings?.dateFormat ?? "DD/MM/YYYY";
 
-  const fieldSx = {
+  const fieldSx = (theme: any) => ({
     "& .MuiOutlinedInput-root": {
       borderRadius: 2,
-      backgroundColor: "#fff",
+      backgroundColor:
+        theme.palette.mode === "dark"
+          ? alpha("#ffffff", 0.03)
+          : theme.palette.background.paper,
       fontSize: scaleFont(14, settings?.textSize),
+      color: theme.palette.text.primary,
       "& fieldset": {
-        borderColor: "#e8e2d9",
+        borderColor: theme.palette.divider,
       },
       "&:hover fieldset": {
-        borderColor: "#f5a623",
+        borderColor: theme.palette.primary.main,
       },
       "&.Mui-focused fieldset": {
-        borderColor: "#f5a623",
+        borderColor: theme.palette.primary.main,
         borderWidth: 1.5,
       },
     },
-  };
+    "& .MuiSvgIcon-root": {
+      color: theme.palette.text.secondary,
+    },
+  });
 
-  const labelSx = {
+  const labelSx = (theme: any) => ({
     fontSize: scaleFont(12, settings?.textSize),
     fontWeight: 600,
-    color: "#6b7280",
+    color: theme.palette.text.secondary,
     letterSpacing: "0.04em",
     textTransform: "uppercase" as const,
     mb: 0.6,
-  };
+  });
 
   const { data: animals = [] } = useQuery({
     queryKey: ["animals"],
@@ -220,21 +226,31 @@ export const AddDewormingDialog = ({ open, onClose }: Props) => {
       maxWidth="sm"
       fullWidth
       PaperProps={{
-        sx: {
+        sx: (theme) => ({
           borderRadius: 4,
           overflow: "hidden",
-          backgroundColor: "#faf8f5",
-        },
+          backgroundColor: theme.palette.background.paper,
+          boxShadow:
+            theme.palette.mode === "dark"
+              ? "0 24px 64px rgba(0,0,0,0.38), 0 4px 12px rgba(0,0,0,0.24)"
+              : undefined,
+        }),
       }}
     >
       <DialogTitle sx={{ p: 0 }}>
         <Box
-          sx={{
+          sx={(theme) => ({
             px: 3.5,
             pt: 3,
             pb: 2.5,
-            background: "linear-gradient(135deg, #fbf2ea 0%, #fdf7ef 100%)",
-          }}
+            background:
+              theme.palette.mode === "dark"
+                ? `linear-gradient(135deg, ${alpha(
+                    theme.palette.primary.main,
+                    0.12
+                  )} 0%, ${alpha(theme.palette.background.paper, 0.9)} 100%)`
+                : "linear-gradient(135deg, #fbf2ea 0%, #fdf7ef 100%)",
+          })}
         >
           <Stack direction="row" justifyContent="space-between">
             <Stack direction="row" spacing={2} alignItems="center">
@@ -256,20 +272,20 @@ export const AddDewormingDialog = ({ open, onClose }: Props) => {
 
               <Box>
                 <Typography
-                  sx={{
+                  sx={(theme) => ({
                     fontSize: scaleFont(19, settings?.textSize),
                     fontWeight: 800,
-                    color: "#071c42",
-                  }}
+                    color: theme.palette.text.primary,
+                  })}
                 >
                   {t("deworming:addDialogTitle")}
                 </Typography>
                 <Typography
-                  sx={{
+                  sx={(theme) => ({
                     fontSize: scaleFont(13, settings?.textSize),
-                    color: "#8a95a3",
+                    color: theme.palette.text.secondary,
                     mt: 0.4,
-                  }}
+                  })}
                 >
                   {t("deworming:addDialogSubtitle")}
                 </Typography>
@@ -279,20 +295,23 @@ export const AddDewormingDialog = ({ open, onClose }: Props) => {
             <IconButton
               onClick={onClose}
               size="small"
-              sx={{
-                color: "#9ca3af",
-                backgroundColor: "rgba(0,0,0,0.04)",
+              sx={(theme) => ({
+                color: theme.palette.text.secondary,
+                backgroundColor:
+                  theme.palette.mode === "dark"
+                    ? alpha("#ffffff", 0.06)
+                    : "rgba(0,0,0,0.04)",
                 borderRadius: 2,
                 width: 32,
                 height: 32,
-              }}
+              })}
             >
               <CloseRoundedIcon sx={{ fontSize: 18 }} />
             </IconButton>
           </Stack>
         </Box>
 
-        <Divider sx={{ borderColor: "#ede8e0" }} />
+        <Divider />
       </DialogTitle>
 
       <DialogContent sx={{ px: 3.5, pt: 3, pb: 3.5 }}>
@@ -447,7 +466,7 @@ export const AddDewormingDialog = ({ open, onClose }: Props) => {
             />
           </Box>
 
-          <Divider sx={{ borderColor: "#ede8e0", mt: 1, mb: 1 }} />
+          <Divider sx={{ mt: 1, mb: 1 }} />
 
           <LoadingButton
             type="submit"

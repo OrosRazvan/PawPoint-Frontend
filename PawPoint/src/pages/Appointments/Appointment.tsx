@@ -7,6 +7,7 @@ import {
   Button,
 } from "@mui/material";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
+import { alpha } from "@mui/material/styles";
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -63,12 +64,12 @@ export const Appointments = () => {
 
   return (
     <Box
-      sx={{
+      sx={(theme) => ({
         minHeight: "100vh",
-        backgroundColor: "#f8f4ef",
+        backgroundColor: theme.palette.background.default,
         px: { xs: 2, sm: 3, md: 5 },
         py: { xs: 3, md: 5 },
-      }}
+      })}
     >
       <Stack spacing={5}>
         <Stack
@@ -79,25 +80,25 @@ export const Appointments = () => {
         >
           <Box>
             <Typography
-              sx={{
+              sx={(theme) => ({
                 fontSize: {
                   xs: scaleFont(34, settings?.textSize),
                   md: scaleFont(42, settings?.textSize),
                 },
                 fontWeight: 800,
                 lineHeight: 1.1,
-                color: "#0b1f44",
-              }}
+                color: theme.palette.text.primary,
+              })}
             >
               {t("appointment:title")}
             </Typography>
 
             <Typography
-              sx={{
+              sx={(theme) => ({
                 mt: 1.5,
                 fontSize: scaleFont(18, settings?.textSize),
-                color: "#5f7087",
-              }}
+                color: theme.palette.text.secondary,
+              })}
             >
               {t("appointment:subtitle")}
             </Typography>
@@ -106,21 +107,24 @@ export const Appointments = () => {
           <Button
             startIcon={<AddOutlinedIcon />}
             onClick={() => navigate("/appointments/book")}
-            sx={{
+            sx={(theme) => ({
               px: 2.5,
               py: 1.2,
               borderRadius: 2.5,
-              color: "#fff",
+              color: theme.palette.primary.contrastText,
               textTransform: "none",
               fontSize: scaleFont(14, settings?.textSize),
               fontWeight: 700,
               letterSpacing: "-0.1px",
-              background: "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
-              boxShadow: "0 4px 12px rgba(245,166,35,0.35)",
+              background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+              boxShadow:
+                theme.palette.mode === "dark"
+                  ? `0 6px 18px ${alpha(theme.palette.primary.main, 0.28)}`
+                  : `0 4px 12px ${alpha(theme.palette.primary.main, 0.35)}`,
               "&:hover": {
-                background: "linear-gradient(135deg, #f0981a 0%, #e88510 100%)",
+                background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.main} 100%)`,
               },
-            }}
+            })}
           >
             {t("appointment:addButton")}
           </Button>
@@ -137,12 +141,12 @@ export const Appointments = () => {
             {upcomingItems.length > 0 && (
               <Box>
                 <Typography
-                  sx={{
+                  sx={(theme) => ({
                     fontSize: scaleFont(24, settings?.textSize),
                     fontWeight: 700,
-                    color: "#071c42",
+                    color: theme.palette.text.primary,
                     mb: 3,
-                  }}
+                  })}
                 >
                   {t("appointment:upcoming")}
                 </Typography>
@@ -171,12 +175,12 @@ export const Appointments = () => {
             {completedItems.length > 0 && (
               <Box>
                 <Typography
-                  sx={{
+                  sx={(theme) => ({
                     fontSize: scaleFont(24, settings?.textSize),
                     fontWeight: 700,
-                    color: "#071c42",
+                    color: theme.palette.text.primary,
                     mb: 3,
-                  }}
+                  })}
                 >
                   {t("appointment:completed")}
                 </Typography>
@@ -193,7 +197,10 @@ export const Appointments = () => {
 
             {completedItems.length === 0 && upcomingItems.length === 0 && (
               <Typography
-                sx={{ color: "#667085", fontSize: scaleFont(16, settings?.textSize) }}
+                sx={(theme) => ({
+                  color: theme.palette.text.secondary,
+                  fontSize: scaleFont(16, settings?.textSize),
+                })}
               >
                 {t("appointment:empty")}
               </Typography>

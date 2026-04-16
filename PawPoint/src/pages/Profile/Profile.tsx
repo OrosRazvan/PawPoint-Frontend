@@ -9,6 +9,7 @@ import {
   Typography,
   Chip,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import EditRoundedIcon from "@mui/icons-material/EditRounded";
 import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
 import VaccinesRoundedIcon from "@mui/icons-material/VaccinesRounded";
@@ -36,15 +37,6 @@ type ActivityItem = {
 };
 
 type AppDateFormat = "DD/MM/YYYY" | "MM/DD/YYYY" | "YYYY-MM-DD";
-
-const pageBg = "#f8f4ef";
-
-const cardSx = {
-  borderRadius: 4,
-  backgroundColor: "#fffdfb",
-  border: "1px solid #ebe3da",
-  boxShadow: "0 10px 24px rgba(0,0,0,0.05)",
-};
 
 const formatDateBySettings = (
   value?: string | Date | null,
@@ -105,6 +97,38 @@ export const Profile = () => {
   const { t } = useTranslation("profile");
 
   const dateFormat: AppDateFormat = settings?.dateFormat ?? "DD/MM/YYYY";
+
+  const cardSx = (theme: any) => ({
+    borderRadius: 4,
+    backgroundColor: theme.palette.background.paper,
+    border: `1px solid ${theme.palette.divider}`,
+    boxShadow:
+      theme.palette.mode === "dark"
+        ? "0 10px 24px rgba(0,0,0,0.28)"
+        : "0 10px 24px rgba(0,0,0,0.05)",
+  });
+
+  const editableFieldSx = (theme: any) => ({
+    "& .MuiOutlinedInput-root": {
+      borderRadius: 2.5,
+      backgroundColor:
+        theme.palette.mode === "dark"
+          ? alpha("#ffffff", 0.03)
+          : theme.palette.background.paper,
+      fontSize: scaleFont(14, settings?.textSize),
+      color: theme.palette.text.primary,
+      "& fieldset": {
+        borderColor: theme.palette.divider,
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: theme.palette.primary.main,
+        borderWidth: 1.5,
+      },
+      "& .MuiInputBase-input.Mui-disabled": {
+        WebkitTextFillColor: theme.palette.text.primary,
+      },
+    },
+  });
 
   const handleLogout = () => {
     clearTokens();
@@ -202,13 +226,13 @@ export const Profile = () => {
   if (isProfileLoading) {
     return (
       <Box
-        sx={{
+        sx={(theme) => ({
           minHeight: "100vh",
-          backgroundColor: pageBg,
+          backgroundColor: theme.palette.background.default,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-        }}
+        })}
       >
         <CircularProgress />
       </Box>
@@ -217,7 +241,13 @@ export const Profile = () => {
 
   if (isProfileError) {
     return (
-      <Box sx={{ minHeight: "100vh", backgroundColor: pageBg, p: 4 }}>
+      <Box
+        sx={(theme) => ({
+          minHeight: "100vh",
+          backgroundColor: theme.palette.background.default,
+          p: 4,
+        })}
+      >
         <Typography color="error">Failed to load profile.</Typography>
       </Box>
     );
@@ -225,24 +255,24 @@ export const Profile = () => {
 
   return (
     <Box
-      sx={{
+      sx={(theme) => ({
         minHeight: "100vh",
-        backgroundColor: pageBg,
+        backgroundColor: theme.palette.background.default,
         px: { xs: 2, sm: 3, md: 5 },
         py: { xs: 3, md: 5 },
-      }}
+      })}
     >
       <Stack spacing={4}>
         <Typography
-          sx={{
+          sx={(theme) => ({
             fontSize: {
               xs: scaleFont(34, settings?.textSize),
               md: scaleFont(42, settings?.textSize),
             },
             fontWeight: 800,
-            color: "#0b1f44",
+            color: theme.palette.text.primary,
             lineHeight: 1.1,
-          }}
+          })}
         >
           {t("title")}
         </Typography>
@@ -253,11 +283,11 @@ export const Profile = () => {
           alignItems="stretch"
         >
           <Box
-            sx={{
-              ...cardSx,
+            sx={(theme) => ({
+              ...cardSx(theme),
               flex: { lg: "0 0 32%" },
               p: 4,
-            }}
+            })}
           >
             <Stack spacing={3}>
               <Stack alignItems="center" spacing={2}>
@@ -272,14 +302,14 @@ export const Profile = () => {
                   />
                 ) : (
                   <Avatar
-                    sx={{
+                    sx={(theme) => ({
                       width: 120,
                       height: 120,
                       fontSize: scaleFont(40, settings?.textSize),
                       fontWeight: 800,
-                      background:
-                        "linear-gradient(135deg, #5f86ff 0%, #8b2cff 100%)",
-                    }}
+                      background: `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, ${theme.palette.primary.main} 100%)`,
+                      color: theme.palette.mode === "dark" ? "#111827" : "#ffffff",
+                    })}
                   >
                     {getInitial(safeProfile.fullName)}
                   </Avatar>
@@ -287,35 +317,40 @@ export const Profile = () => {
 
                 <Box sx={{ textAlign: "center" }}>
                   <Typography
-                    sx={{
+                    sx={(theme) => ({
                       fontSize: scaleFont(22, settings?.textSize),
                       fontWeight: 800,
-                      color: "#071c42",
-                    }}
+                      color: theme.palette.text.primary,
+                    })}
                   >
                     {safeProfile.fullName}
                   </Typography>
 
                   <Typography
-                    sx={{
+                    sx={(theme) => ({
                       mt: 1,
                       fontSize: scaleFont(16, settings?.textSize),
-                      color: "#5f7087",
-                    }}
+                      color: theme.palette.text.secondary,
+                    })}
                   >
                     {safeProfile.email}
                   </Typography>
                 </Box>
               </Stack>
 
-              <Box sx={{ borderTop: "1px solid #ebe3da", pt: 3 }}>
+              <Box
+                sx={(theme) => ({
+                  borderTop: `1px solid ${theme.palette.divider}`,
+                  pt: 3,
+                })}
+              >
                 <Typography
-                  sx={{
+                  sx={(theme) => ({
                     fontSize: scaleFont(18, settings?.textSize),
                     fontWeight: 800,
-                    color: "#071c42",
+                    color: theme.palette.text.primary,
                     mb: 3,
-                  }}
+                  })}
                 >
                   {t("accountInformation")}
                 </Typography>
@@ -323,12 +358,12 @@ export const Profile = () => {
                 <Stack spacing={2.5}>
                   <Box>
                     <Typography
-                      sx={{
+                      sx={(theme) => ({
                         fontSize: scaleFont(15, settings?.textSize),
                         fontWeight: 700,
-                        color: "#425466",
+                        color: theme.palette.text.secondary,
                         mb: 1,
-                      }}
+                      })}
                     >
                       {t("fullName")}
                     </Typography>
@@ -339,13 +374,7 @@ export const Profile = () => {
                         value={fullName}
                         disabled={!isEditingName}
                         onChange={(e) => setFullName(e.target.value)}
-                        sx={{
-                          "& .MuiOutlinedInput-root": {
-                            borderRadius: 2.5,
-                            backgroundColor: "#fff",
-                            fontSize: scaleFont(14, settings?.textSize),
-                          },
-                        }}
+                        sx={editableFieldSx}
                       />
 
                       <IconButton
@@ -357,13 +386,16 @@ export const Profile = () => {
                           }
                         }}
                         disabled={isUpdatingProfile}
-                        sx={{
+                        sx={(theme) => ({
                           width: 44,
                           height: 44,
                           borderRadius: 2.5,
-                          backgroundColor: "#edf4ff",
-                          color: "#2563ff",
-                        }}
+                          backgroundColor: alpha(theme.palette.info.main, 0.12),
+                          color: theme.palette.info.main,
+                          "&:hover": {
+                            backgroundColor: alpha(theme.palette.info.main, 0.2),
+                          },
+                        })}
                       >
                         <EditRoundedIcon />
                       </IconButton>
@@ -372,12 +404,12 @@ export const Profile = () => {
 
                   <Box>
                     <Typography
-                      sx={{
+                      sx={(theme) => ({
                         fontSize: scaleFont(15, settings?.textSize),
                         fontWeight: 700,
-                        color: "#425466",
+                        color: theme.palette.text.secondary,
                         mb: 1,
-                      }}
+                      })}
                     >
                       {t("email")}
                     </Typography>
@@ -386,24 +418,18 @@ export const Profile = () => {
                       fullWidth
                       value={safeProfile.email ?? ""}
                       disabled
-                      sx={{
-                        "& .MuiOutlinedInput-root": {
-                          borderRadius: 2.5,
-                          backgroundColor: "#fff",
-                          fontSize: scaleFont(14, settings?.textSize),
-                        },
-                      }}
+                      sx={editableFieldSx}
                     />
                   </Box>
 
                   <Box>
                     <Typography
-                      sx={{
+                      sx={(theme) => ({
                         fontSize: scaleFont(15, settings?.textSize),
                         fontWeight: 700,
-                        color: "#425466",
+                        color: theme.palette.text.secondary,
                         mb: 1,
-                      }}
+                      })}
                     >
                       {t("phone")}
                     </Typography>
@@ -414,13 +440,7 @@ export const Profile = () => {
                         value={phoneNumber}
                         disabled={!isEditingPhone}
                         onChange={(e) => setPhoneNumber(e.target.value)}
-                        sx={{
-                          "& .MuiOutlinedInput-root": {
-                            borderRadius: 2.5,
-                            backgroundColor: "#fff",
-                            fontSize: scaleFont(14, settings?.textSize),
-                          },
-                        }}
+                        sx={editableFieldSx}
                       />
 
                       <IconButton
@@ -432,13 +452,16 @@ export const Profile = () => {
                           }
                         }}
                         disabled={isUpdatingProfile}
-                        sx={{
+                        sx={(theme) => ({
                           width: 44,
                           height: 44,
                           borderRadius: 2.5,
-                          backgroundColor: "#edf4ff",
-                          color: "#2563ff",
-                        }}
+                          backgroundColor: alpha(theme.palette.info.main, 0.12),
+                          color: theme.palette.info.main,
+                          "&:hover": {
+                            backgroundColor: alpha(theme.palette.info.main, 0.2),
+                          },
+                        })}
                       >
                         <EditRoundedIcon />
                       </IconButton>
@@ -447,16 +470,25 @@ export const Profile = () => {
 
                   <Button
                     onClick={() => navigate("/change-password")}
-                    sx={{
+                    sx={(theme) => ({
                       mt: 1,
                       py: 1.7,
                       borderRadius: 2.5,
-                      backgroundColor: "#efefef",
-                      color: "#071c42",
+                      backgroundColor:
+                        theme.palette.mode === "dark"
+                          ? alpha("#ffffff", 0.06)
+                          : "#efefef",
+                      color: theme.palette.text.primary,
                       textTransform: "none",
                       fontSize: scaleFont(16, settings?.textSize),
                       fontWeight: 700,
-                    }}
+                      "&:hover": {
+                        backgroundColor:
+                          theme.palette.mode === "dark"
+                            ? alpha("#ffffff", 0.1)
+                            : "#e6e6e6",
+                      },
+                    })}
                   >
                     {t("changePassword")}
                   </Button>
@@ -464,18 +496,18 @@ export const Profile = () => {
                   <Button
                     startIcon={<LogoutOutlinedIcon />}
                     onClick={handleLogout}
-                    sx={{
+                    sx={(theme) => ({
                       py: 1.7,
                       borderRadius: 2.5,
-                      backgroundColor: "#fde8e8",
-                      color: "#ff6b63",
+                      backgroundColor: alpha(theme.palette.error.main, 0.12),
+                      color: theme.palette.error.main,
                       textTransform: "none",
                       fontSize: scaleFont(16, settings?.textSize),
                       fontWeight: 700,
                       "&:hover": {
-                        backgroundColor: "#fbdede",
+                        backgroundColor: alpha(theme.palette.error.main, 0.18),
                       },
-                    }}
+                    })}
                   >
                     {t("logout")}
                   </Button>
@@ -485,19 +517,19 @@ export const Profile = () => {
           </Box>
 
           <Box
-            sx={{
-              ...cardSx,
+            sx={(theme) => ({
+              ...cardSx(theme),
               flex: 1,
               p: 4,
-            }}
+            })}
           >
             <Stack spacing={3}>
               <Typography
-                sx={{
+                sx={(theme) => ({
                   fontSize: scaleFont(24, settings?.textSize),
                   fontWeight: 800,
-                  color: "#071c42",
-                }}
+                  color: theme.palette.text.primary,
+                })}
               >
                 {t("recentActivity")}
               </Typography>
@@ -506,11 +538,17 @@ export const Profile = () => {
                 {activityItems.map((item) => {
                   const icon =
                     item.type === "appointment" ? (
-                      <CalendarMonthRoundedIcon sx={{ color: "#9b4dff" }} />
+                      <CalendarMonthRoundedIcon
+                        sx={(theme) => ({ color: theme.palette.secondary.main })}
+                      />
                     ) : item.type === "vaccination" ? (
-                      <VaccinesRoundedIcon sx={{ color: "#2563ff" }} />
+                      <VaccinesRoundedIcon
+                        sx={(theme) => ({ color: theme.palette.info.main })}
+                      />
                     ) : (
-                      <BugReportRoundedIcon sx={{ color: "#16a34a" }} />
+                      <BugReportRoundedIcon
+                        sx={(theme) => ({ color: theme.palette.success.main })}
+                      />
                     );
 
                   const chipLabel =
@@ -520,23 +558,19 @@ export const Profile = () => {
                       ? t("vaccination")
                       : t("deworming");
 
-                  const iconBg =
-                    item.type === "appointment"
-                      ? "#f0e4ff"
-                      : item.type === "vaccination"
-                      ? "#e7f0ff"
-                      : "#def7e6";
-
                   return (
                     <Box
                       key={item.id}
-                      sx={{
-                        border: "1px solid #ebe3da",
+                      sx={(theme) => ({
+                        border: `1px solid ${theme.palette.divider}`,
                         borderRadius: 3,
-                        backgroundColor: "#fff",
+                        backgroundColor:
+                          theme.palette.mode === "dark"
+                            ? alpha("#ffffff", 0.03)
+                            : "#fff",
                         px: 2.5,
                         py: 2.5,
-                      }}
+                      })}
                     >
                       <Stack
                         direction="row"
@@ -546,47 +580,52 @@ export const Profile = () => {
                       >
                         <Stack direction="row" spacing={2} alignItems="flex-start">
                           <Box
-                            sx={{
+                            sx={(theme) => ({
                               width: 54,
                               height: 54,
                               borderRadius: 2.5,
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
-                              backgroundColor: iconBg,
+                              backgroundColor:
+                                item.type === "appointment"
+                                  ? alpha(theme.palette.secondary.main, 0.16)
+                                  : item.type === "vaccination"
+                                  ? alpha(theme.palette.info.main, 0.14)
+                                  : alpha(theme.palette.success.main, 0.14),
                               flexShrink: 0,
-                            }}
+                            })}
                           >
                             {icon}
                           </Box>
 
                           <Box>
                             <Typography
-                              sx={{
+                              sx={(theme) => ({
                                 fontSize: scaleFont(18, settings?.textSize),
                                 fontWeight: 800,
-                                color: "#071c42",
-                              }}
+                                color: theme.palette.text.primary,
+                              })}
                             >
                               {item.title}
                             </Typography>
 
                             <Typography
-                              sx={{
+                              sx={(theme) => ({
                                 mt: 1,
                                 fontSize: scaleFont(15, settings?.textSize),
-                                color: "#5f7087",
-                              }}
+                                color: theme.palette.text.secondary,
+                              })}
                             >
                               {formatDateBySettings(item.dateValue, dateFormat)}
                             </Typography>
 
                             <Typography
-                              sx={{
+                              sx={(theme) => ({
                                 mt: 0.6,
                                 fontSize: scaleFont(15, settings?.textSize),
-                                color: "#425466",
-                              }}
+                                color: theme.palette.text.secondary,
+                              })}
                             >
                               at {t("atClinic", { clinic: item.clinic })}
                             </Typography>
@@ -595,12 +634,15 @@ export const Profile = () => {
 
                         <Chip
                           label={chipLabel}
-                          sx={{
+                          sx={(theme) => ({
                             borderRadius: 999,
-                            backgroundColor: "#f2f4f7",
-                            color: "#425466",
+                            backgroundColor:
+                              theme.palette.mode === "dark"
+                                ? alpha("#ffffff", 0.06)
+                                : "#f2f4f7",
+                            color: theme.palette.text.secondary,
                             fontSize: scaleFont(13, settings?.textSize),
-                          }}
+                          })}
                         />
                       </Stack>
                     </Box>
@@ -609,10 +651,10 @@ export const Profile = () => {
 
                 {activityItems.length === 0 && (
                   <Typography
-                    sx={{
-                      color: "#667085",
+                    sx={(theme) => ({
+                      color: theme.palette.text.secondary,
                       fontSize: scaleFont(16, settings?.textSize),
-                    }}
+                    })}
                   >
                     {t("noRecentActivity")}
                   </Typography>

@@ -9,6 +9,7 @@ import {
   Divider,
   Button,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
 import { LoadingButton } from "@mui/lab";
@@ -42,22 +43,30 @@ export const DeletePetDialog = ({
       maxWidth="xs"
       fullWidth
       PaperProps={{
-        sx: {
+        sx: (theme) => ({
           borderRadius: 4,
           overflow: "hidden",
-          backgroundColor: "#faf8f5",
+          backgroundColor: theme.palette.background.paper,
           boxShadow:
-            "0 24px 64px rgba(7,28,66,0.14), 0 4px 12px rgba(7,28,66,0.06)",
-        },
+            theme.palette.mode === "dark"
+              ? "0 24px 64px rgba(0,0,0,0.38), 0 4px 12px rgba(0,0,0,0.24)"
+              : "0 24px 64px rgba(7,28,66,0.14), 0 4px 12px rgba(7,28,66,0.06)",
+        }),
       }}
     >
       <DialogTitle sx={{ p: 0 }}>
         <Box
-          sx={{
+          sx={(theme) => ({
             px: 3.5,
             pt: 3,
             pb: 2.5,
-            background: "linear-gradient(135deg, #fff5f5 0%, #fff0f0 100%)",
+            background:
+              theme.palette.mode === "dark"
+                ? `linear-gradient(135deg, ${alpha(
+                    theme.palette.error.main,
+                    0.14
+                  )} 0%, ${alpha(theme.palette.background.paper, 0.96)} 100%)`
+                : "linear-gradient(135deg, #fff5f5 0%, #fff0f0 100%)",
             position: "relative",
             overflow: "hidden",
             "&::after": {
@@ -68,10 +77,13 @@ export const DeletePetDialog = ({
               width: 100,
               height: 100,
               borderRadius: "50%",
-              background: "rgba(229,53,53,0.07)",
+              background:
+                theme.palette.mode === "dark"
+                  ? alpha(theme.palette.error.main, 0.12)
+                  : "rgba(229,53,53,0.07)",
               pointerEvents: "none",
             },
-          }}
+          })}
         >
           <Stack
             direction="row"
@@ -99,23 +111,23 @@ export const DeletePetDialog = ({
 
               <Box>
                 <Typography
-                  sx={{
+                  sx={(theme) => ({
                     fontSize: scaleFont(19, settings?.textSize),
                     fontWeight: 800,
-                    color: "#071c42",
+                    color: theme.palette.text.primary,
                     lineHeight: 1.2,
                     letterSpacing: "-0.3px",
-                  }}
+                  })}
                 >
                   {t("dashboard:deletePetTitle")}
                 </Typography>
                 <Typography
-                  sx={{
+                  sx={(theme) => ({
                     fontSize: scaleFont(13, settings?.textSize),
-                    color: "#8a95a3",
+                    color: theme.palette.text.secondary,
                     mt: 0.4,
                     fontWeight: 400,
-                  }}
+                  })}
                 >
                   {t("dashboard:deletePetSubtitle")}
                 </Typography>
@@ -125,25 +137,31 @@ export const DeletePetDialog = ({
             <IconButton
               onClick={onClose}
               size="small"
-              sx={{
-                color: "#9ca3af",
-                backgroundColor: "rgba(0,0,0,0.04)",
+              sx={(theme) => ({
+                color: theme.palette.text.secondary,
+                backgroundColor:
+                  theme.palette.mode === "dark"
+                    ? alpha("#ffffff", 0.06)
+                    : "rgba(0,0,0,0.04)",
                 borderRadius: 2,
                 width: 32,
                 height: 32,
                 mt: 0.5,
                 "&:hover": {
-                  backgroundColor: "rgba(0,0,0,0.08)",
-                  color: "#4b5563",
+                  backgroundColor:
+                    theme.palette.mode === "dark"
+                      ? alpha("#ffffff", 0.1)
+                      : "rgba(0,0,0,0.08)",
+                  color: theme.palette.text.primary,
                 },
-              }}
+              })}
             >
               <CloseRoundedIcon sx={{ fontSize: 18 }} />
             </IconButton>
           </Stack>
         </Box>
 
-        <Divider sx={{ borderColor: "#ede8e0" }} />
+        <Divider />
       </DialogTitle>
 
       <DialogContent
@@ -161,7 +179,7 @@ export const DeletePetDialog = ({
         <Stack spacing={3}>
           {pet && (
             <Box
-              sx={{
+              sx={(theme) => ({
                 mt: 1,
                 display: "flex",
                 alignItems: "center",
@@ -169,25 +187,34 @@ export const DeletePetDialog = ({
                 px: 2.5,
                 py: 2,
                 borderRadius: 3,
-                border: "1px solid #ede8e0",
-                backgroundColor: "#fff",
-              }}
+                border: `1px solid ${theme.palette.divider}`,
+                backgroundColor:
+                  theme.palette.mode === "dark"
+                    ? alpha("#ffffff", 0.03)
+                    : theme.palette.background.paper,
+              })}
             >
               <Box
-                sx={{
+                sx={(theme) => ({
                   width: 48,
                   height: 48,
                   borderRadius: 2,
                   flexShrink: 0,
-                  background: "linear-gradient(135deg, #fbf2ea 0%, #fde8c8 100%)",
+                  background:
+                    theme.palette.mode === "dark"
+                      ? `linear-gradient(135deg, ${alpha(
+                          theme.palette.primary.main,
+                          0.14
+                        )} 0%, ${alpha(theme.palette.primary.light, 0.22)} 100%)`
+                      : "linear-gradient(135deg, #fbf2ea 0%, #fde8c8 100%)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   fontSize: scaleFont(22, settings?.textSize),
                   fontWeight: 800,
-                  color: "#f5a623",
+                  color: theme.palette.primary.main,
                   overflow: "hidden",
-                }}
+                })}
               >
                 {pet.imageUrl ? (
                   <Box
@@ -203,21 +230,21 @@ export const DeletePetDialog = ({
 
               <Box>
                 <Typography
-                  sx={{
+                  sx={(theme) => ({
                     fontSize: scaleFont(15, settings?.textSize),
                     fontWeight: 700,
-                    color: "#071c42",
+                    color: theme.palette.text.primary,
                     letterSpacing: "-0.2px",
-                  }}
+                  })}
                 >
                   {pet.name}
                 </Typography>
                 <Typography
-                  sx={{
+                  sx={(theme) => ({
                     fontSize: scaleFont(13, settings?.textSize),
-                    color: "#8a95a3",
+                    color: theme.palette.text.secondary,
                     mt: 0.2,
-                  }}
+                  })}
                 >
                   {pet.breed} · {pet.weight}
                 </Typography>
@@ -226,57 +253,73 @@ export const DeletePetDialog = ({
           )}
 
           <Box
-            sx={{
+            sx={(theme) => ({
               px: 2,
               py: 1.75,
               borderRadius: 3,
-              backgroundColor: "#fff5f5",
-              border: "1px solid #fcd9d9",
+              backgroundColor:
+                theme.palette.mode === "dark"
+                  ? alpha(theme.palette.error.main, 0.1)
+                  : "#fff5f5",
+              border: `1px solid ${
+                theme.palette.mode === "dark"
+                  ? alpha(theme.palette.error.main, 0.24)
+                  : "#fcd9d9"
+              }`,
               display: "flex",
               alignItems: "flex-start",
               gap: 1.5,
-            }}
+            })}
           >
             <Box
-              sx={{
+              sx={(theme) => ({
                 width: 6,
                 height: 6,
                 borderRadius: "50%",
-                backgroundColor: "#e53535",
+                backgroundColor: theme.palette.error.main,
                 flexShrink: 0,
                 mt: 0.7,
-              }}
+              })}
             />
             <Typography
-              sx={{
+              sx={(theme) => ({
                 fontSize: scaleFont(13.5, settings?.textSize),
-                color: "#7a3030",
+                color:
+                  theme.palette.mode === "dark"
+                    ? alpha(theme.palette.error.main, 0.95)
+                    : "#7a3030",
                 lineHeight: 1.65,
-              }}
+              })}
             >
               {t("dashboard:deletePetConfirmMessage")}
             </Typography>
           </Box>
 
-          <Divider sx={{ borderColor: "#ede8e0" }} />
+          <Divider />
 
           <Stack direction="row" spacing={1.5}>
             <Button
               fullWidth
               onClick={onClose}
-              sx={{
+              sx={(theme) => ({
                 py: 1.35,
                 borderRadius: 2.5,
                 textTransform: "none",
                 fontWeight: 600,
                 fontSize: scaleFont(14, settings?.textSize),
-                color: "#4b5563",
-                backgroundColor: "#f0f2f7",
+                color: theme.palette.text.secondary,
+                backgroundColor:
+                  theme.palette.mode === "dark"
+                    ? alpha("#ffffff", 0.06)
+                    : "#f0f2f7",
                 boxShadow: "none",
                 "&:hover": {
-                  backgroundColor: "#e4e8f0",
+                  backgroundColor:
+                    theme.palette.mode === "dark"
+                      ? alpha("#ffffff", 0.12)
+                      : "#e4e8f0",
                 },
-              }}
+              })}
             >
               {t("dashboard:cancel")}
             </Button>

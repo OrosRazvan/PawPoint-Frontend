@@ -8,14 +8,13 @@ import {
 } from "@mui/material";
 import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
+import { alpha } from "@mui/material/styles";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useVetAvailability } from "../../hooks/useVetAvailability";
 import { useSettings } from "../../hooks/useSettings";
 import { scaleFont } from "../../utils/fontScale";
 import type { VetCabinetDto } from "./types/appointment";
-
-const pageBg = "#f8f4ef";
 
 type EditingAppointment = {
   id: number;
@@ -227,7 +226,8 @@ export const BookAppointmentStep2 = () => {
         key,
         [...slots].sort(
           (a, b) =>
-            new Date(a.startTimeUtc).getTime() - new Date(b.startTimeUtc).getTime()
+            new Date(a.startTimeUtc).getTime() -
+            new Date(b.startTimeUtc).getTime()
         )
       );
     });
@@ -294,35 +294,41 @@ export const BookAppointmentStep2 = () => {
   if (!selectedCabinet) {
     return (
       <Box
-        sx={{
+        sx={(theme) => ({
           minHeight: "100vh",
-          backgroundColor: pageBg,
+          backgroundColor: theme.palette.background.default,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           px: 3,
-        }}
+        })}
       >
         <Stack spacing={2} alignItems="center">
-          <Typography sx={{ fontSize: scaleFont(24, settings?.textSize), fontWeight: 700 }}>
+          <Typography
+            sx={(theme) => ({
+              fontSize: scaleFont(24, settings?.textSize),
+              fontWeight: 700,
+              color: theme.palette.text.primary,
+            })}
+          >
             {t("noCabinetSelected")}
           </Typography>
 
           <Button
             onClick={() => navigate("/appointments/book")}
-            sx={{
+            sx={(theme) => ({
               px: 3,
               py: 1.2,
               borderRadius: 2.5,
               textTransform: "none",
-              backgroundColor: "#f7ae1a",
-              color: "#111827",
+              backgroundColor: theme.palette.primary.main,
+              color: theme.palette.primary.contrastText,
               fontWeight: 700,
               fontSize: scaleFont(14, settings?.textSize),
               "&:hover": {
-                backgroundColor: "#f3a400",
+                backgroundColor: theme.palette.primary.dark,
               },
-            }}
+            })}
           >
             {t("backToStep1")}
           </Button>
@@ -376,109 +382,92 @@ export const BookAppointmentStep2 = () => {
     return "full";
   };
 
+  const stepSx = (active: boolean) => (theme: any) => ({
+    flex: 1,
+    py: 2.6,
+    px: 3,
+    borderRadius: 3,
+    backgroundColor: active
+      ? theme.palette.primary.main
+      : theme.palette.mode === "dark"
+      ? alpha("#ffffff", 0.04)
+      : "#f8f8f8",
+    color: active
+      ? theme.palette.primary.contrastText
+      : theme.palette.text.secondary,
+    fontWeight: active ? 700 : 600,
+    textAlign: "center",
+    border: active ? "none" : `1px solid ${theme.palette.divider}`,
+    boxShadow: active
+      ? theme.palette.mode === "dark"
+        ? `0 8px 20px ${alpha(theme.palette.primary.main, 0.18)}`
+        : "0 8px 20px rgba(0,0,0,0.06)"
+      : "none",
+    fontSize: scaleFont(18, settings?.textSize),
+  });
+
   return (
     <Box
-      sx={{
+      sx={(theme) => ({
         minHeight: "100vh",
-        backgroundColor: pageBg,
+        backgroundColor: theme.palette.background.default,
         px: { xs: 2, sm: 3, md: 5 },
         py: { xs: 3, md: 5 },
-      }}
+      })}
     >
       <Stack spacing={4}>
         <Typography
-          sx={{
+          sx={(theme) => ({
             fontSize: {
               xs: scaleFont(34, settings?.textSize),
               md: scaleFont(44, settings?.textSize),
             },
             fontWeight: 800,
-            color: "#111827",
+            color: theme.palette.text.primary,
             lineHeight: 1.05,
-          }}
+          })}
         >
           {t("bookPageTitle")}
         </Typography>
 
         <Stack direction={{ xs: "column", md: "row" }} spacing={2.5}>
-          <Box
-            sx={{
-              flex: 1,
-              py: 2.6,
-              px: 3,
-              borderRadius: 3,
-              backgroundColor: "#f8f8f8",
-              color: "#5f7087",
-              fontWeight: 600,
-              textAlign: "center",
-              border: "1px solid #ebe7e1",
-              fontSize: scaleFont(18, settings?.textSize),
-            }}
-          >
-            {`1. ${t("step1")}`}
-          </Box>
-
-          <Box
-            sx={{
-              flex: 1,
-              py: 2.6,
-              px: 3,
-              borderRadius: 3,
-              backgroundColor: "#f7ae1a",
-              color: "#111827",
-              fontWeight: 700,
-              textAlign: "center",
-              boxShadow: "0 8px 20px rgba(0,0,0,0.06)",
-              fontSize: scaleFont(18, settings?.textSize),
-            }}
-          >
-            {`2. ${t("step2")}`}
-          </Box>
-
-          <Box
-            sx={{
-              flex: 1,
-              py: 2.6,
-              px: 3,
-              borderRadius: 3,
-              backgroundColor: "#f8f8f8",
-              color: "#5f7087",
-              fontWeight: 600,
-              textAlign: "center",
-              border: "1px solid #ebe7e1",
-              fontSize: scaleFont(18, settings?.textSize),
-            }}
-          >
-            {`3. ${t("step3")}`}
-          </Box>
+          <Box sx={stepSx(false)}>{`1. ${t("step1")}`}</Box>
+          <Box sx={stepSx(true)}>{`2. ${t("step2")}`}</Box>
+          <Box sx={stepSx(false)}>{`3. ${t("step3")}`}</Box>
         </Stack>
 
         <Box
-          sx={{
+          sx={(theme) => ({
             borderRadius: 4,
-            backgroundColor: "#fffdfb",
-            border: "1px solid #ebe3da",
+            backgroundColor: theme.palette.background.paper,
+            border: `1px solid ${theme.palette.divider}`,
             px: { xs: 2, md: 4 },
             py: { xs: 3, md: 4 },
-            boxShadow: "0 10px 24px rgba(0,0,0,0.05)",
-          }}
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 10px 24px rgba(0,0,0,0.28)"
+                : "0 10px 24px rgba(0,0,0,0.05)",
+          })}
         >
           <Stack spacing={4}>
             <Typography
-              sx={{
+              sx={(theme) => ({
                 fontSize: {
                   xs: scaleFont(28, settings?.textSize),
                   md: scaleFont(34, settings?.textSize),
                 },
                 fontWeight: 800,
-                color: "#111827",
-              }}
+                color: theme.palette.text.primary,
+              })}
             >
               {t("availabilityTitle")} — {selectedCabinet.name}
             </Typography>
 
             <Typography
-              sx={{ color: "#5f7087", fontSize: scaleFont(16, settings?.textSize) }}
+              sx={(theme) => ({
+                color: theme.palette.text.secondary,
+                fontSize: scaleFont(16, settings?.textSize),
+              })}
             >
               {t("service")}: {getServiceLabel(serviceType, t)}
             </Typography>
@@ -488,9 +477,7 @@ export const BookAppointmentStep2 = () => {
                 <CircularProgress />
               </Box>
             ) : isError ? (
-              <Typography color="error">
-                {t("availabilityLoadError")}
-              </Typography>
+              <Typography color="error">{t("availabilityLoadError")}</Typography>
             ) : (
               <>
                 <Stack
@@ -515,25 +502,28 @@ export const BookAppointmentStep2 = () => {
                             )
                           )
                         }
-                        sx={{
+                        sx={(theme) => ({
                           minWidth: 42,
                           width: 42,
                           height: 42,
                           borderRadius: 2.5,
-                          color: "#111827",
-                          backgroundColor: "#f3eee7",
-                        }}
+                          color: theme.palette.text.primary,
+                          backgroundColor:
+                            theme.palette.mode === "dark"
+                              ? alpha("#ffffff", 0.05)
+                              : "#f3eee7",
+                        })}
                       >
                         <ChevronLeftRoundedIcon />
                       </Button>
 
                       <Typography
-                        sx={{
+                        sx={(theme) => ({
                           fontSize: scaleFont(24, settings?.textSize),
                           fontWeight: 800,
-                          color: "#111827",
+                          color: theme.palette.text.primary,
                           textTransform: "capitalize",
-                        }}
+                        })}
                       >
                         {t(monthKeys[currentMonth.getMonth()])}{" "}
                         {currentMonth.getFullYear()}
@@ -549,14 +539,17 @@ export const BookAppointmentStep2 = () => {
                             )
                           )
                         }
-                        sx={{
+                        sx={(theme) => ({
                           minWidth: 42,
                           width: 42,
                           height: 42,
                           borderRadius: 2.5,
-                          color: "#111827",
-                          backgroundColor: "#f3eee7",
-                        }}
+                          color: theme.palette.text.primary,
+                          backgroundColor:
+                            theme.palette.mode === "dark"
+                              ? alpha("#ffffff", 0.05)
+                              : "#f3eee7",
+                        })}
                       >
                         <ChevronRightRoundedIcon />
                       </Button>
@@ -579,11 +572,11 @@ export const BookAppointmentStep2 = () => {
                           }}
                         >
                           <Typography
-                            sx={{
+                            sx={(theme) => ({
                               fontSize: scaleFont(16, settings?.textSize),
                               fontWeight: 600,
-                              color: "#5f7087",
-                            }}
+                              color: theme.palette.text.secondary,
+                            })}
                           >
                             {day}
                           </Typography>
@@ -609,248 +602,232 @@ export const BookAppointmentStep2 = () => {
                         const availableCount = daySlots.filter(isSlotAvailable).length;
                         const isSelected = selectedDateKey === key;
 
-                        let backgroundColor = "#ffffff";
-                        let border = "1px solid #e7e1d8";
-                        let textColor = "#111827";
-                        let subTextColor = "#6b7280";
-                        let cursor = "pointer";
-
-                        if (variant === "available") {
-                          backgroundColor = isSelected ? "#f7ae1a" : "#56c7c1";
-                          border = isSelected
-                            ? "2px solid #f5a623"
-                            : "1px solid transparent";
-                          textColor = "#111827";
-                          subTextColor = "#274b4a";
-                        }
-
-                        if (variant === "full") {
-                          backgroundColor = isSelected ? "#f7ae1a" : "#ffd37a";
-                          border = isSelected
-                            ? "2px solid #f5a623"
-                            : "1px solid transparent";
-                          textColor = "#111827";
-                          subTextColor = "#8a5d00";
-                        }
-
-                        if (variant === "unavailable") {
-                          backgroundColor = "#efefef";
-                          border = "1px solid #dddddd";
-                          textColor = "#b2b2b2";
-                          subTextColor = "#b8b8b8";
-                          cursor = "default";
-                        }
-
                         return (
                           <Box
                             key={key}
-                            onClick={() => {
-                              if (variant === "unavailable") return;
-                              setSelectedDateKey(key);
-                            }}
-                            sx={{
-                              minHeight: 78,
-                              borderRadius: 3,
-                              px: 1.2,
-                              py: 1.1,
-                              backgroundColor,
-                              border,
-                              cursor,
-                              display: "flex",
-                              flexDirection: "column",
-                              justifyContent: "space-between",
-                              transition: "all 0.2s ease",
-                              opacity: variant === "unavailable" ? 0.9 : 1,
+                            onClick={() =>
+                              variant !== "unavailable" && setSelectedDateKey(key)
+                            }
+                            sx={(theme) => {
+                              let backgroundColor = theme.palette.background.paper;
+                              let border = `1px solid ${theme.palette.divider}`;
+                              let textColor = theme.palette.text.primary;
+                              let subTextColor = theme.palette.text.secondary;
+                              let cursor = "pointer";
+
+                              if (variant === "available") {
+                                backgroundColor = isSelected
+                                  ? theme.palette.primary.main
+                                  : theme.palette.mode === "dark"
+                                  ? alpha(theme.palette.success.main, 0.22)
+                                  : "#56c7c1";
+                                border = isSelected
+                                  ? `2px solid ${theme.palette.primary.main}`
+                                  : "1px solid transparent";
+                                textColor = isSelected
+                                  ? theme.palette.primary.contrastText
+                                  : theme.palette.text.primary;
+                                subTextColor = isSelected
+                                  ? alpha(theme.palette.primary.contrastText, 0.8)
+                                  : theme.palette.mode === "dark"
+                                  ? "#b6f3e8"
+                                  : "#274b4a";
+                              }
+
+                              if (variant === "full") {
+                                backgroundColor = isSelected
+                                  ? theme.palette.primary.main
+                                  : theme.palette.mode === "dark"
+                                  ? alpha(theme.palette.warning.main, 0.22)
+                                  : "#ffd37a";
+                                border = isSelected
+                                  ? `2px solid ${theme.palette.primary.main}`
+                                  : "1px solid transparent";
+                                textColor = isSelected
+                                  ? theme.palette.primary.contrastText
+                                  : theme.palette.text.primary;
+                                subTextColor = isSelected
+                                  ? alpha(theme.palette.primary.contrastText, 0.8)
+                                  : theme.palette.mode === "dark"
+                                  ? "#ffd98f"
+                                  : "#8a5d00";
+                              }
+
+                              if (variant === "unavailable") {
+                                backgroundColor =
+                                  theme.palette.mode === "dark"
+                                    ? alpha("#ffffff", 0.04)
+                                    : "#efefef";
+                                border = `1px solid ${theme.palette.divider}`;
+                                textColor = theme.palette.text.secondary;
+                                subTextColor = theme.palette.text.secondary;
+                                cursor = "default";
+                              }
+
+                              return {
+                                minHeight: 78,
+                                p: 1.4,
+                                borderRadius: 2.5,
+                                backgroundColor,
+                                border,
+                                cursor,
+                                transition: "all 0.2s ease",
+                              };
                             }}
                           >
                             <Typography
-                              sx={{
+                              sx={(theme) => ({
                                 fontSize: scaleFont(16, settings?.textSize),
-                                fontWeight: 700,
-                                color: textColor,
-                                textAlign: "center",
-                              }}
+                                fontWeight: 800,
+                                color:
+                                  variant === "unavailable"
+                                    ? theme.palette.text.secondary
+                                    : selectedDateKey === key
+                                    ? theme.palette.primary.contrastText
+                                    : theme.palette.text.primary,
+                              })}
                             >
                               {date.getDate()}
                             </Typography>
 
                             <Typography
-                              sx={{
+                              sx={(theme) => ({
+                                mt: 0.6,
                                 fontSize: scaleFont(12, settings?.textSize),
-                                fontWeight: 600,
-                                color: subTextColor,
-                                textAlign: "center",
-                              }}
+                                color:
+                                  variant === "unavailable"
+                                    ? theme.palette.text.secondary
+                                    : selectedDateKey === key
+                                    ? alpha(theme.palette.primary.contrastText, 0.82)
+                                    : variant === "available"
+                                    ? theme.palette.mode === "dark"
+                                      ? "#b6f3e8"
+                                      : "#274b4a"
+                                    : theme.palette.mode === "dark"
+                                    ? "#ffd98f"
+                                    : "#8a5d00",
+                              })}
                             >
                               {variant === "unavailable"
-                                ? t("calendarNoSlots")
-                                : t("calendarSlots", { count: availableCount })}
+                                ? t("noSlots")
+                                : variant === "full"
+                                ? t("full")
+                                : `${availableCount} ${t("availableSlots")}`}
                             </Typography>
                           </Box>
                         );
                       })}
                     </Box>
-
-                    <Stack direction="row" spacing={3} sx={{ mt: 4, flexWrap: "wrap" }}>
-                      <Stack direction="row" spacing={1.2} alignItems="center">
-                        <Box
-                          sx={{
-                            width: 16,
-                            height: 16,
-                            borderRadius: 1,
-                            backgroundColor: "#56c7c1",
-                          }}
-                        />
-                        <Typography
-                          sx={{ color: "#5f7087", fontSize: scaleFont(15, settings?.textSize) }}
-                        >
-                          {t("calendarAvailable")}
-                        </Typography>
-                      </Stack>
-
-                      <Stack direction="row" spacing={1.2} alignItems="center">
-                        <Box
-                          sx={{
-                            width: 16,
-                            height: 16,
-                            borderRadius: 1,
-                            backgroundColor: "#ffd37a",
-                          }}
-                        />
-                        <Typography
-                          sx={{ color: "#5f7087", fontSize: scaleFont(15, settings?.textSize) }}
-                        >
-                          {t("calendarLimited")}
-                        </Typography>
-                      </Stack>
-
-                      <Stack direction="row" spacing={1.2} alignItems="center">
-                        <Box
-                          sx={{
-                            width: 16,
-                            height: 16,
-                            borderRadius: 1,
-                            backgroundColor: "#efefef",
-                            border: "1px solid #dddddd",
-                          }}
-                        />
-                        <Typography
-                          sx={{ color: "#5f7087", fontSize: scaleFont(15, settings?.textSize) }}
-                        >
-                          {t("calendarUnavailable")}
-                        </Typography>
-                      </Stack>
-                    </Stack>
                   </Box>
 
-                  <Box sx={{ flex: 1, width: "100%" }}>
+                  <Box
+                    sx={(theme) => ({
+                      width: "100%",
+                      maxWidth: { lg: 360 },
+                      borderRadius: 3,
+                      border: `1px solid ${theme.palette.divider}`,
+                      backgroundColor:
+                        theme.palette.mode === "dark"
+                          ? alpha("#ffffff", 0.03)
+                          : "#faf8f5",
+                      p: 3,
+                    })}
+                  >
                     <Typography
-                      sx={{
-                        fontSize: scaleFont(24, settings?.textSize),
+                      sx={(theme) => ({
+                        fontSize: scaleFont(22, settings?.textSize),
                         fontWeight: 800,
-                        color: "#111827",
-                        mb: 2,
-                      }}
+                        color: theme.palette.text.primary,
+                      })}
                     >
-                      {t("availableHours")}
+                      {selectedDateLabel || t("selectDate")}
                     </Typography>
 
-                    {selectedDateKey ? (
-                      <>
+                    <Stack spacing={1.5} sx={{ mt: 2.5 }}>
+                      {selectedDaySlots.length === 0 ? (
                         <Typography
-                          sx={{
-                            mb: 3,
-                            fontSize: scaleFont(16, settings?.textSize),
-                            color: "#5f7087",
-                          }}
+                          sx={(theme) => ({
+                            fontSize: scaleFont(15, settings?.textSize),
+                            color: theme.palette.text.secondary,
+                          })}
                         >
-                          {t("availableHoursFor", { date: selectedDateLabel })}
+                          {t("noSlotsAvailable")}
                         </Typography>
+                      ) : (
+                        selectedDaySlots.map((slot) => {
+                          const isSelected =
+                            selectedSlot?.startTimeUtc === slot.startTimeUtc;
 
-                        {selectedDaySlots.length > 0 ? (
-                          <Box
-                            sx={{
-                              display: "grid",
-                              gridTemplateColumns: {
-                                xs: "repeat(2, minmax(0, 1fr))",
-                                md: "repeat(3, minmax(0, 1fr))",
-                              },
-                              gap: 2,
-                            }}
-                          >
-                            {selectedDaySlots.map((slot, index) => {
-                              const isSelectedSlot =
-                                selectedSlot?.startTimeUtc === slot.startTimeUtc;
-
-                              return (
-                                <Button
-                                  key={`${slot.startTimeUtc}-${index}`}
-                                  onClick={() => setSelectedSlot(slot)}
-                                  sx={{
-                                    py: 2.1,
-                                    borderRadius: 2.5,
-                                    textTransform: "none",
-                                    fontSize: scaleFont(18, settings?.textSize),
-                                    fontWeight: 700,
-                                    border: isSelectedSlot
-                                      ? "2px solid #f5a623"
-                                      : "1px solid #e4ddd4",
-                                    backgroundColor: isSelectedSlot
-                                      ? "#f7ae1a"
-                                      : "#fff",
-                                    color: "#111827",
-                                    "&:hover": {
-                                      backgroundColor: isSelectedSlot
-                                        ? "#f3a400"
-                                        : "#faf6ef",
-                                    },
-                                  }}
-                                >
-                                  {formatTime(slot.startTimeUtc)}
-                                </Button>
-                              );
-                            })}
-                          </Box>
-                        ) : (
-                          <Typography
-                            sx={{ color: "#8b8b8b", fontSize: scaleFont(16, settings?.textSize) }}
-                          >
-                            {t("noHoursOnDay")}
-                          </Typography>
-                        )}
-                      </>
-                    ) : (
-                      <Typography
-                        sx={{ color: "#8b8b8b", fontSize: scaleFont(16, settings?.textSize) }}
-                      >
-                        {t("selectDayPrompt")}
-                      </Typography>
-                    )}
+                          return (
+                            <Button
+                              key={`${slot.startTimeUtc}-${slot.endTimeUtc}`}
+                              onClick={() => setSelectedSlot(slot)}
+                              sx={(theme) => ({
+                                justifyContent: "space-between",
+                                px: 2,
+                                py: 1.35,
+                                borderRadius: 2.5,
+                                textTransform: "none",
+                                fontSize: scaleFont(16, settings?.textSize),
+                                fontWeight: 700,
+                                backgroundColor: isSelected
+                                  ? theme.palette.primary.main
+                                  : theme.palette.mode === "dark"
+                                  ? alpha("#ffffff", 0.04)
+                                  : theme.palette.background.paper,
+                                color: isSelected
+                                  ? theme.palette.primary.contrastText
+                                  : theme.palette.text.primary,
+                                border: isSelected
+                                  ? `1px solid ${theme.palette.primary.main}`
+                                  : `1px solid ${theme.palette.divider}`,
+                                "&:hover": {
+                                  backgroundColor: isSelected
+                                    ? theme.palette.primary.dark
+                                    : theme.palette.mode === "dark"
+                                    ? alpha("#ffffff", 0.07)
+                                    : "#f3eee7",
+                                },
+                              })}
+                            >
+                              <span>{formatTime(slot.startTimeUtc)}</span>
+                              <span>{formatTime(slot.endTimeUtc)}</span>
+                            </Button>
+                          );
+                        })
+                      )}
+                    </Stack>
                   </Box>
                 </Stack>
 
                 <Stack
                   direction="row"
                   justifyContent="space-between"
-                  sx={{ pt: 4 }}
+                  sx={{ pt: 2 }}
                 >
                   <Button
                     onClick={handleBack}
                     startIcon={<ChevronLeftRoundedIcon />}
-                    sx={{
-                      minWidth: 160,
+                    sx={(theme) => ({
+                      minWidth: 140,
                       px: 3.5,
                       py: 1.55,
                       borderRadius: 2.5,
                       textTransform: "none",
                       fontSize: scaleFont(18, settings?.textSize),
                       fontWeight: 700,
-                      backgroundColor: "#e8e2d9",
-                      color: "#111827",
+                      backgroundColor:
+                        theme.palette.mode === "dark"
+                          ? alpha("#ffffff", 0.06)
+                          : "#e8e2d9",
+                      color: theme.palette.text.primary,
                       "&:hover": {
-                        backgroundColor: "#ddd5ca",
+                        backgroundColor:
+                          theme.palette.mode === "dark"
+                            ? alpha("#ffffff", 0.1)
+                            : "#ddd5ca",
                       },
-                    }}
+                    })}
                   >
                     {t("back")}
                   </Button>
@@ -859,24 +836,42 @@ export const BookAppointmentStep2 = () => {
                     onClick={handleNext}
                     disabled={!selectedSlot}
                     endIcon={<ChevronRightRoundedIcon />}
-                    sx={{
-                      minWidth: 160,
+                    sx={(theme) => ({
+                      minWidth: 180,
                       px: 3.5,
                       py: 1.55,
                       borderRadius: 2.5,
                       textTransform: "none",
                       fontSize: scaleFont(18, settings?.textSize),
                       fontWeight: 700,
-                      backgroundColor: selectedSlot ? "#f7ae1a" : "#f4d28a",
-                      color: selectedSlot ? "#111827" : "#8c7a4e",
+                      backgroundColor: selectedSlot
+                        ? theme.palette.primary.main
+                        : theme.palette.mode === "dark"
+                        ? alpha(theme.palette.primary.main, 0.25)
+                        : "#f4d28a",
+                      color: selectedSlot
+                        ? theme.palette.primary.contrastText
+                        : theme.palette.mode === "dark"
+                        ? alpha("#ffffff", 0.45)
+                        : "#8c7a4e",
                       "&:hover": {
-                        backgroundColor: selectedSlot ? "#f3a400" : "#f4d28a",
+                        backgroundColor: selectedSlot
+                          ? theme.palette.primary.dark
+                          : theme.palette.mode === "dark"
+                          ? alpha(theme.palette.primary.main, 0.25)
+                          : "#f4d28a",
                       },
                       "&.Mui-disabled": {
-                        backgroundColor: "#f4d28a",
-                        color: "#8c7a4e",
+                        backgroundColor:
+                          theme.palette.mode === "dark"
+                            ? alpha(theme.palette.primary.main, 0.25)
+                            : "#f4d28a",
+                        color:
+                          theme.palette.mode === "dark"
+                            ? alpha("#ffffff", 0.45)
+                            : "#8c7a4e",
                       },
-                    }}
+                    })}
                   >
                     {t("next")}
                   </Button>

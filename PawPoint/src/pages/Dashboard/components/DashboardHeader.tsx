@@ -13,24 +13,24 @@ export const DashboardHeader = ({ title, subtitle }: Props) => {
   return (
     <Stack spacing={1} sx={{ mb: 4 }}>
       <Typography
-        sx={{
+        sx={(theme) => ({
           fontSize: {
             xs: scaleFont(34, settings?.textSize),
             md: scaleFont(42, settings?.textSize),
           },
           fontWeight: 800,
           lineHeight: 1.1,
-          color: "#0b1f44",
-        }}
+          color: theme.palette.text.primary,
+        })}
       >
         {title}
       </Typography>
 
       <Typography
-        sx={{
+        sx={(theme) => ({
           fontSize: scaleFont(18, settings?.textSize),
-          color: "#3f5878",
-        }}
+          color: theme.palette.text.secondary,
+        })}
       >
         {subtitle}
       </Typography>

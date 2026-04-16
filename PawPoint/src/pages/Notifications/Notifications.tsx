@@ -8,13 +8,15 @@ import {
 } from "@mui/material";
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
 import DoneRoundedIcon from "@mui/icons-material/DoneRounded";
+import { alpha } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
 import { useNotifications } from "../../hooks/useNotifications";
 import { useMarkNotificationRead } from "../../hooks/useMarkNotificationRead";
 import { useDeleteNotification } from "../../hooks/useDeleteNotification";
 import { useNotificationRealtime } from "../../hooks/useNotificationRealtime";
-
-const pageBg = "#f8f4ef";
+import { useSettings } from "../../hooks/useSettings";
+import { scaleFont } from "../../utils/fontScale";
+import { getAccessToken } from "../../auth/tokenStorage";
 
 const formatDate = (value: string) => {
   const date = new Date(value);
@@ -30,8 +32,13 @@ const formatDate = (value: string) => {
 };
 
 export const Notifications = () => {
+  const token = getAccessToken();
   const { t } = useTranslation(["notifications"]);
-  useNotificationRealtime();
+  const { data: settings } = useSettings();
+
+  if (token) {
+    useNotificationRealtime();
+  }
 
   const { data, isLoading, isError } = useNotifications({
     pageNumber: 1,
@@ -45,20 +52,23 @@ export const Notifications = () => {
 
   return (
     <Box
-      sx={{
+      sx={(theme) => ({
         minHeight: "100vh",
-        backgroundColor: pageBg,
+        backgroundColor: theme.palette.background.default,
         px: { xs: 2, sm: 3, md: 5 },
         py: { xs: 3, md: 5 },
-      }}
+      })}
     >
       <Stack spacing={4}>
         <Typography
-          sx={{
-            fontSize: { xs: 34, md: 42 },
+          sx={(theme) => ({
+            fontSize: {
+              xs: scaleFont(34, settings?.textSize),
+              md: scaleFont(42, settings?.textSize),
+            },
             fontWeight: 800,
-            color: "#0b1f44",
-          }}
+            color: theme.palette.text.primary,
+          })}
         >
           {t("notifications:title")}
         </Typography>
@@ -70,7 +80,12 @@ export const Notifications = () => {
         ) : isError ? (
           <Typography color="error">{t("notifications:loadError")}</Typography>
         ) : notifications.length === 0 ? (
-          <Typography sx={{ color: "#667085" }}>
+          <Typography
+            sx={(theme) => ({
+              color: theme.palette.text.secondary,
+              fontSize: scaleFont(16, settings?.textSize),
+            })}
+          >
             {t("notifications:empty")}
           </Typography>
         ) : (
@@ -78,13 +93,20 @@ export const Notifications = () => {
             {notifications.map((item: typeof notifications[number]) => (
               <Box
                 key={item.id}
-                sx={{
+                sx={(theme) => ({
                   p: 3,
                   borderRadius: 3,
-                  border: "1px solid #ebe3da",
-                  backgroundColor: item.isRead ? "#f5f5f5" : "#fffdfb",
-                  boxShadow: "0 8px 20px rgba(0,0,0,0.03)",
-                }}
+                  border: `1px solid ${theme.palette.divider}`,
+                  backgroundColor: item.isRead
+                    ? theme.palette.mode === "dark"
+                      ? alpha("#ffffff", 0.03)
+                      : "#f5f5f5"
+                    : theme.palette.background.paper,
+                  boxShadow:
+                    theme.palette.mode === "dark"
+                      ? "0 8px 20px rgba(0,0,0,0.22)"
+                      : "0 8px 20px rgba(0,0,0,0.03)",
+                })}
               >
                 <Stack spacing={2}>
                   <Stack
@@ -95,31 +117,35 @@ export const Notifications = () => {
                   >
                     <Box>
                       <Typography
-                        sx={{
-                          fontSize: 18,
+                        sx={(theme) => ({
+                          fontSize: scaleFont(18, settings?.textSize),
                           fontWeight: item.isRead ? 700 : 800,
-                          color: item.isRead ? "#667085" : "#071c42",
-                        }}
+                          color: item.isRead
+                            ? theme.palette.text.secondary
+                            : theme.palette.text.primary,
+                        })}
                       >
                         {item.name}
                       </Typography>
 
                       <Typography
-                        sx={{
+                        sx={(theme) => ({
                           mt: 1,
-                          fontSize: 15,
-                          color: item.isRead ? "#98a2b3" : "#475467",
-                        }}
+                          fontSize: scaleFont(15, settings?.textSize),
+                          color: item.isRead
+                            ? alpha(theme.palette.text.secondary, 0.8)
+                            : theme.palette.text.secondary,
+                        })}
                       >
                         {item.content}
                       </Typography>
 
                       <Typography
-                        sx={{
+                        sx={(theme) => ({
                           mt: 1,
-                          fontSize: 13,
-                          color: "#98a2b3",
-                        }}
+                          fontSize: scaleFont(13, settings?.textSize),
+                          color: alpha(theme.palette.text.secondary, 0.75),
+                        })}
                       >
                         {formatDate(item.createdAt)}
                       </Typography>
@@ -127,11 +153,15 @@ export const Notifications = () => {
 
                     <Chip
                       label={item.typeName}
-                      sx={{
+                      sx={(theme) => ({
                         borderRadius: 999,
-                        backgroundColor: "#f2f4f7",
-                        color: "#475467",
-                      }}
+                        backgroundColor:
+                          theme.palette.mode === "dark"
+                            ? alpha("#ffffff", 0.06)
+                            : "#f2f4f7",
+                        color: theme.palette.text.secondary,
+                        fontSize: scaleFont(13, settings?.textSize),
+                      })}
                     />
                   </Stack>
 
@@ -140,13 +170,23 @@ export const Notifications = () => {
                       <Button
                         startIcon={<DoneRoundedIcon />}
                         onClick={() => markAsRead(item.id)}
-                        sx={{
+                        sx={(theme) => ({
                           borderRadius: 2.5,
                           textTransform: "none",
                           fontWeight: 700,
-                          backgroundColor: "#e7f8ec",
-                          color: "#067647",
-                        }}
+                          fontSize: scaleFont(14, settings?.textSize),
+                          backgroundColor:
+                            theme.palette.mode === "dark"
+                              ? alpha(theme.palette.success.main, 0.14)
+                              : "#e7f8ec",
+                          color: theme.palette.success.main,
+                          "&:hover": {
+                            backgroundColor:
+                              theme.palette.mode === "dark"
+                                ? alpha(theme.palette.success.main, 0.22)
+                                : "#d8f2e0",
+                          },
+                        })}
                       >
                         {t("notifications:markAsRead")}
                       </Button>
@@ -155,13 +195,23 @@ export const Notifications = () => {
                     <Button
                       startIcon={<DeleteOutlineRoundedIcon />}
                       onClick={() => deleteNotification(item.id)}
-                      sx={{
+                      sx={(theme) => ({
                         borderRadius: 2.5,
                         textTransform: "none",
                         fontWeight: 700,
-                        backgroundColor: "#fde8e8",
-                        color: "#d92d20",
-                      }}
+                        fontSize: scaleFont(14, settings?.textSize),
+                        backgroundColor:
+                          theme.palette.mode === "dark"
+                            ? alpha(theme.palette.error.main, 0.14)
+                            : "#fde8e8",
+                        color: theme.palette.error.main,
+                        "&:hover": {
+                          backgroundColor:
+                            theme.palette.mode === "dark"
+                              ? alpha(theme.palette.error.main, 0.22)
+                              : "#fbdede",
+                        },
+                      })}
                     >
                       {t("notifications:delete")}
                     </Button>

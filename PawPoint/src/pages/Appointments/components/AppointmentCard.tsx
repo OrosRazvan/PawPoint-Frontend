@@ -8,6 +8,7 @@ import {
 } from "@mui/material";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import { alpha } from "@mui/material/styles";
 import { useSettings } from "../../../hooks/useSettings";
 import { scaleFont } from "../../../utils/fontScale";
 import type { AppointmentCardItem } from "../types/appointment";
@@ -73,13 +74,16 @@ export const AppointmentCard = ({ item, onEdit }: Props) => {
   return (
     <Paper
       elevation={0}
-      sx={{
+      sx={(theme) => ({
         p: 3,
         borderRadius: 4,
-        border: "1px solid #e7e1d8",
-        backgroundColor: "#faf8f5",
+        border: `1px solid ${theme.palette.divider}`,
+        backgroundColor:
+          theme.palette.mode === "dark"
+            ? alpha("#ffffff", 0.03)
+            : "#faf8f5",
         minHeight: 250,
-      }}
+      })}
     >
       <Stack spacing={2}>
         <Stack
@@ -89,23 +93,23 @@ export const AppointmentCard = ({ item, onEdit }: Props) => {
         >
           <Box>
             <Typography
-              sx={{
+              sx={(theme) => ({
                 fontSize: scaleFont(18, settings?.textSize),
                 fontWeight: 800,
-                color: "#071c42",
+                color: theme.palette.text.primary,
                 lineHeight: 1.2,
-              }}
+              })}
             >
               {item.animalName}
             </Typography>
 
             <Typography
-              sx={{
+              sx={(theme) => ({
                 mt: 1,
                 fontSize: scaleFont(13, settings?.textSize),
-                color: "#7b8794",
+                color: theme.palette.text.secondary,
                 fontWeight: 500,
-              }}
+              })}
             >
               {item.serviceType}
             </Typography>
@@ -114,58 +118,65 @@ export const AppointmentCard = ({ item, onEdit }: Props) => {
           <Chip
             label={item.status}
             size="small"
-            sx={{
+            sx={(theme) => ({
               height: 30,
               borderRadius: 999,
               fontWeight: 700,
               fontSize: scaleFont(12, settings?.textSize),
               textTransform: "lowercase",
-              backgroundColor: isCompleted ? "#dff4f1" : "#f8ecd8",
-              color: isCompleted ? "#57cfc8" : "#f5a623",
-            }}
+              backgroundColor: isCompleted
+                ? alpha(theme.palette.success.main, 0.16)
+                : alpha(theme.palette.primary.main, 0.16),
+              color: isCompleted
+                ? theme.palette.success.main
+                : theme.palette.primary.main,
+            })}
           />
         </Stack>
 
         <Stack spacing={1.2}>
           <Stack direction="row" spacing={1.2} alignItems="center">
             <CalendarTodayOutlinedIcon
-              sx={{ fontSize: 18, color: "#8a95a3" }}
+              sx={(theme) => ({
+                fontSize: 18,
+                color: theme.palette.text.secondary,
+              })}
             />
             <Typography
-              sx={{
+              sx={(theme) => ({
                 fontSize: scaleFont(13, settings?.textSize),
-                color: "#667085",
-              }}
+                color: theme.palette.text.secondary,
+              })}
             >
               {formatDateTimeBySettings(item.slotStartTimeUtc, dateFormat)}
             </Typography>
           </Stack>
 
           <Typography
-            sx={{
+            sx={(theme) => ({
               fontSize: scaleFont(13, settings?.textSize),
               fontWeight: 700,
-              color: "#071c42",
-            }}
+              color: theme.palette.text.primary,
+            })}
           >
             {item.vetCabinetName || "—"}
           </Typography>
 
           <Typography
-            sx={{
+            sx={(theme) => ({
               fontSize: scaleFont(13, settings?.textSize),
-              color: "#667085",
-            }}
+              color: theme.palette.text.secondary,
+            })}
           >
             {item.vetCabinetAddress || "—"}
           </Typography>
 
           <Typography
-            sx={{
+            sx={(theme) => ({
               fontSize: scaleFont(13, settings?.textSize),
-              color: "#071c42",
+              color: theme.palette.text.primary,
               fontWeight: 700,
-            }}
+            })}
           >
             {item.priceRon != null ? `${item.priceRon} RON` : "—"}
           </Typography>
@@ -176,16 +187,16 @@ export const AppointmentCard = ({ item, onEdit }: Props) => {
             <Button
               fullWidth
               onClick={onEdit}
-              sx={{
+              sx={(theme) => ({
                 py: 1.15,
                 borderRadius: 2.5,
-                backgroundColor: "#dff4f1",
-                color: "#57cfc8",
+                backgroundColor: alpha(theme.palette.success.main, 0.14),
+                color: theme.palette.success.main,
                 minWidth: 0,
                 "&:hover": {
-                  backgroundColor: "#d2efeb",
+                  backgroundColor: alpha(theme.palette.success.main, 0.22),
                 },
-              }}
+              })}
             >
               <EditOutlinedIcon sx={{ fontSize: 19 }} />
             </Button>

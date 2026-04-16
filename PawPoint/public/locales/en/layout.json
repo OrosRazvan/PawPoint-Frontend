@@ -7,7 +7,9 @@
     "appointments": "Appointments",
     "deworming": "Deworming",
     "assistant": "Assistant",
-    "logout": "Logout"
+    "logout": "Logout",
+    "profile": "Profile",
+    "settings": "Settings"
   },
   "footer": {
     "aboutTitle": "About PawPoint",

@@ -7,6 +7,7 @@ import {
   MenuItem,
   Typography,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import { useTranslation } from "react-i18next";
 
@@ -56,21 +57,27 @@ export const LanguageSwitcher = () => {
       <Button
         onClick={handleOpen}
         endIcon={<KeyboardArrowDownRoundedIcon />}
-        sx={{
+        sx={(theme) => ({
           minWidth: "unset",
           px: 1.6,
           py: 0.9,
           borderRadius: "999px",
           textTransform: "none",
           fontWeight: 700,
-          color: "#1f2a37",
-          backgroundColor: "#fff",
-          border: "1px solid #ece7df",
-          boxShadow: "0 6px 18px rgba(0,0,0,0.06)",
+          color: theme.palette.text.primary,
+          backgroundColor: theme.palette.background.paper,
+          border: `1px solid ${theme.palette.divider}`,
+          boxShadow:
+            theme.palette.mode === "dark"
+              ? "0 8px 22px rgba(0,0,0,0.28)"
+              : "0 6px 18px rgba(0,0,0,0.06)",
           "&:hover": {
-            backgroundColor: "#faf8f4",
+            backgroundColor:
+              theme.palette.mode === "dark"
+                ? alpha("#ffffff", 0.04)
+                : "#faf8f4",
           },
-        }}
+        })}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <Box
@@ -85,7 +92,10 @@ export const LanguageSwitcher = () => {
               display: "block",
             }}
           />
-          <Typography component="span" sx={{ fontWeight: 800, fontSize: 15 }}>
+          <Typography
+            component="span"
+            sx={{ fontWeight: 800, fontSize: 15 }}
+          >
             {currentLanguage.shortLabel}
           </Typography>
         </Box>
@@ -98,15 +108,19 @@ export const LanguageSwitcher = () => {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         PaperProps={{
-          sx: {
+          sx: (theme) => ({
             mt: 1,
             p: 0.8,
             minWidth: 220,
             borderRadius: "32px",
-            backgroundColor: "#fff",
-            boxShadow: "0 16px 40px rgba(0,0,0,0.12)",
+            backgroundColor: theme.palette.background.paper,
+            border: `1px solid ${theme.palette.divider}`,
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 18px 42px rgba(0,0,0,0.36)"
+                : "0 16px 40px rgba(0,0,0,0.12)",
             overflow: "hidden",
-          },
+          }),
         }}
       >
         {languages.map((lang) => {
@@ -115,54 +129,41 @@ export const LanguageSwitcher = () => {
           return (
             <MenuItem
               key={lang.code}
-              onClick={() => handleChangeLanguage(lang.code as "en" | "ro")}
               selected={selected}
-              sx={{
-                minHeight: 64,
-                px: 2,
+              onClick={() => handleChangeLanguage(lang.code as "en" | "ro")}
+              sx={(theme) => ({
+                px: 1.3,
                 py: 1.2,
-                my: 0.4,
-                borderRadius: "999px",
-                display: "flex",
-                alignItems: "center",
-                gap: 1.5,
-                backgroundColor: selected ? "#f7f1e7" : "transparent",
-                "&:hover": {
-                  backgroundColor: selected ? "#f7f1e7" : "#faf8f4",
-                },
-                "&.Mui-selected": {
-                  backgroundColor: "#f7f1e7",
-                },
-                "&.Mui-selected:hover": {
-                  backgroundColor: "#f7f1e7",
-                },
-              }}
+                borderRadius: "24px",
+                mb: 0.4,
+                backgroundColor: selected
+                  ? alpha(theme.palette.primary.main, 0.16)
+                  : "transparent",
+              })}
             >
               <Box
                 component="img"
                 src={lang.flag}
                 alt={lang.shortLabel}
                 sx={{
-                  width: 26,
-                  height: 26,
+                  width: 28,
+                  height: 28,
                   borderRadius: "50%",
                   objectFit: "cover",
-                  flexShrink: 0,
-                  display: "block",
+                  mr: 1.4,
                 }}
               />
-
               <ListItemText
                 primary={lang.fullLabel}
                 secondary={lang.shortLabel}
                 primaryTypographyProps={{
-                  fontWeight: 700,
-                  fontSize: 16,
-                  color: "#2a2a2a",
+                  fontWeight: selected ? 800 : 700,
+                  color: "inherit",
                 }}
                 secondaryTypographyProps={{
-                  fontSize: 13,
-                  color: "#7b7b7b",
+                  sx: (theme) => ({
+                    color: theme.palette.text.secondary,
+                  }),
                 }}
               />
             </MenuItem>

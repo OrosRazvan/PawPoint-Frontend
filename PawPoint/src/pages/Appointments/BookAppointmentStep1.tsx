@@ -11,13 +11,12 @@ import {
 import PetsRoundedIcon from "@mui/icons-material/PetsRounded";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import StarRoundedIcon from "@mui/icons-material/StarRounded";
+import { alpha } from "@mui/material/styles";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAppointmentVetCabinets } from "../../hooks/useAppointmentVetCabinets";
 import { useSettings } from "../../hooks/useSettings";
 import { scaleFont } from "../../utils/fontScale";
-
-const pageBg = "#f8f4ef";
 
 const sortOptions = [
   { value: "priceAsc", labelKey: "sortPriceAsc" },
@@ -44,23 +43,30 @@ export const BookAppointmentStep1 = () => {
   const { t } = useTranslation("appointment");
   const { data: settings } = useSettings();
 
-  const fieldSx = {
+  const fieldSx = (theme: any) => ({
     minWidth: 170,
     "& .MuiOutlinedInput-root": {
       borderRadius: 2.5,
-      backgroundColor: "#fff",
+      backgroundColor:
+        theme.palette.mode === "dark"
+          ? alpha("#ffffff", 0.03)
+          : theme.palette.background.paper,
       fontSize: scaleFont(14, settings?.textSize),
+      color: theme.palette.text.primary,
       "& fieldset": {
-        borderColor: "#ded8cf",
+        borderColor: theme.palette.divider,
       },
       "&.Mui-focused fieldset": {
-        borderColor: "#f5a623",
+        borderColor: theme.palette.primary.main,
         borderWidth: 1.5,
       },
+      "& .MuiSvgIcon-root": {
+        color: theme.palette.text.secondary,
+      },
     },
-  };
+  });
 
-  const cardSx = (selected: boolean) => ({
+  const cardSx = (selected: boolean) => (theme: any) => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
@@ -68,10 +74,49 @@ export const BookAppointmentStep1 = () => {
     px: 4,
     py: 4,
     borderRadius: 3,
-    border: selected ? "2px solid #f5a623" : "1px solid #e4ddd4",
-    backgroundColor: selected ? "#f6dfab" : "#faf8f5",
+    border: selected
+      ? `2px solid ${theme.palette.primary.main}`
+      : `1px solid ${theme.palette.divider}`,
+    backgroundColor: selected
+      ? theme.palette.mode === "dark"
+        ? alpha(theme.palette.primary.main, 0.18)
+        : alpha(theme.palette.primary.main, 0.18)
+      : theme.palette.mode === "dark"
+      ? alpha("#ffffff", 0.03)
+      : "#faf8f5",
     transition: "all 0.2s ease",
     cursor: "pointer",
+    "&:hover": {
+      borderColor: theme.palette.primary.main,
+      backgroundColor:
+        theme.palette.mode === "dark"
+          ? alpha(theme.palette.primary.main, 0.12)
+          : alpha(theme.palette.primary.main, 0.1),
+    },
+  });
+
+  const stepSx = (active: boolean) => (theme: any) => ({
+    flex: 1,
+    py: 2.6,
+    px: 3,
+    borderRadius: 3,
+    backgroundColor: active
+      ? theme.palette.primary.main
+      : theme.palette.mode === "dark"
+      ? alpha("#ffffff", 0.04)
+      : "#f8f8f8",
+    color: active
+      ? theme.palette.primary.contrastText
+      : theme.palette.text.secondary,
+    fontWeight: active ? 700 : 600,
+    textAlign: "center",
+    border: active ? "none" : `1px solid ${theme.palette.divider}`,
+    boxShadow: active
+      ? theme.palette.mode === "dark"
+        ? `0 8px 20px ${alpha(theme.palette.primary.main, 0.18)}`
+        : "0 8px 20px rgba(0,0,0,0.06)"
+      : "none",
+    fontSize: scaleFont(18, settings?.textSize),
   });
 
   const formatPrice = (value?: number) => {
@@ -151,90 +196,46 @@ export const BookAppointmentStep1 = () => {
 
   return (
     <Box
-      sx={{
+      sx={(theme) => ({
         minHeight: "100vh",
-        backgroundColor: pageBg,
+        backgroundColor: theme.palette.background.default,
         px: { xs: 2, sm: 3, md: 5 },
         py: { xs: 3, md: 5 },
-      }}
+      })}
     >
       <Stack spacing={4}>
         <Typography
-          sx={{
+          sx={(theme) => ({
             fontSize: {
               xs: scaleFont(34, settings?.textSize),
               md: scaleFont(44, settings?.textSize),
             },
             fontWeight: 800,
-            color: "#111827",
+            color: theme.palette.text.primary,
             lineHeight: 1.05,
-          }}
+          })}
         >
           {t("bookPageTitle")}
         </Typography>
 
         <Stack direction={{ xs: "column", md: "row" }} spacing={2.5}>
-          <Box
-            sx={{
-              flex: 1,
-              py: 2.6,
-              px: 3,
-              borderRadius: 3,
-              backgroundColor: "#f7ae1a",
-              color: "#111827",
-              fontWeight: 700,
-              textAlign: "center",
-              boxShadow: "0 8px 20px rgba(0,0,0,0.06)",
-              fontSize: scaleFont(18, settings?.textSize),
-            }}
-          >
-            {`1. ${t("step1")}`}
-          </Box>
-
-          <Box
-            sx={{
-              flex: 1,
-              py: 2.6,
-              px: 3,
-              borderRadius: 3,
-              backgroundColor: "#f8f8f8",
-              color: "#5f7087",
-              fontWeight: 600,
-              textAlign: "center",
-              border: "1px solid #ebe7e1",
-              fontSize: scaleFont(18, settings?.textSize),
-            }}
-          >
-            {`2. ${t("step2")}`}
-          </Box>
-
-          <Box
-            sx={{
-              flex: 1,
-              py: 2.6,
-              px: 3,
-              borderRadius: 3,
-              backgroundColor: "#f8f8f8",
-              color: "#5f7087",
-              fontWeight: 600,
-              textAlign: "center",
-              border: "1px solid #ebe7e1",
-              fontSize: scaleFont(18, settings?.textSize),
-            }}
-          >
-            {`3. ${t("step3")}`}
-          </Box>
+          <Box sx={stepSx(true)}>{`1. ${t("step1")}`}</Box>
+          <Box sx={stepSx(false)}>{`2. ${t("step2")}`}</Box>
+          <Box sx={stepSx(false)}>{`3. ${t("step3")}`}</Box>
         </Stack>
 
         <Box
-          sx={{
+          sx={(theme) => ({
             borderRadius: 4,
-            backgroundColor: "#fffdfb",
-            border: "1px solid #ebe3da",
+            backgroundColor: theme.palette.background.paper,
+            border: `1px solid ${theme.palette.divider}`,
             px: { xs: 2, md: 4 },
             py: { xs: 3, md: 4 },
-            boxShadow: "0 10px 24px rgba(0,0,0,0.05)",
-          }}
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 10px 24px rgba(0,0,0,0.28)"
+                : "0 10px 24px rgba(0,0,0,0.05)",
+          })}
         >
           <Stack spacing={3}>
             <Stack
@@ -245,23 +246,23 @@ export const BookAppointmentStep1 = () => {
             >
               <Stack direction="row" spacing={2} alignItems="center">
                 <Typography
-                  sx={{
+                  sx={(theme) => ({
                     fontSize: scaleFont(18, settings?.textSize),
                     fontWeight: 600,
-                    color: "#111827",
+                    color: theme.palette.text.primary,
                     minWidth: 56,
-                  }}
+                  })}
                 >
                   {t("service")}:
                 </Typography>
 
                 <Typography
-                  sx={{
+                  sx={(theme) => ({
                     fontSize: scaleFont(18, settings?.textSize),
                     fontWeight: 600,
-                    color: "#111827",
+                    color: theme.palette.text.primary,
                     minWidth: 56,
-                  }}
+                  })}
                 >
                   {t("consult")}
                 </Typography>
@@ -269,12 +270,12 @@ export const BookAppointmentStep1 = () => {
 
               <Stack direction="row" spacing={2} alignItems="center">
                 <Typography
-                  sx={{
+                  sx={(theme) => ({
                     fontSize: scaleFont(18, settings?.textSize),
                     fontWeight: 600,
-                    color: "#111827",
+                    color: theme.palette.text.primary,
                     minWidth: 36,
-                  }}
+                  })}
                 >
                   {t("sort")}
                 </Typography>
@@ -306,9 +307,7 @@ export const BookAppointmentStep1 = () => {
                 <CircularProgress />
               </Box>
             ) : isError ? (
-              <Typography color="error">
-                {t("loadCabinetsError")}
-              </Typography>
+              <Typography color="error">{t("loadCabinetsError")}</Typography>
             ) : (
               <Stack spacing={3}>
                 {sortedCabinets.map((cabinet) => {
@@ -327,132 +326,159 @@ export const BookAppointmentStep1 = () => {
                         sx={{ minWidth: 0 }}
                       >
                         <Box
-                          sx={{
+                          sx={(theme) => ({
                             width: 82,
                             height: 82,
                             borderRadius: 3,
-                            backgroundColor: "#f7ae1a",
+                            backgroundColor: theme.palette.primary.main,
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            color: "#0b1f44",
+                            color: theme.palette.primary.contrastText,
                             flexShrink: 0,
-                          }}
+                          })}
                         >
                           <PetsRoundedIcon sx={{ fontSize: 38 }} />
                         </Box>
 
                         <Box sx={{ minWidth: 0 }}>
                           <Typography
-                            sx={{
+                            sx={(theme) => ({
                               fontSize: scaleFont(22, settings?.textSize),
                               fontWeight: 800,
-                              color: "#111827",
+                              color: theme.palette.text.primary,
                               lineHeight: 1.2,
-                            }}
+                            })}
                           >
                             {cabinet.name}
                           </Typography>
 
-                          <Stack
-                            direction="row"
-                            spacing={1.2}
-                            alignItems="center"
-                            sx={{ mt: 1 }}
-                          >
-                            <Typography
-                              sx={{
-                                fontSize: scaleFont(16, settings?.textSize),
-                                color: "#5f7087",
-                              }}
-                            >
-                              {t("rating")}: {cabinet.rating ?? "—"}
-                            </Typography>
-
-                            <StarRoundedIcon
-                              sx={{ fontSize: 19, color: "#f7ae1a" }}
-                            />
-                          </Stack>
-
                           <Typography
-                            sx={{
+                            sx={(theme) => ({
                               mt: 0.8,
-                              fontSize: scaleFont(16, settings?.textSize),
-                              color: "#5f7087",
-                            }}
+                              fontSize: scaleFont(15, settings?.textSize),
+                              color: theme.palette.text.secondary,
+                            })}
                           >
-                            {t("workingHours")}: {t("workingHoursValue")}
+                            {cabinet.address || "—"}
                           </Typography>
 
-                          {cabinet.basePriceRon != null && (
+                          <Stack
+                            direction="row"
+                            spacing={1}
+                            alignItems="center"
+                            sx={{ mt: 1.4 }}
+                          >
+                            <StarRoundedIcon
+                              sx={(theme) => ({
+                                fontSize: 18,
+                                color: theme.palette.warning.main,
+                              })}
+                            />
                             <Typography
-                              sx={{
-                                mt: 0.8,
+                              sx={(theme) => ({
                                 fontSize: scaleFont(15, settings?.textSize),
-                                color: "#6b7280",
-                              }}
+                                fontWeight: 700,
+                                color: theme.palette.text.primary,
+                              })}
                             >
-                              {t("price")}: {formatPrice(cabinet.basePriceRon)}
+                              {cabinet.rating != null
+                                ? cabinet.rating.toFixed(1)
+                                : "—"}
                             </Typography>
-                          )}
+
+                            <Typography
+                              sx={(theme) => ({
+                                fontSize: scaleFont(14, settings?.textSize),
+                                color: theme.palette.text.secondary,
+                              })}
+                            >
+                              • {formatPrice(cabinet.basePriceRon)}
+                            </Typography>
+                          </Stack>
                         </Box>
                       </Stack>
 
                       <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedCabinetId(cabinet.id);
-                        }}
-                        sx={{
-                          minWidth: 116,
-                          px: 3,
-                          py: 1.3,
+                        endIcon={<ChevronRightRoundedIcon />}
+                        sx={(theme) => ({
+                          px: 2.4,
+                          py: 1.1,
                           borderRadius: 2.5,
+                          minWidth: 0,
                           textTransform: "none",
-                          fontSize: scaleFont(18, settings?.textSize),
+                          fontSize: scaleFont(15, settings?.textSize),
                           fontWeight: 700,
-                          color: "#111827",
-                          backgroundColor: "#f7ae1a",
+                          backgroundColor: isSelected
+                            ? theme.palette.primary.main
+                            : theme.palette.mode === "dark"
+                            ? alpha("#ffffff", 0.05)
+                            : "#f3eee7",
+                          color: isSelected
+                            ? theme.palette.primary.contrastText
+                            : theme.palette.text.primary,
                           "&:hover": {
-                            backgroundColor: "#f3a400",
+                            backgroundColor: isSelected
+                              ? theme.palette.primary.dark
+                              : theme.palette.mode === "dark"
+                              ? alpha("#ffffff", 0.08)
+                              : "#ece4d8",
                           },
-                        }}
+                        })}
                       >
-                        {t("select")}
+                        {isSelected ? t("selected") : t("select")}
                       </Button>
                     </Box>
                   );
                 })}
-
-                <Stack direction="row" justifyContent="flex-end" sx={{ pt: 1 }}>
-                  <Button
-                    onClick={handleNext}
-                    disabled={!selectedCabinet}
-                    endIcon={<ChevronRightRoundedIcon />}
-                    sx={{
-                      minWidth: 160,
-                      px: 3.5,
-                      py: 1.55,
-                      borderRadius: 2.5,
-                      textTransform: "none",
-                      fontSize: scaleFont(18, settings?.textSize),
-                      fontWeight: 700,
-                      backgroundColor: selectedCabinet ? "#f7ae1a" : "#f4d28a",
-                      color: selectedCabinet ? "#111827" : "#8c7a4e",
-                      "&:hover": {
-                        backgroundColor: selectedCabinet ? "#f3a400" : "#f4d28a",
-                      },
-                      "&.Mui-disabled": {
-                        backgroundColor: "#f4d28a",
-                        color: "#8c7a4e",
-                      },
-                    }}
-                  >
-                    {t("next")}
-                  </Button>
-                </Stack>
               </Stack>
             )}
+
+            <Stack direction="row" justifyContent="flex-end" sx={{ pt: 1 }}>
+              <Button
+                onClick={handleNext}
+                disabled={!selectedCabinet}
+                endIcon={<ChevronRightRoundedIcon />}
+                sx={(theme) => ({
+                  minWidth: 180,
+                  px: 3.5,
+                  py: 1.55,
+                  borderRadius: 2.5,
+                  textTransform: "none",
+                  fontSize: scaleFont(18, settings?.textSize),
+                  fontWeight: 700,
+                  backgroundColor: selectedCabinet
+                    ? theme.palette.primary.main
+                    : theme.palette.mode === "dark"
+                    ? alpha(theme.palette.primary.main, 0.25)
+                    : "#f4d28a",
+                  color: selectedCabinet
+                    ? theme.palette.primary.contrastText
+                    : theme.palette.mode === "dark"
+                    ? alpha("#ffffff", 0.45)
+                    : "#8c7a4e",
+                  "&:hover": {
+                    backgroundColor: selectedCabinet
+                      ? theme.palette.primary.dark
+                      : theme.palette.mode === "dark"
+                      ? alpha(theme.palette.primary.main, 0.25)
+                      : "#f4d28a",
+                  },
+                  "&.Mui-disabled": {
+                    backgroundColor:
+                      theme.palette.mode === "dark"
+                        ? alpha(theme.palette.primary.main, 0.25)
+                        : "#f4d28a",
+                    color:
+                      theme.palette.mode === "dark"
+                        ? alpha("#ffffff", 0.45)
+                        : "#8c7a4e",
+                  },
+                })}
+              >
+                {t("next")}
+              </Button>
+            </Stack>
           </Stack>
         </Box>
       </Stack>

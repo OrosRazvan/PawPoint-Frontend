@@ -11,8 +11,11 @@ export const AppThemeProvider = ({ children }: Props) => {
   const { data: settings } = useSettings();
 
   const theme = useMemo(() => {
-    return createAppTheme(settings?.textSize ?? "Medium");
-  }, [settings?.textSize]);
+    return createAppTheme(
+      settings?.textSize ?? "Medium",
+      settings?.darkMode ?? false
+    );
+  }, [settings?.textSize, settings?.darkMode]);
 
   return (
     <ThemeProvider theme={theme}>

@@ -7,7 +7,9 @@
     "appointments": "Programări",
     "deworming": "Deparazitare",
     "assistant": "Asistent",
-    "logout": "Logout"
+    "logout": "Logout",
+    "profile": "Profil",
+    "settings": "Setări"
   },
   "footer": {
     "aboutTitle": "Despre PawPoint",
