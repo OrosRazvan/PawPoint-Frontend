@@ -1,8 +1,10 @@
 import { apiClient } from "./client";
 import {
+  FORGOT_PASSWORD_ENDPOINT,
   LOGIN_ENDPOINT,
   REFRESH_ENDPOINT,
   REGISTER_ENDPOINT,
+  RESET_PASSWORD_ENDPOINT,
   VERIFY_EMAIL_ENDPOINT,
 } from "./endpoints/endpoints";
 
@@ -24,6 +26,23 @@ export type VerifyEmailRequest = {
 
 export type RefreshRequest = {
   refreshToken: string;
+};
+
+export type ForgotPasswordRequest = {
+  email: string;
+};
+
+export type ForgotPasswordResponse = {
+  success: boolean;
+};
+
+export type ResetPasswordRequest = {
+  token: string;
+  newPassword: string;
+};
+
+export type ResetPasswordResponse = {
+  success: boolean;
 };
 
 export type BackendTokens = {
@@ -73,6 +92,22 @@ export const authApi = {
   refresh: async (payload: RefreshRequest) => {
     const { data } = await apiClient.post<BackendTokens>(
       REFRESH_ENDPOINT,
+      payload
+    );
+    return data;
+  },
+
+  forgotPassword: async (payload: ForgotPasswordRequest) => {
+    const { data } = await apiClient.post<ForgotPasswordResponse>(
+      FORGOT_PASSWORD_ENDPOINT,
+      payload
+    );
+    return data;
+  },
+
+  resetPassword: async (payload: ResetPasswordRequest) => {
+    const { data } = await apiClient.post<ResetPasswordResponse>(
+      RESET_PASSWORD_ENDPOINT,
       payload
     );
     return data;

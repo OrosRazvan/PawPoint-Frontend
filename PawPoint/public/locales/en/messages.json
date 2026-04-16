@@ -1,0 +1,7 @@
+{
+  "forgotPasswordEmailSent": "We have sent you the password reset email.",
+  "forgotPasswordFailed": "We could not send the reset email.",
+  "resetPasswordSuccess": "Password was reset successfully.",
+  "resetPasswordFailed": "We could not reset the password.",
+  "resetPasswordInvalidToken": "The reset link is invalid or missing."
+}
