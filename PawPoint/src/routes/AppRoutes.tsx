@@ -18,6 +18,8 @@ import { Profile } from "../pages/Profile/Profile";
 import { ChangePassword } from "../pages/Profile/ChangePassword";
 import { Notifications } from "../pages/Notifications/Notifications";
 import { Settings } from "../pages/Settings/Settings";
+import { ForgotPassword } from "../pages/ForgotPassword/ForgotPassword";
+import { ResetPassword } from "../pages/ResetPassword/ResetPassword";
 
 export const AppRoutes = () => {
   return (
@@ -25,6 +27,8 @@ export const AppRoutes = () => {
       <Route path="/" element={<PublicRoute><Register /></PublicRoute>} />
       <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/verify-email" element={<VerifyEmail />} />
+      <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
+      <Route path="/reset-password" element={<PublicRoute><ResetPassword /></PublicRoute>} />
 
       <Route
           path="/change-password"
