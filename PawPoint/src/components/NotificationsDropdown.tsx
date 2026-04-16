@@ -9,6 +9,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
 import CircleIcon from "@mui/icons-material/Circle";
 import { useMemo, useState } from "react";
@@ -18,6 +19,7 @@ import { useNotifications } from "../hooks/useNotifications";
 import { useMarkNotificationRead } from "../hooks/useMarkNotificationRead";
 import { useNotificationRealtime } from "../hooks/useNotificationRealtime";
 import { useSettings } from "../hooks/useSettings";
+import { scaleFont } from "../utils/fontScale";
 import { filterNotificationsForNavbar } from "../utils/filterNotificationsBySettings";
 import type { NotificationDto } from "../pages/Notifications/types/notification";
 
@@ -118,7 +120,16 @@ export const NotificationsDropdown = ({ showCount = true }: Props) => {
     <>
       <IconButton
         onClick={(e) => setAnchorEl(e.currentTarget)}
-        sx={{ color: "#6b7280", display: { xs: "none", md: "inline-flex" } }}
+        sx={(theme) => ({
+          color: theme.palette.text.secondary,
+          display: { xs: "none", md: "inline-flex" },
+          "&:hover": {
+            backgroundColor:
+              theme.palette.mode === "dark"
+                ? alpha("#ffffff", 0.06)
+                : alpha(theme.palette.text.primary, 0.05),
+          },
+        })}
       >
         <Badge
           color="error"
@@ -145,19 +156,30 @@ export const NotificationsDropdown = ({ showCount = true }: Props) => {
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         transformOrigin={{ vertical: "top", horizontal: "right" }}
         PaperProps={{
-          sx: {
+          sx: (theme) => ({
             mt: 1.5,
             width: 430,
             borderRadius: 4,
             overflow: "hidden",
             p: 0,
-            boxShadow: "0 16px 40px rgba(7,28,66,0.14)",
-          },
+            backgroundColor: theme.palette.background.paper,
+            border: `1px solid ${theme.palette.divider}`,
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 16px 40px rgba(0,0,0,0.36)"
+                : "0 16px 40px rgba(7,28,66,0.14)",
+          }),
         }}
       >
         <Box sx={{ px: 3, py: 2.5 }}>
           <Stack direction="row" justifyContent="space-between" alignItems="center">
-            <Typography sx={{ fontSize: 18, fontWeight: 800, color: "#071c42" }}>
+            <Typography
+              sx={(theme) => ({
+                fontSize: scaleFont(18, settings?.textSize),
+                fontWeight: 800,
+                color: theme.palette.text.primary,
+              })}
+            >
               {t("notifications:title")}
             </Typography>
 
@@ -165,11 +187,12 @@ export const NotificationsDropdown = ({ showCount = true }: Props) => {
               <Chip
                 label={t("notifications:unreadCount", { count: unreadEnabledCount })}
                 size="small"
-                sx={{
-                  backgroundColor: "#fde8e8",
-                  color: "#d92d20",
+                sx={(theme) => ({
+                  backgroundColor: alpha(theme.palette.error.main, 0.12),
+                  color: theme.palette.error.main,
                   fontWeight: 700,
-                }}
+                  fontSize: scaleFont(12, settings?.textSize),
+                })}
               />
             )}
           </Stack>
@@ -180,13 +203,23 @@ export const NotificationsDropdown = ({ showCount = true }: Props) => {
         <Stack sx={{ maxHeight: 360, overflowY: "auto" }}>
           {isLoading ? (
             <Box sx={{ px: 3, py: 3 }}>
-              <Typography sx={{ color: "#667085" }}>
+              <Typography
+                sx={(theme) => ({
+                  color: theme.palette.text.secondary,
+                  fontSize: scaleFont(14, settings?.textSize),
+                })}
+              >
                 {t("notifications:loading")}
               </Typography>
             </Box>
           ) : notifications.length === 0 ? (
             <Box sx={{ px: 3, py: 3 }}>
-              <Typography sx={{ color: "#667085" }}>
+              <Typography
+                sx={(theme) => ({
+                  color: theme.palette.text.secondary,
+                  fontSize: scaleFont(14, settings?.textSize),
+                })}
+              >
                 {t("notifications:empty")}
               </Typography>
             </Box>
@@ -199,53 +232,73 @@ export const NotificationsDropdown = ({ showCount = true }: Props) => {
                     markAsRead(item.id);
                   }
                 }}
-                sx={{
+                sx={(theme) => ({
                   px: 3,
                   py: 2.2,
                   cursor: "pointer",
-                  backgroundColor: item.isRead ? "#f7f7f7" : "#ffffff",
-                  borderBottom: "1px solid #f1ece6",
+                  backgroundColor: item.isRead
+                    ? theme.palette.mode === "dark"
+                      ? alpha("#ffffff", 0.03)
+                      : "#f7f7f7"
+                    : theme.palette.background.paper,
+                  borderBottom: `1px solid ${theme.palette.divider}`,
                   "&:hover": {
-                    backgroundColor: item.isRead ? "#f1f1f1" : "#faf6ef",
+                    backgroundColor: item.isRead
+                      ? theme.palette.mode === "dark"
+                        ? alpha("#ffffff", 0.05)
+                        : "#f1f1f1"
+                      : theme.palette.mode === "dark"
+                      ? alpha(theme.palette.primary.main, 0.08)
+                      : "#faf6ef",
                   },
-                }}
+                })}
               >
                 <Stack direction="row" spacing={1.2} alignItems="flex-start">
                   {!item.isRead && (
-                    <CircleIcon sx={{ fontSize: 10, color: "#d92d20", mt: 0.7 }} />
+                    <CircleIcon
+                      sx={(theme) => ({
+                        fontSize: 10,
+                        color: theme.palette.error.main,
+                        mt: 0.7,
+                      })}
+                    />
                   )}
 
                   <Box sx={{ minWidth: 0, flex: 1 }}>
                     <Typography
-                      sx={{
-                        fontSize: 14,
+                      sx={(theme) => ({
+                        fontSize: scaleFont(14, settings?.textSize),
                         fontWeight: item.isRead ? 600 : 800,
-                        color: item.isRead ? "#667085" : "#111827",
-                      }}
+                        color: item.isRead
+                          ? theme.palette.text.secondary
+                          : theme.palette.text.primary,
+                      })}
                     >
                       {item.name}
                     </Typography>
 
                     <Typography
-                      sx={{
+                      sx={(theme) => ({
                         mt: 0.5,
-                        fontSize: 13,
-                        color: item.isRead ? "#98a2b3" : "#475467",
+                        fontSize: scaleFont(13, settings?.textSize),
+                        color: item.isRead
+                          ? alpha(theme.palette.text.secondary, 0.75)
+                          : theme.palette.text.secondary,
                         display: "-webkit-box",
                         overflow: "hidden",
                         WebkitLineClamp: 2,
                         WebkitBoxOrient: "vertical",
-                      }}
+                      })}
                     >
                       {item.content}
                     </Typography>
 
                     <Typography
-                      sx={{
+                      sx={(theme) => ({
                         mt: 0.8,
-                        fontSize: 12,
-                        color: "#98a2b3",
-                      }}
+                        fontSize: scaleFont(12, settings?.textSize),
+                        color: alpha(theme.palette.text.secondary, 0.72),
+                      })}
                     >
                       {formatDate(item.createdAt)}
                     </Typography>
@@ -265,17 +318,24 @@ export const NotificationsDropdown = ({ showCount = true }: Props) => {
               setAnchorEl(null);
               navigate("/notifications");
             }}
-            sx={{
+            sx={(theme) => ({
               py: 1.2,
               borderRadius: 2.5,
               textTransform: "none",
               fontWeight: 700,
-              color: "#071c42",
-              backgroundColor: "#f6efe4",
+              fontSize: scaleFont(14, settings?.textSize),
+              color: theme.palette.text.primary,
+              backgroundColor:
+                theme.palette.mode === "dark"
+                  ? alpha("#ffffff", 0.05)
+                  : "#f6efe4",
               "&:hover": {
-                backgroundColor: "#efe4d2",
+                backgroundColor:
+                  theme.palette.mode === "dark"
+                    ? alpha("#ffffff", 0.08)
+                    : "#efe4d2",
               },
-            }}
+            })}
           >
             {t("notifications:seeAll")}
           </Button>

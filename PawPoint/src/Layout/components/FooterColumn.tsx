@@ -1,4 +1,6 @@
 import { Stack, Typography } from "@mui/material";
+import { useSettings } from "../../hooks/useSettings";
+import { scaleFont } from "../../utils/fontScale";
 
 type Props = {
   title: string;
@@ -6,14 +8,16 @@ type Props = {
 };
 
 export const FooterColumn = ({ title, items }: Props) => {
+  const { data: settings } = useSettings();
+
   return (
     <Stack spacing={2}>
       <Typography
-        sx={{
-          fontSize: 20,
+        sx={(theme) => ({
+          fontSize: scaleFont(20, settings?.textSize),
           fontWeight: 700,
-          color: "#071c42",
-        }}
+          color: theme.palette.text.primary,
+        })}
       >
         {title}
       </Typography>
@@ -22,10 +26,10 @@ export const FooterColumn = ({ title, items }: Props) => {
         {items.map((item) => (
           <Typography
             key={item}
-            sx={{
-              fontSize: 16,
-              color: "#4c5c73",
-            }}
+            sx={(theme) => ({
+              fontSize: scaleFont(16, settings?.textSize),
+              color: theme.palette.text.secondary,
+            })}
           >
             {item}
           </Typography>

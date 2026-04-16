@@ -3,14 +3,17 @@ import { getAccessToken } from "../auth/tokenStorage";
 
 let connection: HubConnection | null = null;
 
+const baseUrl = import.meta.env.VITE_API_URL;
+
 export const getNotificationConnection = () => {
   if (connection) {
     return connection;
   }
 
   connection = new HubConnectionBuilder()
-    .withUrl("https://localhost:7168/hub", {
+    .withUrl(`${baseUrl}/hubs/notifications`, {
       accessTokenFactory: () => getAccessToken() ?? "",
+      withCredentials: false,
     })
     .withAutomaticReconnect()
     .configureLogging(LogLevel.Information)

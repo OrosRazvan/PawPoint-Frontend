@@ -8,11 +8,11 @@ export const Navbar = () => {
     <AppBar
       position="sticky"
       elevation={0}
-      sx={{
-        backgroundColor: "#ffffff",
-        borderBottom: "1px solid #e5e5e5",
-        color: "#111827",
-      }}
+      sx={(theme) => ({
+        backgroundColor: theme.palette.background.paper,
+        borderBottom: `1px solid ${theme.palette.divider}`,
+        color: theme.palette.text.primary,
+      })}
     >
       <Toolbar
         sx={{

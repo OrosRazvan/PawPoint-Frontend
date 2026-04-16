@@ -8,6 +8,7 @@ import {
   Divider,
   Chip,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import PetsRoundedIcon from "@mui/icons-material/PetsRounded";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
@@ -147,12 +148,12 @@ export const AnimalDetails = () => {
 
   return (
     <Box
-      sx={{
+      sx={(theme) => ({
         minHeight: "100vh",
-        backgroundColor: "#f8f4ef",
+        backgroundColor: theme.palette.background.default,
         display: "flex",
         flexDirection: "column",
-      }}
+      })}
     >
       {isLoading ? (
         <Box
@@ -174,11 +175,18 @@ export const AnimalDetails = () => {
         <Grid container sx={{ flex: 1, minHeight: "100vh" }}>
           <Grid
             size={{ xs: 12, md: 4, lg: 3.5 }}
-            sx={{
+            sx={(theme) => ({
               background:
-                "linear-gradient(170deg, #fbf2ea 0%, #fde8c8 50%, #faf6f0 100%)",
-              borderRight: { md: "1px solid #ede8e0" },
-              borderBottom: { xs: "1px solid #ede8e0", md: "none" },
+                theme.palette.mode === "dark"
+                  ? `linear-gradient(170deg, ${alpha(
+                      theme.palette.primary.main,
+                      0.14
+                    )} 0%, ${alpha(theme.palette.primary.light, 0.08)} 45%, ${
+                      theme.palette.background.paper
+                    } 100%)`
+                  : "linear-gradient(170deg, #fbf2ea 0%, #fde8c8 50%, #faf6f0 100%)",
+              borderRight: { md: `1px solid ${theme.palette.divider}` },
+              borderBottom: { xs: `1px solid ${theme.palette.divider}`, md: "none" },
               display: "flex",
               flexDirection: "column",
               px: { xs: 4, md: 5 },
@@ -186,43 +194,52 @@ export const AnimalDetails = () => {
               position: "relative",
               overflow: "hidden",
               minHeight: { md: "100vh" },
-            }}
+            })}
           >
             <Box
-              sx={{
+              sx={(theme) => ({
                 position: "absolute",
                 top: -70,
                 right: -70,
                 width: 240,
                 height: 240,
                 borderRadius: "50%",
-                background: "rgba(245,166,35,0.09)",
+                background:
+                  theme.palette.mode === "dark"
+                    ? alpha(theme.palette.primary.main, 0.12)
+                    : "rgba(245,166,35,0.09)",
                 pointerEvents: "none",
-              }}
+              })}
             />
             <Box
-              sx={{
+              sx={(theme) => ({
                 position: "absolute",
                 bottom: -50,
                 left: -50,
                 width: 180,
                 height: 180,
                 borderRadius: "50%",
-                background: "rgba(245,166,35,0.07)",
+                background:
+                  theme.palette.mode === "dark"
+                    ? alpha(theme.palette.primary.main, 0.08)
+                    : "rgba(245,166,35,0.07)",
                 pointerEvents: "none",
-              }}
+              })}
             />
             <Box
-              sx={{
+              sx={(theme) => ({
                 position: "absolute",
                 top: "40%",
                 left: -30,
                 width: 100,
                 height: 100,
                 borderRadius: "50%",
-                background: "rgba(245,166,35,0.05)",
+                background:
+                  theme.palette.mode === "dark"
+                    ? alpha(theme.palette.primary.main, 0.06)
+                    : "rgba(245,166,35,0.05)",
                 pointerEvents: "none",
-              }}
+              })}
             />
 
             <Box sx={{ position: "relative", zIndex: 1, mb: { xs: 4, md: 6 } }}>
@@ -231,17 +248,20 @@ export const AnimalDetails = () => {
                   <ArrowBackRoundedIcon sx={{ fontSize: "16px !important" }} />
                 }
                 onClick={() => navigate("/dashboard")}
-                sx={{
+                sx={(theme) => ({
                   textTransform: "none",
                   fontWeight: 600,
                   fontSize: scaleFont(13, textSize),
-                  color: "#b07830",
+                  color:
+                    theme.palette.mode === "dark"
+                      ? theme.palette.primary.light
+                      : "#b07830",
                   px: 0,
                   "&:hover": {
-                    color: "#071c42",
+                    color: theme.palette.text.primary,
                     backgroundColor: "transparent",
                   },
-                }}
+                })}
               >
                 Back to dashboard
               </Button>
@@ -259,11 +279,11 @@ export const AnimalDetails = () => {
               }}
             >
               <Box
-                sx={{
+                sx={(theme) => ({
                   width: { xs: 110, md: 148 },
                   height: { xs: 110, md: 148 },
                   borderRadius: 5,
-                  background: "#fff",
+                  background: theme.palette.background.paper,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -272,14 +292,16 @@ export const AnimalDetails = () => {
                     md: scaleFont(62, textSize),
                   },
                   fontWeight: 800,
-                  color: "#f5a623",
+                  color: theme.palette.primary.main,
                   overflow: "hidden",
                   flexShrink: 0,
                   boxShadow:
-                    "0 20px 56px rgba(245,166,35,0.2), 0 4px 16px rgba(7,28,66,0.08)",
-                  border: "4px solid #fff",
+                    theme.palette.mode === "dark"
+                      ? "0 20px 56px rgba(0,0,0,0.28), 0 4px 16px rgba(0,0,0,0.16)"
+                      : "0 20px 56px rgba(245,166,35,0.2), 0 4px 16px rgba(7,28,66,0.08)",
+                  border: `4px solid ${theme.palette.background.paper}`,
                   mb: 3,
-                }}
+                })}
               >
                 {data.profilePictureUrl ? (
                   <Box
@@ -294,17 +316,17 @@ export const AnimalDetails = () => {
               </Box>
 
               <Typography
-                sx={{
+                sx={(theme) => ({
                   fontSize: {
                     xs: scaleFont(30, textSize),
                     md: scaleFont(38, textSize),
                   },
                   fontWeight: 800,
-                  color: "#071c42",
+                  color: theme.palette.text.primary,
                   lineHeight: 1.1,
                   letterSpacing: "-0.6px",
                   textAlign: "center",
-                }}
+                })}
               >
                 {data.name}
               </Typography>
@@ -329,30 +351,43 @@ export const AnimalDetails = () => {
                   }
                   label={data.breed ?? data.species ?? "—"}
                   size="small"
-                  sx={{
-                    backgroundColor: "rgba(245,166,35,0.13)",
-                    color: "#b87010",
+                  sx={(theme) => ({
+                    backgroundColor:
+                      theme.palette.mode === "dark"
+                        ? alpha(theme.palette.primary.main, 0.16)
+                        : "rgba(245,166,35,0.13)",
+                    color:
+                      theme.palette.mode === "dark"
+                        ? theme.palette.primary.light
+                        : "#b87010",
                     fontWeight: 700,
                     fontSize: scaleFont(12, textSize),
-                    border: "1px solid rgba(245,166,35,0.28)",
+                    border: `1px solid ${
+                      theme.palette.mode === "dark"
+                        ? alpha(theme.palette.primary.main, 0.26)
+                        : "rgba(245,166,35,0.28)"
+                    }`,
                     borderRadius: 2,
                     height: 28,
                     "& .MuiChip-label": { px: 1.2 },
-                  }}
+                  })}
                 />
                 {data.sex && (
                   <Chip
                     label={data.sex}
                     size="small"
-                    sx={{
-                      backgroundColor: "rgba(7,28,66,0.06)",
-                      color: "#4b5563",
+                    sx={(theme) => ({
+                      backgroundColor:
+                        theme.palette.mode === "dark"
+                          ? alpha("#ffffff", 0.06)
+                          : "rgba(7,28,66,0.06)",
+                      color: theme.palette.text.secondary,
                       fontWeight: 700,
                       fontSize: scaleFont(12, textSize),
                       borderRadius: 2,
                       height: 28,
                       "& .MuiChip-label": { px: 1.2 },
-                    }}
+                    })}
                   />
                 )}
               </Stack>
@@ -422,21 +457,35 @@ export const AnimalDetails = () => {
                   />
                 }
                 onClick={() => setIsDeleteOpen(true)}
-                sx={{
+                sx={(theme) => ({
                   py: 1.4,
                   borderRadius: 3,
                   textTransform: "none",
                   fontWeight: 700,
                   fontSize: scaleFont(14, textSize),
-                  color: "#e53535",
-                  backgroundColor: "rgba(255,255,255,0.7)",
-                  border: "1px solid rgba(229,53,53,0.2)",
+                  color: theme.palette.error.main,
+                  backgroundColor:
+                    theme.palette.mode === "dark"
+                      ? alpha(theme.palette.error.main, 0.1)
+                      : "rgba(255,255,255,0.7)",
+                  border: `1px solid ${
+                    theme.palette.mode === "dark"
+                      ? alpha(theme.palette.error.main, 0.22)
+                      : "rgba(229,53,53,0.2)"
+                  }`,
                   transition: "all 0.2s ease",
                   "&:hover": {
-                    backgroundColor: "#fff0f0",
-                    border: "1px solid rgba(229,53,53,0.35)",
+                    backgroundColor:
+                      theme.palette.mode === "dark"
+                        ? alpha(theme.palette.error.main, 0.18)
+                        : "#fff0f0",
+                    border: `1px solid ${
+                      theme.palette.mode === "dark"
+                        ? alpha(theme.palette.error.main, 0.34)
+                        : "rgba(229,53,53,0.35)"
+                    }`,
                   },
-                }}
+                })}
               >
                 Delete pet
               </Button>
@@ -445,32 +494,35 @@ export const AnimalDetails = () => {
 
           <Grid
             size={{ xs: 12, md: 8, lg: 8.5 }}
-            sx={{
+            sx={(theme) => ({
               px: { xs: 3, sm: 5, md: 8 },
               py: { xs: 4, md: 7 },
-              backgroundColor: "#f8f4ef",
-            }}
+              backgroundColor: theme.palette.background.default,
+            })}
           >
             <Typography
-              sx={{
+              sx={(theme) => ({
                 fontSize: scaleFont(22, textSize),
                 fontWeight: 800,
-                color: "#071c42",
+                color: theme.palette.text.primary,
                 letterSpacing: "-0.4px",
                 mb: 3,
-              }}
+              })}
             >
               All details
             </Typography>
 
             <Box
-              sx={{
+              sx={(theme) => ({
                 borderRadius: 4,
-                border: "1px solid #ede8e0",
-                backgroundColor: "#faf8f5",
+                border: `1px solid ${theme.palette.divider}`,
+                backgroundColor: theme.palette.background.paper,
                 overflow: "hidden",
-                boxShadow: "0 2px 16px rgba(7,28,66,0.05)",
-              }}
+                boxShadow:
+                  theme.palette.mode === "dark"
+                    ? "0 2px 16px rgba(0,0,0,0.22)"
+                    : "0 2px 16px rgba(7,28,66,0.05)",
+              })}
             >
               <DetailRow
                 icon={<PetsRoundedIcon sx={{ fontSize: 16 }} />}
@@ -549,35 +601,42 @@ type StatPillProps = {
 
 const StatPill = ({ icon, label, value, textSize }: StatPillProps) => (
   <Box
-    sx={{
+    sx={(theme) => ({
       display: "flex",
       alignItems: "center",
       justifyContent: "space-between",
       px: 2,
       py: 1.4,
       borderRadius: 3,
-      backgroundColor: "rgba(255,255,255,0.75)",
-      border: "1px solid rgba(245,166,35,0.2)",
-    }}
+      backgroundColor:
+        theme.palette.mode === "dark"
+          ? alpha("#ffffff", 0.04)
+          : "rgba(255,255,255,0.75)",
+      border: `1px solid ${
+        theme.palette.mode === "dark"
+          ? alpha(theme.palette.primary.main, 0.18)
+          : "rgba(245,166,35,0.2)"
+      }`,
+    })}
   >
     <Stack direction="row" spacing={1.2} alignItems="center">
       <Box sx={{ color: "#f5a623" }}>{icon}</Box>
       <Typography
-        sx={{
+        sx={(theme) => ({
           fontSize: scaleFont(13, textSize),
           fontWeight: 600,
-          color: "#8a95a3",
-        }}
+          color: theme.palette.text.secondary,
+        })}
       >
         {label}
       </Typography>
     </Stack>
     <Typography
-      sx={{
+      sx={(theme) => ({
         fontSize: scaleFont(13, textSize),
         fontWeight: 700,
-        color: "#071c42",
-      }}
+        color: theme.palette.text.primary,
+      })}
     >
       {value}
     </Typography>
@@ -604,49 +663,57 @@ const DetailRow = ({
       direction="row"
       alignItems="center"
       justifyContent="space-between"
-      sx={{
+      sx={(theme) => ({
         py: 2.2,
         px: 3,
         transition: "background 0.15s",
-        "&:hover": { backgroundColor: "rgba(245,166,35,0.035)" },
-      }}
+        "&:hover": {
+          backgroundColor:
+            theme.palette.mode === "dark"
+              ? alpha(theme.palette.primary.main, 0.06)
+              : "rgba(245,166,35,0.035)",
+        },
+      })}
     >
       <Stack direction="row" spacing={2} alignItems="center">
         <Box
-          sx={{
+          sx={(theme) => ({
             width: 36,
             height: 36,
             borderRadius: 2.5,
-            backgroundColor: "#f0f2f7",
+            backgroundColor:
+              theme.palette.mode === "dark"
+                ? alpha("#ffffff", 0.06)
+                : "#f0f2f7",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            color: "#8a95a3",
+            color: theme.palette.text.secondary,
             flexShrink: 0,
-          }}
+          })}
         >
           {icon}
         </Box>
         <Typography
-          sx={{
+          sx={(theme) => ({
             fontSize: scaleFont(14, textSize),
             fontWeight: 600,
-            color: "#6b7280",
-          }}
+            color: theme.palette.text.secondary,
+          })}
         >
           {label}
         </Typography>
       </Stack>
       <Typography
-        sx={{
+        sx={(theme) => ({
           fontSize: scaleFont(15, textSize),
           fontWeight: 700,
-          color: "#071c42",
-        }}
+          color: theme.palette.text.primary,
+        })}
       >
         {value}
       </Typography>
     </Stack>
-    {!isLast && <Divider sx={{ borderColor: "#f0ece6", mx: 3 }} />}
+    {!isLast && <Divider sx={{ mx: 3 }} />}
   </>
 );

@@ -1,4 +1,5 @@
 import { Button, Stack, Typography } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import type { ReactNode } from "react";
 import { useSettings } from "../../../../hooks/useSettings";
 import { scaleFont } from "../../../../utils/fontScale";
@@ -25,18 +26,28 @@ export const QuickActionButton = ({
       fullWidth
       onClick={onClick}
       variant="text"
-      sx={{
+      sx={(theme) => ({
         justifyContent: "flex-start",
         px: 2,
         py: 2,
         borderRadius: 3,
-        backgroundColor,
+        backgroundColor:
+          theme.palette.mode === "dark"
+            ? alpha(textColor, 0.14)
+            : backgroundColor,
         textTransform: "none",
+        border:
+          theme.palette.mode === "dark"
+            ? `1px solid ${alpha(textColor, 0.2)}`
+            : "none",
         "&:hover": {
-          backgroundColor,
-          opacity: 0.92,
+          backgroundColor:
+            theme.palette.mode === "dark"
+              ? alpha(textColor, 0.2)
+              : backgroundColor,
+          opacity: 0.95,
         },
-      }}
+      })}
     >
       <Stack direction="row" spacing={1.5} alignItems="center">
         {icon}

@@ -12,6 +12,7 @@ import {
   Divider,
   Grid,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import PetsRoundedIcon from "@mui/icons-material/PetsRounded";
 import {
@@ -44,45 +45,55 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
   const queryClient = useQueryClient();
   const { data: settings } = useSettings();
 
-  const fieldSx = {
+  const fieldSx = (theme: any) => ({
     "& .MuiOutlinedInput-root": {
       borderRadius: 2,
-      backgroundColor: "#fff",
+      backgroundColor:
+        theme.palette.mode === "dark"
+          ? alpha("#ffffff", 0.03)
+          : theme.palette.background.paper,
+      color: theme.palette.text.primary,
       fontSize: scaleFont(14, settings?.textSize),
       transition: "box-shadow 0.2s ease",
       "& fieldset": {
-        borderColor: "#e8e2d9",
+        borderColor: theme.palette.divider,
       },
       "&:hover fieldset": {
-        borderColor: "#f5a623",
+        borderColor: theme.palette.primary.main,
       },
       "&.Mui-focused fieldset": {
-        borderColor: "#f5a623",
+        borderColor: theme.palette.primary.main,
         borderWidth: 1.5,
       },
       "&.Mui-focused": {
-        boxShadow: "0 0 0 3px rgba(245,166,35,0.12)",
+        boxShadow:
+          theme.palette.mode === "dark"
+            ? `0 0 0 3px ${alpha(theme.palette.primary.main, 0.2)}`
+            : "0 0 0 3px rgba(245,166,35,0.12)",
       },
     },
     "& .MuiInputBase-input::placeholder": {
-      color: "#aaa",
-      opacity: 1,
+      color: theme.palette.text.secondary,
+      opacity: 0.8,
       fontSize: scaleFont(14, settings?.textSize),
     },
     "& .MuiFormHelperText-root": {
       marginLeft: 0,
       fontSize: scaleFont(12, settings?.textSize),
     },
-  };
+    "& .MuiSvgIcon-root": {
+      color: theme.palette.text.secondary,
+    },
+  });
 
-  const labelSx = {
+  const labelSx = (theme: any) => ({
     fontSize: scaleFont(12, settings?.textSize),
     fontWeight: 600,
-    color: "#6b7280",
+    color: theme.palette.text.secondary,
     letterSpacing: "0.04em",
     textTransform: "uppercase" as const,
     mb: 0.6,
-  };
+  });
 
   const {
     control,
@@ -142,22 +153,30 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
       maxWidth="sm"
       fullWidth
       PaperProps={{
-        sx: {
+        sx: (theme) => ({
           borderRadius: 4,
           overflow: "hidden",
-          backgroundColor: "#faf8f5",
+          backgroundColor: theme.palette.background.paper,
           boxShadow:
-            "0 24px 64px rgba(7,28,66,0.14), 0 4px 12px rgba(7,28,66,0.06)",
-        },
+            theme.palette.mode === "dark"
+              ? "0 24px 64px rgba(0,0,0,0.38), 0 4px 12px rgba(0,0,0,0.24)"
+              : "0 24px 64px rgba(7,28,66,0.14), 0 4px 12px rgba(7,28,66,0.06)",
+        }),
       }}
     >
       <DialogTitle sx={{ p: 0 }}>
         <Box
-          sx={{
+          sx={(theme) => ({
             px: 3.5,
             pt: 3,
             pb: 2.5,
-            background: "linear-gradient(135deg, #fbf2ea 0%, #fdf7ef 100%)",
+            background:
+              theme.palette.mode === "dark"
+                ? `linear-gradient(135deg, ${alpha(
+                    theme.palette.primary.main,
+                    0.12
+                  )} 0%, ${alpha(theme.palette.background.paper, 0.9)} 100%)`
+                : "linear-gradient(135deg, #fbf2ea 0%, #fdf7ef 100%)",
             position: "relative",
             overflow: "hidden",
             "&::after": {
@@ -168,10 +187,13 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
               width: 120,
               height: 120,
               borderRadius: "50%",
-              background: "rgba(245,166,35,0.08)",
+              background:
+                theme.palette.mode === "dark"
+                  ? alpha(theme.palette.primary.main, 0.1)
+                  : "rgba(245,166,35,0.08)",
               pointerEvents: "none",
             },
-          }}
+          })}
         >
           <Stack
             direction="row"
@@ -199,23 +221,23 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
 
               <Box>
                 <Typography
-                  sx={{
+                  sx={(theme) => ({
                     fontSize: scaleFont(19, settings?.textSize),
                     fontWeight: 800,
-                    color: "#071c42",
+                    color: theme.palette.text.primary,
                     lineHeight: 1.2,
                     letterSpacing: "-0.3px",
-                  }}
+                  })}
                 >
                   {t("dashboard:addPetDialogTitle")}
                 </Typography>
                 <Typography
-                  sx={{
+                  sx={(theme) => ({
                     fontSize: scaleFont(13, settings?.textSize),
-                    color: "#8a95a3",
+                    color: theme.palette.text.secondary,
                     mt: 0.4,
                     fontWeight: 400,
-                  }}
+                  })}
                 >
                   {t("dashboard:addPetDialogSubtitle")}
                 </Typography>
@@ -225,25 +247,31 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
             <IconButton
               onClick={onClose}
               size="small"
-              sx={{
-                color: "#9ca3af",
-                backgroundColor: "rgba(0,0,0,0.04)",
+              sx={(theme) => ({
+                color: theme.palette.text.secondary,
+                backgroundColor:
+                  theme.palette.mode === "dark"
+                    ? alpha("#ffffff", 0.06)
+                    : "rgba(0,0,0,0.04)",
                 borderRadius: 2,
                 width: 32,
                 height: 32,
                 mt: 0.5,
                 "&:hover": {
-                  backgroundColor: "rgba(0,0,0,0.08)",
-                  color: "#4b5563",
+                  backgroundColor:
+                    theme.palette.mode === "dark"
+                      ? alpha("#ffffff", 0.1)
+                      : "rgba(0,0,0,0.08)",
+                  color: theme.palette.text.primary,
                 },
-              }}
+              })}
             >
               <CloseRoundedIcon sx={{ fontSize: 18 }} />
             </IconButton>
           </Stack>
         </Box>
 
-        <Divider sx={{ borderColor: "#ede8e0" }} />
+        <Divider />
       </DialogTitle>
 
       <DialogContent sx={{ px: 3.5, pt: 3, pb: 3.5 }}>
@@ -293,10 +321,10 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
                     <MenuItem
                       value=""
                       disabled
-                      sx={{
+                      sx={(theme) => ({
                         fontSize: scaleFont(14, settings?.textSize),
-                        color: "#aaa",
-                      }}
+                        color: theme.palette.text.secondary,
+                      })}
                     >
                       {t("dashboard:species")}
                     </MenuItem>
@@ -326,10 +354,10 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
                     <MenuItem
                       value=""
                       disabled
-                      sx={{
+                      sx={(theme) => ({
                         fontSize: scaleFont(14, settings?.textSize),
-                        color: "#aaa",
-                      }}
+                        color: theme.palette.text.secondary,
+                      })}
                     >
                       {t("dashboard:sex")}
                     </MenuItem>
@@ -413,7 +441,7 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
             />
           </Box>
 
-          <Divider sx={{ borderColor: "#ede8e0", mb: 2.5 }} />
+          <Divider sx={{ mb: 2.5 }} />
 
           <LoadingButton
             type="submit"

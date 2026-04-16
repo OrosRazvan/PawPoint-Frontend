@@ -6,12 +6,12 @@ import { Footer } from "./components/Footer";
 export const MainLayout = () => {
   return (
     <Box
-      sx={{
+      sx={(theme) => ({
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
-        backgroundColor: "#f8f4ef",
-      }}
+        backgroundColor: theme.palette.background.default,
+      })}
     >
       <Navbar />
 

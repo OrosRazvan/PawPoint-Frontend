@@ -7,11 +7,11 @@ type Props = {
 export const DashboardBackground = ({ children }: Props) => {
   return (
     <Box
-      sx={{
+      sx={(theme) => ({
         minHeight: "100vh",
         width: "100%",
-        backgroundColor: "#f8f4ef",
-      }}
+        backgroundColor: theme.palette.background.default,
+      })}
     >
       {children}
     </Box>

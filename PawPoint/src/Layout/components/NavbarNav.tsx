@@ -6,6 +6,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
@@ -16,22 +17,31 @@ import BugReportOutlinedIcon from "@mui/icons-material/BugReportOutlined";
 import AssistantOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-
-const navButtonSx = {
-  px: 2,
-  py: 1.25,
-  borderRadius: 999,
-  textTransform: "none",
-  fontSize: 15,
-  fontWeight: 600,
-  color: "#4b5563",
-  minWidth: "auto",
-};
+import { useSettings } from "../../hooks/useSettings";
+import { scaleFont } from "../../utils/fontScale";
 
 export const NavbarNav = () => {
   const { t } = useTranslation(["layout"]);
   const navigate = useNavigate();
   const location = useLocation();
+  const { data: settings } = useSettings();
+
+  const navButtonSx = (theme: any) => ({
+    px: 2,
+    py: 1.25,
+    borderRadius: 999,
+    textTransform: "none",
+    fontSize: scaleFont(15, settings?.textSize),
+    fontWeight: 600,
+    color: theme.palette.text.secondary,
+    minWidth: "auto",
+    "&:hover": {
+      backgroundColor:
+        theme.palette.mode === "dark"
+          ? alpha("#ffffff", 0.06)
+          : "#f5f5f5",
+    },
+  });
 
   const [managementAnchor, setManagementAnchor] = useState<null | HTMLElement>(null);
 
@@ -49,24 +59,29 @@ export const NavbarNav = () => {
 
   return (
     <Stack direction="row" spacing={1} alignItems="center">
-      <Button
-        startIcon={<HomeOutlinedIcon />}
-        sx={navButtonSx}
-      >
+      <Button startIcon={<HomeOutlinedIcon />} sx={navButtonSx}>
         {t("layout:home")}
       </Button>
 
       <Button
         startIcon={<DashboardOutlinedIcon />}
         onClick={() => navigate("/dashboard")}
-        sx={{
-          ...navButtonSx,
-          backgroundColor: isDashboard ? "#efd39d" : "transparent",
-          color: isDashboard ? "#071c42" : "#4b5563",
+        sx={(theme) => ({
+          ...navButtonSx(theme),
+          backgroundColor: isDashboard
+            ? alpha(theme.palette.primary.main, 0.22)
+            : "transparent",
+          color: isDashboard
+            ? theme.palette.text.primary
+            : theme.palette.text.secondary,
           "&:hover": {
-            backgroundColor: isDashboard ? "#efd39d" : "#f5f5f5",
+            backgroundColor: isDashboard
+              ? alpha(theme.palette.primary.main, 0.22)
+              : theme.palette.mode === "dark"
+              ? alpha("#ffffff", 0.06)
+              : "#f5f5f5",
           },
-        }}
+        })}
       >
         {t("layout:dashboard")}
       </Button>
@@ -80,14 +95,22 @@ export const NavbarNav = () => {
           )
         }
         onClick={(e) => setManagementAnchor(e.currentTarget)}
-        sx={{
-          ...navButtonSx,
-          backgroundColor: managementActive ? "#f2e4c3" : "transparent",
-          color: managementActive ? "#071c42" : "#4b5563",
+        sx={(theme) => ({
+          ...navButtonSx(theme),
+          backgroundColor: managementActive
+            ? alpha(theme.palette.primary.main, 0.16)
+            : "transparent",
+          color: managementActive
+            ? theme.palette.text.primary
+            : theme.palette.text.secondary,
           "&:hover": {
-            backgroundColor: managementActive ? "#f2e4c3" : "#f5f5f5",
+            backgroundColor: managementActive
+              ? alpha(theme.palette.primary.main, 0.16)
+              : theme.palette.mode === "dark"
+              ? alpha("#ffffff", 0.06)
+              : "#f5f5f5",
           },
-        }}
+        })}
       >
         {t("layout:management")}
       </Button>
@@ -105,13 +128,18 @@ export const NavbarNav = () => {
           horizontal: "left",
         }}
         PaperProps={{
-          sx: {
+          sx: (theme) => ({
             mt: 1.2,
             minWidth: 240,
             borderRadius: 3,
             p: 1,
-            boxShadow: "0 12px 32px rgba(7,28,66,0.12)",
-          },
+            backgroundColor: theme.palette.background.paper,
+            border: `1px solid ${theme.palette.divider}`,
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 16px 36px rgba(0,0,0,0.36)"
+                : "0 12px 32px rgba(7,28,66,0.12)",
+          }),
         }}
       >
         <MenuItem
@@ -122,8 +150,15 @@ export const NavbarNav = () => {
           sx={{ borderRadius: 2, py: 1.2 }}
         >
           <Stack direction="row" spacing={1.5} alignItems="center">
-            <VaccinesOutlinedIcon sx={{ color: "#6b7280" }} />
-            <Typography>{t("layout:vaccinations")}</Typography>
+            <VaccinesOutlinedIcon sx={(theme) => ({ color: theme.palette.text.secondary })} />
+            <Typography
+              sx={(theme) => ({
+                fontSize: scaleFont(14, settings?.textSize),
+                color: theme.palette.text.primary,
+              })}
+            >
+              {t("layout:vaccinations")}
+            </Typography>
           </Stack>
         </MenuItem>
 
@@ -135,8 +170,15 @@ export const NavbarNav = () => {
           sx={{ borderRadius: 2, py: 1.2 }}
         >
           <Stack direction="row" spacing={1.5} alignItems="center">
-            <EventAvailableOutlinedIcon sx={{ color: "#6b7280" }} />
-            <Typography>{t("layout:appointments")}</Typography>
+            <EventAvailableOutlinedIcon sx={(theme) => ({ color: theme.palette.text.secondary })} />
+            <Typography
+              sx={(theme) => ({
+                fontSize: scaleFont(14, settings?.textSize),
+                color: theme.palette.text.primary,
+              })}
+            >
+              {t("layout:appointments")}
+            </Typography>
           </Stack>
         </MenuItem>
 
@@ -148,16 +190,20 @@ export const NavbarNav = () => {
           sx={{ borderRadius: 2, py: 1.2 }}
         >
           <Stack direction="row" spacing={1.5} alignItems="center">
-            <BugReportOutlinedIcon sx={{ color: "#6b7280" }} />
-            <Typography>{t("layout:deworming")}</Typography>
+            <BugReportOutlinedIcon sx={(theme) => ({ color: theme.palette.text.secondary })} />
+            <Typography
+              sx={(theme) => ({
+                fontSize: scaleFont(14, settings?.textSize),
+                color: theme.palette.text.primary,
+              })}
+            >
+              {t("layout:deworming")}
+            </Typography>
           </Stack>
         </MenuItem>
       </Menu>
 
-      <Button
-        startIcon={<AssistantOutlinedIcon />}
-        sx={navButtonSx}
-      >
+      <Button startIcon={<AssistantOutlinedIcon />} sx={navButtonSx}>
         {t("layout:assistant")}
       </Button>
     </Stack>

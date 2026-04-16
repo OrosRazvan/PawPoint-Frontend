@@ -14,12 +14,16 @@ export const SectionCard = ({ title, children, rightSlot }: Props) => {
   return (
     <Paper
       elevation={0}
-      sx={{
+      sx={(theme) => ({
         p: 3,
         borderRadius: 4,
-        border: "1px solid #dedede",
-        backgroundColor: "#fcfcfc",
-      }}
+        border: `1px solid ${theme.palette.divider}`,
+        backgroundColor: theme.palette.background.paper,
+        boxShadow:
+          theme.palette.mode === "dark"
+            ? "0 10px 24px rgba(0,0,0,0.24)"
+            : "0 10px 24px rgba(0,0,0,0.05)",
+      })}
     >
       <Stack
         direction="row"
@@ -28,11 +32,11 @@ export const SectionCard = ({ title, children, rightSlot }: Props) => {
         sx={{ mb: 3 }}
       >
         <Typography
-          sx={{
+          sx={(theme) => ({
             fontSize: scaleFont(22, settings?.textSize),
             fontWeight: 700,
-            color: "#071c42",
-          }}
+            color: theme.palette.text.primary,
+          })}
         >
           {title}
         </Typography>

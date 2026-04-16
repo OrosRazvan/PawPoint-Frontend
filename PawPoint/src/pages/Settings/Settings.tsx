@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import NotificationsNoneRoundedIcon from "@mui/icons-material/NotificationsNoneRounded";
 import PaletteOutlinedIcon from "@mui/icons-material/PaletteOutlined";
+import { alpha } from "@mui/material/styles";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSnackbar } from "notistack";
@@ -23,17 +24,6 @@ import type {
   UserSettingsDto,
 } from "./types/settings";
 
-const pageBg = "#f8f4ef";
-
-const sectionCardSx = {
-  borderRadius: 4,
-  backgroundColor: "#fffdfb",
-  border: "1px solid #ebe3da",
-  px: { xs: 2, md: 4 },
-  py: { xs: 3, md: 4 },
-  boxShadow: "0 10px 24px rgba(0,0,0,0.05)",
-};
-
 const orangeSwitchSx = {
   "& .MuiSwitch-switchBase.Mui-checked": {
     color: "#fff",
@@ -43,7 +33,6 @@ const orangeSwitchSx = {
     opacity: 1,
   },
   "& .MuiSwitch-track": {
-    backgroundColor: "#d1d5db",
     opacity: 1,
   },
 };
@@ -63,31 +52,16 @@ export const Settings = () => {
     }
   }, [data]);
 
-  const optionButtonSx = (active: boolean) => ({
-    flex: 1,
-    py: 1.8,
-    borderRadius: 2.5,
-    textTransform: "none",
-    fontSize: scaleFont(16, form?.textSize),
-    fontWeight: 700,
-    border: active ? "2px solid #f5a623" : "1px solid #ebe7e1",
-    backgroundColor: active ? "#f7ae1a" : "#f8f8f8",
-    color: "#111827",
-    "&:hover": {
-      backgroundColor: active ? "#f3a400" : "#f3eee7",
-    },
-  });
-
   if (isLoading || !form) {
     return (
       <Box
-        sx={{
+        sx={(theme) => ({
           minHeight: "100vh",
-          backgroundColor: pageBg,
+          backgroundColor: theme.palette.background.default,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-        }}
+        })}
       >
         <CircularProgress />
       </Box>
@@ -97,17 +71,56 @@ export const Settings = () => {
   if (isError) {
     return (
       <Box
-        sx={{
+        sx={(theme) => ({
           minHeight: "100vh",
-          backgroundColor: pageBg,
+          backgroundColor: theme.palette.background.default,
           px: { xs: 2, sm: 3, md: 5 },
           py: { xs: 3, md: 5 },
-        }}
+        })}
       >
         <Typography color="error">{t("settings:saveError")}</Typography>
       </Box>
     );
   }
+
+  const sectionCardSx = (theme: any) => ({
+    borderRadius: 4,
+    backgroundColor: theme.palette.background.paper,
+    border: `1px solid ${theme.palette.divider}`,
+    px: { xs: 2, md: 4 },
+    py: { xs: 3, md: 4 },
+    boxShadow:
+      theme.palette.mode === "dark"
+        ? "0 10px 24px rgba(0,0,0,0.28)"
+        : "0 10px 24px rgba(0,0,0,0.05)",
+  });
+
+  const optionButtonSx = (active: boolean) => (theme: any) => ({
+    flex: 1,
+    py: 1.8,
+    borderRadius: 2.5,
+    textTransform: "none",
+    fontSize: scaleFont(16, form?.textSize),
+    fontWeight: 700,
+    border: active
+      ? `2px solid ${theme.palette.primary.main}`
+      : `1px solid ${theme.palette.divider}`,
+    backgroundColor: active
+      ? theme.palette.primary.main
+      : theme.palette.mode === "dark"
+      ? alpha("#ffffff", 0.04)
+      : "#f8f8f8",
+    color: active
+      ? theme.palette.primary.contrastText
+      : theme.palette.text.primary,
+    "&:hover": {
+      backgroundColor: active
+        ? theme.palette.primary.dark
+        : theme.palette.mode === "dark"
+        ? alpha("#ffffff", 0.08)
+        : "#f3eee7",
+    },
+  });
 
   const updateField = <K extends keyof UserSettingsDto>(
     key: K,
@@ -167,24 +180,24 @@ export const Settings = () => {
 
   return (
     <Box
-      sx={{
+      sx={(theme) => ({
         minHeight: "100vh",
-        backgroundColor: pageBg,
+        backgroundColor: theme.palette.background.default,
         px: { xs: 2, sm: 3, md: 5 },
         py: { xs: 3, md: 5 },
-      }}
+      })}
     >
       <Stack spacing={4}>
         <Typography
-          sx={{
+          sx={(theme) => ({
             fontSize: {
               xs: scaleFont(34, form.textSize),
               md: scaleFont(44, form.textSize),
             },
             fontWeight: 800,
-            color: "#111827",
+            color: theme.palette.text.primary,
             lineHeight: 1.05,
-          }}
+          })}
         >
           {t("settings:title")}
         </Typography>
@@ -192,13 +205,13 @@ export const Settings = () => {
         <Box sx={sectionCardSx}>
           <Stack spacing={4}>
             <Stack direction="row" spacing={1.5} alignItems="center">
-              <PaletteOutlinedIcon sx={{ color: "#6b7280" }} />
+              <PaletteOutlinedIcon sx={(theme) => ({ color: theme.palette.text.secondary })} />
               <Typography
-                sx={{
+                sx={(theme) => ({
                   fontSize: scaleFont(24, form.textSize),
                   fontWeight: 800,
-                  color: "#111827",
-                }}
+                  color: theme.palette.text.primary,
+                })}
               >
                 {t("settings:appearance")}
               </Typography>
@@ -211,20 +224,20 @@ export const Settings = () => {
             >
               <Box>
                 <Typography
-                  sx={{
+                  sx={(theme) => ({
                     fontSize: scaleFont(18, form.textSize),
                     fontWeight: 700,
-                    color: "#111827",
-                  }}
+                    color: theme.palette.text.primary,
+                  })}
                 >
                   {t("settings:theme")}
                 </Typography>
                 <Typography
-                  sx={{
+                  sx={(theme) => ({
                     fontSize: scaleFont(16, form.textSize),
-                    color: "#5f7087",
+                    color: theme.palette.text.secondary,
                     mt: 0.5,
-                  }}
+                  })}
                 >
                   {t("settings:themeSubtitle")}
                 </Typography>
@@ -239,12 +252,12 @@ export const Settings = () => {
 
             <Box>
               <Typography
-                sx={{
+                sx={(theme) => ({
                   fontSize: scaleFont(18, form.textSize),
                   fontWeight: 700,
-                  color: "#111827",
+                  color: theme.palette.text.primary,
                   mb: 2,
-                }}
+                })}
               >
                 {t("settings:textSize")}
               </Typography>
@@ -273,12 +286,12 @@ export const Settings = () => {
 
             <Box>
               <Typography
-                sx={{
+                sx={(theme) => ({
                   fontSize: scaleFont(18, form.textSize),
                   fontWeight: 700,
-                  color: "#111827",
+                  color: theme.palette.text.primary,
                   mb: 2,
-                }}
+                })}
               >
                 {t("settings:weightUnits")}
               </Typography>
@@ -301,12 +314,12 @@ export const Settings = () => {
 
             <Box>
               <Typography
-                sx={{
+                sx={(theme) => ({
                   fontSize: scaleFont(18, form.textSize),
                   fontWeight: 700,
-                  color: "#111827",
+                  color: theme.palette.text.primary,
                   mb: 2,
-                }}
+                })}
               >
                 {t("settings:dateFormat")}
               </Typography>
@@ -320,18 +333,22 @@ export const Settings = () => {
                       e.target.value as UserSettingsDto["dateFormat"]
                     )
                   }
-                  sx={{
+                  sx={(theme) => ({
                     borderRadius: 2.5,
-                    backgroundColor: "#fff",
+                    backgroundColor: theme.palette.background.paper,
                     fontSize: scaleFont(14, form.textSize),
+                    color: theme.palette.text.primary,
                     "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#ded8cf",
+                      borderColor: theme.palette.divider,
                     },
                     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#f5a623",
+                      borderColor: theme.palette.primary.main,
                       borderWidth: 1.5,
                     },
-                  }}
+                    "& .MuiSvgIcon-root": {
+                      color: theme.palette.text.secondary,
+                    },
+                  })}
                 >
                   <MenuItem
                     value="DD/MM/YYYY"
@@ -360,13 +377,15 @@ export const Settings = () => {
         <Box sx={sectionCardSx}>
           <Stack spacing={4}>
             <Stack direction="row" spacing={1.5} alignItems="center">
-              <NotificationsNoneRoundedIcon sx={{ color: "#6b7280" }} />
+              <NotificationsNoneRoundedIcon
+                sx={(theme) => ({ color: theme.palette.text.secondary })}
+              />
               <Typography
-                sx={{
+                sx={(theme) => ({
                   fontSize: scaleFont(24, form.textSize),
                   fontWeight: 800,
-                  color: "#111827",
-                }}
+                  color: theme.palette.text.primary,
+                })}
               >
                 {t("settings:notifications")}
               </Typography>
@@ -379,20 +398,20 @@ export const Settings = () => {
             >
               <Box>
                 <Typography
-                  sx={{
+                  sx={(theme) => ({
                     fontSize: scaleFont(18, form.textSize),
                     fontWeight: 700,
-                    color: "#111827",
-                  }}
+                    color: theme.palette.text.primary,
+                  })}
                 >
                   {t("settings:enableNotifications")}
                 </Typography>
                 <Typography
-                  sx={{
+                  sx={(theme) => ({
                     fontSize: scaleFont(16, form.textSize),
-                    color: "#5f7087",
+                    color: theme.palette.text.secondary,
                     mt: 0.5,
-                  }}
+                  })}
                 >
                   {t("settings:enableNotificationsSubtitle")}
                 </Typography>
@@ -409,12 +428,12 @@ export const Settings = () => {
 
             <Box>
               <Typography
-                sx={{
+                sx={(theme) => ({
                   fontSize: scaleFont(18, form.textSize),
                   fontWeight: 700,
-                  color: "#111827",
+                  color: theme.palette.text.primary,
                   mb: 2.5,
-                }}
+                })}
               >
                 {t("settings:reminderSettings")}
               </Typography>
@@ -426,11 +445,11 @@ export const Settings = () => {
                   alignItems="center"
                 >
                   <Typography
-                    sx={{
+                    sx={(theme) => ({
                       fontSize: scaleFont(17, form.textSize),
                       fontWeight: 600,
-                      color: "#111827",
-                    }}
+                      color: theme.palette.text.primary,
+                    })}
                   >
                     {t("settings:vaccinations")}
                   </Typography>
@@ -450,11 +469,11 @@ export const Settings = () => {
                   alignItems="center"
                 >
                   <Typography
-                    sx={{
+                    sx={(theme) => ({
                       fontSize: scaleFont(17, form.textSize),
                       fontWeight: 600,
-                      color: "#111827",
-                    }}
+                      color: theme.palette.text.primary,
+                    })}
                   >
                     {t("settings:appointments")}
                   </Typography>
@@ -474,11 +493,11 @@ export const Settings = () => {
                   alignItems="center"
                 >
                   <Typography
-                    sx={{
+                    sx={(theme) => ({
                       fontSize: scaleFont(17, form.textSize),
                       fontWeight: 600,
-                      color: "#111827",
-                    }}
+                      color: theme.palette.text.primary,
+                    })}
                   >
                     {t("settings:deworming")}
                   </Typography>
@@ -496,12 +515,12 @@ export const Settings = () => {
 
             <Box>
               <Typography
-                sx={{
+                sx={(theme) => ({
                   fontSize: scaleFont(18, form.textSize),
                   fontWeight: 700,
-                  color: "#111827",
+                  color: theme.palette.text.primary,
                   mb: 2,
-                }}
+                })}
               >
                 {t("settings:badgeMode")}
               </Typography>
@@ -528,7 +547,7 @@ export const Settings = () => {
           <Button
             onClick={handleSave}
             disabled={updateSettingsMutation.isPending}
-            sx={{
+            sx={(theme) => ({
               minWidth: 220,
               px: 3.5,
               py: 1.6,
@@ -536,17 +555,20 @@ export const Settings = () => {
               textTransform: "none",
               fontSize: scaleFont(18, form.textSize),
               fontWeight: 700,
-              color: "#111827",
-              backgroundColor: "#f7ae1a",
-              boxShadow: "0 8px 20px rgba(245,166,35,0.24)",
+              color: theme.palette.primary.contrastText,
+              backgroundColor: theme.palette.primary.main,
+              boxShadow:
+                theme.palette.mode === "dark"
+                  ? "0 8px 20px rgba(245,166,35,0.24)"
+                  : "0 8px 20px rgba(245,166,35,0.24)",
               "&:hover": {
-                backgroundColor: "#f3a400",
+                backgroundColor: theme.palette.primary.dark,
               },
               "&.Mui-disabled": {
-                backgroundColor: "#f4d28a",
-                color: "#8c7a4e",
+                backgroundColor: alpha(theme.palette.primary.main, 0.45),
+                color: alpha(theme.palette.primary.contrastText, 0.7),
               },
-            }}
+            })}
           >
             {updateSettingsMutation.isPending
               ? t("settings:saving")
