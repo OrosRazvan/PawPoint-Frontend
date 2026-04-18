@@ -20,6 +20,9 @@ import { Notifications } from "../pages/Notifications/Notifications";
 import { Settings } from "../pages/Settings/Settings";
 import { ForgotPassword } from "../pages/ForgotPassword/ForgotPassword";
 import { ResetPassword } from "../pages/ResetPassword/ResetPassword";
+import { AdminDashboard } from "../pages/Admin/AdminDashboard";
+import { AdminUserDetails } from "../pages/Admin/AdminUserDetails";
+import { AdminRoute } from "./AdminRoute";
 
 export const AppRoutes = () => {
   return (
@@ -54,6 +57,8 @@ export const AppRoutes = () => {
         <Route path="/animals/:animalId" element={<PrivateRoute><AnimalDetails /></PrivateRoute>}/>
         <Route path="/notifications" element={<PrivateRoute><Notifications /></PrivateRoute>} />
         <Route path="/settings" element={<PrivateRoute><Settings/></PrivateRoute>} />
+        <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+        <Route path="/admin/users/:id" element={<AdminRoute><AdminUserDetails /></AdminRoute>} />
       </Route>
     </Routes>
   );
