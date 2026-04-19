@@ -1,0 +1,13 @@
+{
+  "title": "Contact us",
+  "subtitle": "Send a message to the PawPoint team.",
+  "sentToAdminNote": "Your message will be sent directly to the PawPoint administrator.",
+  "messageTitle": "Title",
+  "description": "Description",
+  "send": "Send message",
+  "myMessages": "My messages",
+  "myMessagesSubtitle": "See your contact requests and admin replies.",
+  "replies": "Replies",
+  "noReplies": "No replies yet.",
+  "loadFailed": "Could not load your messages."
+}

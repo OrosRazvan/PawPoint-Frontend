@@ -3,5 +3,7 @@
   "forgotPasswordFailed": "We could not send the reset email.",
   "resetPasswordSuccess": "Password was reset successfully.",
   "resetPasswordFailed": "We could not reset the password.",
-  "resetPasswordInvalidToken": "The reset link is invalid or missing."
+  "resetPasswordInvalidToken": "The reset link is invalid or missing.",
+  "contactMessageSent": "Your message was sent successfully.",
+  "contactMessageFailed": "We could not send your message."
 }

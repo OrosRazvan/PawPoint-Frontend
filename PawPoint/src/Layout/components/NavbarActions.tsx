@@ -1,12 +1,14 @@
 import { useMemo, useState } from "react";
 import {
   Avatar,
+  Badge,
   Box,
   Divider,
   IconButton,
   Menu,
   MenuItem,
   Stack,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
@@ -14,18 +16,40 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
+import ContactSupportOutlinedIcon from "@mui/icons-material/ContactSupportOutlined";
+import MailOutlineRoundedIcon from "@mui/icons-material/MailOutlineRounded";
+import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { clearTokens } from "../../auth/tokenStorage";
+
+import { clearTokens, getAccessToken } from "../../auth/tokenStorage";
 import { NotificationsDropdown } from "../../components/NotificationsDropdown";
 import { getNotificationBadgeMode } from "../../utils/notificationBadgePreference";
 import { useSettings } from "../../hooks/useSettings";
 import { useUserProfile } from "../../hooks/useUserProfile";
 import { scaleFont } from "../../utils/fontScale";
+import { useAdminContactMessages } from "../../hooks/useAdminContactMessages";
 
 const getInitial = (name?: string | null) => {
   if (!name?.trim()) return "U";
   return name.trim().charAt(0).toUpperCase();
+};
+
+const getIsAdminFromToken = (): boolean => {
+  try {
+    const token = getAccessToken();
+    if (!token) return false;
+
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    const role =
+      payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] ??
+      payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"] ??
+      payload.role;
+
+    return role === "Admin";
+  } catch {
+    return false;
+  }
 };
 
 export const NavbarActions = () => {
@@ -38,10 +62,35 @@ export const NavbarActions = () => {
 
   const showNotificationCount = getNotificationBadgeMode() === "count";
   const menuOpen = Boolean(anchorEl);
+  const isAdmin = getIsAdminFromToken();
+
+  const { data: adminMessages = [] } = useAdminContactMessages(isAdmin);
+  const unansweredCount = isAdmin
+    ? adminMessages.filter((x) => x.status === "Open" || x.replies.length === 0).length
+    : 0;
 
   const displayName = useMemo(() => {
     return profile?.fullName?.trim() || t("layout:navbar.profile");
   }, [profile?.fullName, t]);
+
+  const actionIconButtonSx = (theme: any) => ({
+    width: 42,
+    height: 42,
+    borderRadius: 999,
+    color: theme.palette.text.primary,
+    border: `1px solid ${theme.palette.divider}`,
+    backgroundColor: theme.palette.background.paper,
+    boxShadow:
+      theme.palette.mode === "dark"
+        ? "0 8px 20px rgba(0,0,0,0.22)"
+        : "0 6px 16px rgba(0,0,0,0.06)",
+    "&:hover": {
+      backgroundColor:
+        theme.palette.mode === "dark"
+          ? alpha("#ffffff", 0.05)
+          : alpha(theme.palette.text.primary, 0.04),
+    },
+  });
 
   const handleLogout = () => {
     clearTokens();
@@ -74,7 +123,46 @@ export const NavbarActions = () => {
 
   return (
     <Stack direction="row" spacing={1.2} alignItems="center" flexShrink={0}>
-      <NotificationsDropdown showCount={showNotificationCount} />
+      {!isAdmin && <NotificationsDropdown showCount={showNotificationCount} />}
+
+      {!isAdmin && (
+        <Tooltip title="Contact Us">
+          <IconButton
+            onClick={() => navigate("/contact-us")}
+            sx={actionIconButtonSx}
+          >
+            <ContactSupportOutlinedIcon />
+          </IconButton>
+        </Tooltip>
+      )}
+
+      {!isAdmin && (
+        <Tooltip title="My Messages">
+          <IconButton
+            onClick={() => navigate("/my-contact-messages")}
+            sx={actionIconButtonSx}
+          >
+            <MailOutlineRoundedIcon />
+          </IconButton>
+        </Tooltip>
+      )}
+
+      {isAdmin && (
+        <Tooltip title="Admin Messages">
+          <IconButton
+            onClick={() => navigate("/admin/contact-messages")}
+            sx={actionIconButtonSx}
+          >
+            <Badge
+              color="error"
+              badgeContent={unansweredCount}
+              invisible={unansweredCount <= 0}
+            >
+              <AdminPanelSettingsOutlinedIcon color="primary" />
+            </Badge>
+          </IconButton>
+        </Tooltip>
+      )}
 
       <Box>
         <IconButton
@@ -104,10 +192,7 @@ export const NavbarActions = () => {
             <Avatar
               src={profile.profilePictureUrl}
               alt={displayName}
-              sx={{
-                width: 34,
-                height: 34,
-              }}
+              sx={{ width: 34, height: 34 }}
             />
           ) : (
             <Avatar
@@ -212,48 +297,40 @@ export const NavbarActions = () => {
             </Stack>
           </Box>
 
-          <Divider />
+          {!isAdmin && (
+            <>
+              <Divider />
 
-          <MenuItem
-            onClick={handleGoToProfile}
-            sx={{ py: 1.4, px: 2, gap: 1.4 }}
-          >
-            <PersonOutlineOutlinedIcon fontSize="small" />
-            <Typography
-              sx={(theme) => ({
-                fontSize: scaleFont(14, settings?.textSize),
-                color: theme.palette.text.primary,
-              })}
-            >
-              {t("layout:navbar.profile")}
-            </Typography>
-          </MenuItem>
+              <MenuItem onClick={handleGoToProfile} sx={{ py: 1.4, px: 2, gap: 1.4 }}>
+                <PersonOutlineOutlinedIcon fontSize="small" />
+                <Typography
+                  sx={(theme) => ({
+                    fontSize: scaleFont(14, settings?.textSize),
+                    color: theme.palette.text.primary,
+                  })}
+                >
+                  {t("layout:navbar.profile")}
+                </Typography>
+              </MenuItem>
 
-          <MenuItem
-            onClick={handleGoToSettings}
-            sx={{ py: 1.4, px: 2, gap: 1.4 }}
-          >
-            <SettingsOutlinedIcon fontSize="small" />
-            <Typography
-              sx={(theme) => ({
-                fontSize: scaleFont(14, settings?.textSize),
-                color: theme.palette.text.primary,
-              })}
-            >
-              {t("layout:navbar.settings")}
-            </Typography>
-          </MenuItem>
+              <MenuItem onClick={handleGoToSettings} sx={{ py: 1.4, px: 2, gap: 1.4 }}>
+                <SettingsOutlinedIcon fontSize="small" />
+                <Typography
+                  sx={(theme) => ({
+                    fontSize: scaleFont(14, settings?.textSize),
+                    color: theme.palette.text.primary,
+                  })}
+                >
+                  {t("layout:navbar.settings")}
+                </Typography>
+              </MenuItem>
+            </>
+          )}
 
-          <Divider />
+          {isAdmin && <Divider />}
 
-          <MenuItem
-            onClick={handleMenuLogout}
-            sx={{ py: 1.4, px: 2, gap: 1.4 }}
-          >
-            <LogoutOutlinedIcon
-              fontSize="small"
-              color="error"
-            />
+          <MenuItem onClick={handleMenuLogout} sx={{ py: 1.4, px: 2, gap: 1.4 }}>
+            <LogoutOutlinedIcon fontSize="small" color="error" />
             <Typography
               sx={(theme) => ({
                 fontSize: scaleFont(14, settings?.textSize),

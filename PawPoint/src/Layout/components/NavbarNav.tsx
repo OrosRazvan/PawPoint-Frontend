@@ -15,16 +15,37 @@ import VaccinesOutlinedIcon from "@mui/icons-material/VaccinesOutlined";
 import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
 import BugReportOutlinedIcon from "@mui/icons-material/BugReportOutlined";
 import AssistantOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
+import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useSettings } from "../../hooks/useSettings";
 import { scaleFont } from "../../utils/fontScale";
+import { getAccessToken } from "../../auth/tokenStorage";
+
+const getIsAdminFromToken = (): boolean => {
+  try {
+    const token = getAccessToken();
+    if (!token) return false;
+
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    const role =
+      payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] ??
+      payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"] ??
+      payload.role;
+
+    return role === "Admin";
+  } catch {
+    return false;
+  }
+};
 
 export const NavbarNav = () => {
   const { t } = useTranslation(["layout"]);
   const navigate = useNavigate();
   const location = useLocation();
   const { data: settings } = useSettings();
+
+  const isAdmin = getIsAdminFromToken();
 
   const navButtonSx = (theme: any) => ({
     px: 2,
@@ -44,10 +65,10 @@ export const NavbarNav = () => {
   });
 
   const [managementAnchor, setManagementAnchor] = useState<null | HTMLElement>(null);
-
   const managementOpen = Boolean(managementAnchor);
 
   const isDashboard = location.pathname.startsWith("/dashboard");
+  const isAdminPage = location.pathname.startsWith("/admin");
 
   const managementActive = useMemo(
     () =>
@@ -56,6 +77,35 @@ export const NavbarNav = () => {
       location.pathname.startsWith("/deworming"),
     [location.pathname]
   );
+
+  if (isAdmin) {
+    return (
+      <Stack direction="row" spacing={1} alignItems="center">
+        <Button
+          startIcon={<AdminPanelSettingsOutlinedIcon />}
+          onClick={() => navigate("/admin")}
+          sx={(theme) => ({
+            ...navButtonSx(theme),
+            backgroundColor: isAdminPage
+              ? alpha(theme.palette.primary.main, 0.22)
+              : "transparent",
+            color: isAdminPage
+              ? theme.palette.text.primary
+              : theme.palette.text.secondary,
+            "&:hover": {
+              backgroundColor: isAdminPage
+                ? alpha(theme.palette.primary.main, 0.22)
+                : theme.palette.mode === "dark"
+                ? alpha("#ffffff", 0.06)
+                : "#f5f5f5",
+            },
+          })}
+        >
+          Admin
+        </Button>
+      </Stack>
+    );
+  }
 
   return (
     <Stack direction="row" spacing={1} alignItems="center">

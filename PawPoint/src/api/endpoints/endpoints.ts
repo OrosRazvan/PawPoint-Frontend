@@ -48,3 +48,6 @@ export const DELETE_NOTIFICATION_ENDPOINT = "/notifications";
 
 export const GET_SETTINGS_ENDPOINT = "/settings";
 export const UPDATE_SETTINGS_ENDPOINT = "/settings";
+
+export const CONTACT_MESSAGES_ENDPOINT = "/contact-messages";
+export const ADMIN_CONTACT_MESSAGES_ENDPOINT = "/admin/contact-messages";
