@@ -3,5 +3,7 @@
   "forgotPasswordFailed": "Nu am putut trimite emailul de resetare.",
   "resetPasswordSuccess": "Parola a fost resetată cu succes.",
   "resetPasswordFailed": "Nu am putut reseta parola.",
-  "resetPasswordInvalidToken": "Linkul de resetare este invalid sau lipsește."
+  "resetPasswordInvalidToken": "Linkul de resetare este invalid sau lipsește.",
+  "contactMessageSent": "Mesajul a fost trimis cu succes.",
+  "contactMessageFailed": "Nu am putut trimite mesajul."
 }

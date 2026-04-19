@@ -1,0 +1,13 @@
+{
+  "title": "Contactează-ne",
+  "subtitle": "Trimite un mesaj echipei PawPoint.",
+  "sentToAdminNote": "Mesajul tău va fi trimis direct administratorului PawPoint.",
+  "messageTitle": "Titlu",
+  "description": "Descriere",
+  "send": "Trimite mesajul",
+  "myMessages": "Mesajele mele",
+  "myMessagesSubtitle": "Vezi cererile tale și răspunsurile adminului.",
+  "replies": "Răspunsuri",
+  "noReplies": "Nu există încă răspunsuri.",
+  "loadFailed": "Nu am putut încărca mesajele tale."
+}

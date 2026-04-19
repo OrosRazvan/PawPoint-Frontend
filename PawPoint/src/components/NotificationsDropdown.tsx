@@ -20,7 +20,6 @@ import { useMarkNotificationRead } from "../hooks/useMarkNotificationRead";
 import { useNotificationRealtime } from "../hooks/useNotificationRealtime";
 import { useSettings } from "../hooks/useSettings";
 import { scaleFont } from "../utils/fontScale";
-import { filterNotificationsForNavbar } from "../utils/filterNotificationsBySettings";
 import type { NotificationDto } from "../pages/Notifications/types/notification";
 
 const formatDate = (value: string) => {
@@ -61,6 +60,38 @@ const extractNotifications = (data: unknown): NotificationDto[] => {
   return [];
 };
 
+const shouldShowNotificationInNavbar = (
+  notification: NotificationDto,
+  settings: {
+    enableNotifications?: boolean;
+    vaccinationNotifications?: boolean;
+    appointmentNotifications?: boolean;
+    dewormingNotifications?: boolean;
+  } | undefined
+) => {
+  if (!settings?.enableNotifications) {
+    return false;
+  }
+
+  const typeName = notification.typeName ?? "";
+
+  if (typeName.startsWith("Vaccination")) {
+    return !!settings.vaccinationNotifications;
+  }
+
+  if (typeName.startsWith("Appointment")) {
+    return !!settings.appointmentNotifications;
+  }
+
+  if (typeName.startsWith("Deworming")) {
+    return !!settings.dewormingNotifications;
+  }
+
+  // toate celelalte notificări rămân vizibile:
+  // AnimalCreated, ProfileUpdated, ContactMessageReplyReceived etc.
+  return true;
+};
+
 export const NotificationsDropdown = ({ showCount = true }: Props) => {
   const { t } = useTranslation(["notifications"]);
   const navigate = useNavigate();
@@ -79,7 +110,10 @@ export const NotificationsDropdown = ({ showCount = true }: Props) => {
   const allNotifications = useMemo(() => extractNotifications(data), [data]);
 
   const navbarNotifications = useMemo(
-    () => filterNotificationsForNavbar(allNotifications, settings),
+    () =>
+      allNotifications.filter((item) =>
+        shouldShowNotificationInNavbar(item, settings)
+      ),
     [allNotifications, settings]
   );
 
@@ -183,15 +217,18 @@ export const NotificationsDropdown = ({ showCount = true }: Props) => {
               {t("notifications:title")}
             </Typography>
 
-            {settings?.enableNotifications && !showDotOnly && unreadEnabledCount > 0 && (
+            {unreadEnabledCount > 0 && (
               <Chip
-                label={t("notifications:unreadCount", { count: unreadEnabledCount })}
+                label={showDotOnly ? "•" : unreadEnabledCount}
                 size="small"
                 sx={(theme) => ({
-                  backgroundColor: alpha(theme.palette.error.main, 0.12),
-                  color: theme.palette.error.main,
+                  borderRadius: 999,
                   fontWeight: 700,
-                  fontSize: scaleFont(12, settings?.textSize),
+                  backgroundColor:
+                    theme.palette.mode === "dark"
+                      ? alpha(theme.palette.error.main, 0.18)
+                      : alpha(theme.palette.error.main, 0.12),
+                  color: theme.palette.error.main,
                 })}
               />
             )}
@@ -200,142 +237,138 @@ export const NotificationsDropdown = ({ showCount = true }: Props) => {
 
         <Divider />
 
-        <Stack sx={{ maxHeight: 360, overflowY: "auto" }}>
+        <Box sx={{ maxHeight: 360, overflowY: "auto" }}>
           {isLoading ? (
             <Box sx={{ px: 3, py: 3 }}>
               <Typography
                 sx={(theme) => ({
                   color: theme.palette.text.secondary,
-                  fontSize: scaleFont(14, settings?.textSize),
+                  fontSize: scaleFont(15, settings?.textSize),
                 })}
               >
                 {t("notifications:loading")}
               </Typography>
             </Box>
           ) : notifications.length === 0 ? (
-            <Box sx={{ px: 3, py: 3 }}>
+            <Box sx={{ px: 3, py: 4 }}>
               <Typography
                 sx={(theme) => ({
                   color: theme.palette.text.secondary,
-                  fontSize: scaleFont(14, settings?.textSize),
+                  fontSize: scaleFont(15, settings?.textSize),
                 })}
               >
                 {t("notifications:empty")}
               </Typography>
             </Box>
           ) : (
-            notifications.map((item) => (
-              <Box
-                key={item.id}
-                onClick={() => {
-                  if (!item.isRead) {
-                    markAsRead(item.id);
-                  }
-                }}
-                sx={(theme) => ({
-                  px: 3,
-                  py: 2.2,
-                  cursor: "pointer",
-                  backgroundColor: item.isRead
-                    ? theme.palette.mode === "dark"
-                      ? alpha("#ffffff", 0.03)
-                      : "#f7f7f7"
-                    : theme.palette.background.paper,
-                  borderBottom: `1px solid ${theme.palette.divider}`,
-                  "&:hover": {
+            <Stack divider={<Divider flexItem />}>
+              {notifications.map((item) => (
+                <Box
+                  key={item.id}
+                  sx={(theme) => ({
+                    px: 3,
+                    py: 2,
                     backgroundColor: item.isRead
-                      ? theme.palette.mode === "dark"
-                        ? alpha("#ffffff", 0.05)
-                        : "#f1f1f1"
+                      ? "transparent"
                       : theme.palette.mode === "dark"
                       ? alpha(theme.palette.primary.main, 0.08)
-                      : "#faf6ef",
-                  },
-                })}
-              >
-                <Stack direction="row" spacing={1.2} alignItems="flex-start">
-                  {!item.isRead && (
-                    <CircleIcon
-                      sx={(theme) => ({
-                        fontSize: 10,
-                        color: theme.palette.error.main,
-                        mt: 0.7,
-                      })}
-                    />
-                  )}
-
-                  <Box sx={{ minWidth: 0, flex: 1 }}>
-                    <Typography
-                      sx={(theme) => ({
-                        fontSize: scaleFont(14, settings?.textSize),
-                        fontWeight: item.isRead ? 600 : 800,
-                        color: item.isRead
-                          ? theme.palette.text.secondary
-                          : theme.palette.text.primary,
-                      })}
+                      : alpha(theme.palette.primary.main, 0.05),
+                  })}
+                >
+                  <Stack spacing={1.2}>
+                    <Stack
+                      direction="row"
+                      justifyContent="space-between"
+                      alignItems="flex-start"
+                      spacing={1.5}
                     >
-                      {item.name}
-                    </Typography>
+                      <Stack direction="row" spacing={1.2} alignItems="flex-start" sx={{ minWidth: 0 }}>
+                        {!item.isRead && (
+                          <CircleIcon
+                            sx={(theme) => ({
+                              fontSize: 10,
+                              mt: 0.8,
+                              color: theme.palette.error.main,
+                            })}
+                          />
+                        )}
 
-                    <Typography
-                      sx={(theme) => ({
-                        mt: 0.5,
-                        fontSize: scaleFont(13, settings?.textSize),
-                        color: item.isRead
-                          ? alpha(theme.palette.text.secondary, 0.75)
-                          : theme.palette.text.secondary,
-                        display: "-webkit-box",
-                        overflow: "hidden",
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: "vertical",
-                      })}
-                    >
-                      {item.content}
-                    </Typography>
+                        <Box sx={{ minWidth: 0 }}>
+                          <Typography
+                            sx={(theme) => ({
+                              fontSize: scaleFont(15, settings?.textSize),
+                              fontWeight: item.isRead ? 700 : 800,
+                              color: theme.palette.text.primary,
+                              lineHeight: 1.35,
+                            })}
+                          >
+                            {item.name}
+                          </Typography>
 
-                    <Typography
-                      sx={(theme) => ({
-                        mt: 0.8,
-                        fontSize: scaleFont(12, settings?.textSize),
-                        color: alpha(theme.palette.text.secondary, 0.72),
-                      })}
-                    >
-                      {formatDate(item.createdAt)}
-                    </Typography>
-                  </Box>
-                </Stack>
-              </Box>
-            ))
+                          <Typography
+                            sx={(theme) => ({
+                              mt: 0.5,
+                              fontSize: scaleFont(14, settings?.textSize),
+                              color: theme.palette.text.secondary,
+                              lineHeight: 1.45,
+                              whiteSpace: "pre-wrap",
+                              wordBreak: "break-word",
+                            })}
+                          >
+                            {item.content}
+                          </Typography>
+
+                          <Typography
+                            sx={(theme) => ({
+                              mt: 0.8,
+                              fontSize: scaleFont(12, settings?.textSize),
+                              color: alpha(theme.palette.text.secondary, 0.8),
+                            })}
+                          >
+                            {formatDate(item.createdAt)}
+                          </Typography>
+                        </Box>
+                      </Stack>
+
+                      {!item.isRead && (
+                        <Button
+                          size="small"
+                          onClick={() => markAsRead(item.id)}
+                          sx={{
+                            minWidth: "auto",
+                            px: 1,
+                            textTransform: "none",
+                            fontWeight: 700,
+                            borderRadius: 2,
+                          }}
+                        >
+                          {t("notifications:markAsRead")}
+                        </Button>
+                      )}
+                    </Stack>
+                  </Stack>
+                </Box>
+              ))}
+            </Stack>
           )}
-        </Stack>
+        </Box>
 
         <Divider />
 
         <Box sx={{ p: 2 }}>
           <Button
             fullWidth
+            variant="contained"
             onClick={() => {
               setAnchorEl(null);
               navigate("/notifications");
             }}
-            sx={(theme) => ({
-              py: 1.2,
-              borderRadius: 2.5,
+            sx={{
+              borderRadius: 999,
               textTransform: "none",
-              fontWeight: 700,
-              fontSize: scaleFont(14, settings?.textSize),
-              color: theme.palette.text.primary,
-              backgroundColor:
-                theme.palette.mode === "dark"
-                  ? alpha("#ffffff", 0.05)
-                  : "#f6efe4",
-              "&:hover": {
-                backgroundColor:
-                  theme.palette.mode === "dark"
-                    ? alpha("#ffffff", 0.08)
-                    : "#efe4d2",
-              },
-            })}
+              fontWeight: 800,
+              py: 1.3,
+            }}
           >
             {t("notifications:seeAll")}
           </Button>

@@ -23,6 +23,10 @@ import { ResetPassword } from "../pages/ResetPassword/ResetPassword";
 import { AdminDashboard } from "../pages/Admin/AdminDashboard";
 import { AdminUserDetails } from "../pages/Admin/AdminUserDetails";
 import { AdminRoute } from "./AdminRoute";
+import { ContactUs } from "../pages/ContactUs/ContactUs";
+import { MyContactMessages } from "../pages/ContactUs/MyContactMessages";
+import { AdminContactMessages } from "../pages/Admin/AdminContactMessages";
+import { AdminContactMessageDetails } from "../pages/Admin/AdminContactMessageDetails";
 
 export const AppRoutes = () => {
   return (
@@ -58,8 +62,12 @@ export const AppRoutes = () => {
         <Route path="/notifications" element={<PrivateRoute><Notifications /></PrivateRoute>} />
         <Route path="/settings" element={<PrivateRoute><Settings/></PrivateRoute>} />
         <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+        
         <Route path="/admin/users/:id" element={<AdminRoute><AdminUserDetails /></AdminRoute>} />
-      </Route>
+        <Route path="/contact-us" element={<PrivateRoute><ContactUs /></PrivateRoute>}/>
+        <Route path="/my-contact-messages" element={<PrivateRoute><MyContactMessages /></PrivateRoute>}/>
+        <Route path="/admin/contact-messages" element={<AdminRoute><AdminContactMessages /></AdminRoute>}/>
+        <Route path="/admin/contact-messages/:id" element={<AdminRoute><AdminContactMessageDetails /></AdminRoute>}/></Route>
     </Routes>
   );
 };

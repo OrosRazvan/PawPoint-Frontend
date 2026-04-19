@@ -36,7 +36,7 @@ export type DewormingDto = {
   animalName?: string;
   productName?: string;
   administrationDate?: string;
-  date?: string;
+  date?: string | null;
 };
 
 export type DashboardEvent = {

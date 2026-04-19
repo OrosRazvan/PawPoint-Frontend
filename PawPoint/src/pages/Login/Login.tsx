@@ -102,7 +102,22 @@ export const Login = () => {
           variant: "success",
         });
 
-        navigate("/dashboard", { replace: true });
+        const token = data.tokens.accessToken;
+
+        let role: string | null = null;
+
+        try {
+          const payload = JSON.parse(atob(token.split(".")[1]));
+          role =
+            payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] ??
+            payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"] ??
+            payload.role ??
+            null;
+        } catch {
+          role = null;
+        }
+
+        navigate(role === "Admin" ? "/admin" : "/dashboard", { replace: true });
       },
       onError: () => {
         enqueueSnackbar(t("messages:loginFailed"), {
