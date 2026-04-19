@@ -50,7 +50,7 @@ export const DeleteVaccinationDialog = ({
           boxShadow:
             theme.palette.mode === "dark"
               ? "0 24px 64px rgba(0,0,0,0.38), 0 4px 12px rgba(0,0,0,0.24)"
-              : undefined,
+              : "0 24px 64px rgba(7,28,66,0.14), 0 4px 12px rgba(7,28,66,0.06)",
         }),
       }}
     >
@@ -67,9 +67,29 @@ export const DeleteVaccinationDialog = ({
                     0.14
                   )} 0%, ${alpha(theme.palette.background.paper, 0.96)} 100%)`
                 : "linear-gradient(135deg, #fff5f5 0%, #fff0f0 100%)",
+            position: "relative",
+            overflow: "hidden",
+            "&::after": {
+              content: '""',
+              position: "absolute",
+              bottom: -24,
+              right: -24,
+              width: 100,
+              height: 100,
+              borderRadius: "50%",
+              background:
+                theme.palette.mode === "dark"
+                  ? alpha(theme.palette.error.main, 0.12)
+                  : "rgba(229,53,53,0.07)",
+              pointerEvents: "none",
+            },
           })}
         >
-          <Stack direction="row" justifyContent="space-between">
+          <Stack
+            direction="row"
+            alignItems="flex-start"
+            justifyContent="space-between"
+          >
             <Stack direction="row" spacing={2} alignItems="center">
               <Box
                 sx={{
@@ -79,8 +99,11 @@ export const DeleteVaccinationDialog = ({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  background: "linear-gradient(135deg, #e53535 0%, #c72b2b 100%)",
+                  background:
+                    "linear-gradient(135deg, #e53535 0%, #c72b2b 100%)",
                   color: "#fff",
+                  flexShrink: 0,
+                  boxShadow: "0 4px 12px rgba(229,53,53,0.35)",
                 }}
               >
                 <DeleteOutlineRoundedIcon sx={{ fontSize: 22 }} />
@@ -92,6 +115,8 @@ export const DeleteVaccinationDialog = ({
                     fontSize: scaleFont(19, settings?.textSize),
                     fontWeight: 800,
                     color: theme.palette.text.primary,
+                    lineHeight: 1.2,
+                    letterSpacing: "-0.3px",
                   })}
                 >
                   {t("vaccination:deleteDialogTitle")}
@@ -101,6 +126,7 @@ export const DeleteVaccinationDialog = ({
                     fontSize: scaleFont(13, settings?.textSize),
                     color: theme.palette.text.secondary,
                     mt: 0.4,
+                    fontWeight: 400,
                   })}
                 >
                   {t("vaccination:deleteDialogSubtitle")}
@@ -120,6 +146,14 @@ export const DeleteVaccinationDialog = ({
                 borderRadius: 2,
                 width: 32,
                 height: 32,
+                mt: 0.5,
+                "&:hover": {
+                  backgroundColor:
+                    theme.palette.mode === "dark"
+                      ? alpha("#ffffff", 0.1)
+                      : "rgba(0,0,0,0.08)",
+                  color: theme.palette.text.primary,
+                },
               })}
             >
               <CloseRoundedIcon sx={{ fontSize: 18 }} />
@@ -130,11 +164,23 @@ export const DeleteVaccinationDialog = ({
         <Divider />
       </DialogTitle>
 
-      <DialogContent sx={{ px: 3.5, pt: 3, pb: 3.5 }}>
+      <DialogContent
+        sx={{
+          px: 3.5,
+          pb: 3.5,
+          "&.MuiDialogContent-root": {
+            pt: 5,
+          },
+          "&.MuiDialogContent-root:first-of-type": {
+            pt: 2,
+          },
+        }}
+      >
         <Stack spacing={3}>
           {item && (
             <Box
               sx={(theme) => ({
+                mt: 1,
                 display: "flex",
                 alignItems: "center",
                 gap: 2,
@@ -148,12 +194,38 @@ export const DeleteVaccinationDialog = ({
                     : theme.palette.background.paper,
               })}
             >
+              <Box
+                sx={(theme) => ({
+                  width: 48,
+                  height: 48,
+                  borderRadius: 2,
+                  flexShrink: 0,
+                  background:
+                    theme.palette.mode === "dark"
+                      ? `linear-gradient(135deg, ${alpha(
+                          theme.palette.primary.main,
+                          0.14
+                        )} 0%, ${alpha(theme.palette.primary.light, 0.22)} 100%)`
+                      : "linear-gradient(135deg, #fbf2ea 0%, #fde8c8 100%)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: scaleFont(22, settings?.textSize),
+                  fontWeight: 800,
+                  color: theme.palette.primary.main,
+                  overflow: "hidden",
+                })}
+              >
+                {item.animalName?.charAt(0)?.toUpperCase() ?? "V"}
+              </Box>
+
               <Box>
                 <Typography
                   sx={(theme) => ({
                     fontSize: scaleFont(15, settings?.textSize),
                     fontWeight: 700,
                     color: theme.palette.text.primary,
+                    letterSpacing: "-0.2px",
                   })}
                 >
                   {item.animalName}
@@ -218,6 +290,12 @@ export const DeleteVaccinationDialog = ({
                   theme.palette.mode === "dark"
                     ? alpha("#ffffff", 0.06)
                     : "#f0f2f7",
+                "&:hover": {
+                  backgroundColor:
+                    theme.palette.mode === "dark"
+                      ? alpha("#ffffff", 0.1)
+                      : "#e8ecf3",
+                },
               })}
             >
               {t("vaccination:cancel")}
@@ -236,6 +314,11 @@ export const DeleteVaccinationDialog = ({
                 fontSize: scaleFont(14, settings?.textSize),
                 background: "linear-gradient(135deg, #e53535 0%, #c72b2b 100%)",
                 color: "#fff",
+                boxShadow: "0 8px 18px rgba(229,53,53,0.28)",
+                "&:hover": {
+                  background: "linear-gradient(135deg, #d92d2d 0%, #b92525 100%)",
+                  boxShadow: "0 10px 22px rgba(229,53,53,0.34)",
+                },
               }}
             >
               {t("vaccination:deleteConfirm")}

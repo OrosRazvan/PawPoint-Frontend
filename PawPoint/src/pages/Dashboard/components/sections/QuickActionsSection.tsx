@@ -6,13 +6,13 @@ import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import { useTranslation } from "react-i18next";
 import { SectionCard } from "../cards/SectionCard";
 import { QuickActionButton } from "../cards/QuickActionButton";
-import type { QuickActionItem } from "../../data/dashboardMockData";
+import type { QuickActionItem } from "../../types/dashboard";
 
 type Props = {
   actions: QuickActionItem[];
 };
 
-const iconMap = {
+const iconMap: Record<QuickActionItem["icon"], React.ReactNode> = {
   vaccination: <VaccinesOutlinedIcon sx={{ color: "#1657ff" }} />,
   appointment: <EventAvailableOutlinedIcon sx={{ color: "#f59e0b" }} />,
   deworming: <BugReportOutlinedIcon sx={{ color: "#05a533" }} />,
@@ -24,7 +24,7 @@ export const QuickActionsSection = ({ actions }: Props) => {
 
   return (
     <SectionCard title={t("dashboard:quickActions")}>
-      <Stack spacing={2}>
+      <Stack spacing={3.5}>
         {actions.map((action) => (
           <QuickActionButton
             key={action.id}

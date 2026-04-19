@@ -44,7 +44,7 @@ export const BookAppointmentStep1 = () => {
   const { data: settings } = useSettings();
 
   const fieldSx = (theme: any) => ({
-    minWidth: 170,
+    minWidth: { xs: "100%", sm: 200, md: 220 },
     "& .MuiOutlinedInput-root": {
       borderRadius: 2.5,
       backgroundColor:
@@ -68,11 +68,12 @@ export const BookAppointmentStep1 = () => {
 
   const cardSx = (selected: boolean) => (theme: any) => ({
     display: "flex",
-    alignItems: "center",
+    flexDirection: { xs: "column", sm: "row" },
+    alignItems: { xs: "stretch", sm: "center" },
     justifyContent: "space-between",
-    gap: 3,
-    px: 4,
-    py: 4,
+    gap: { xs: 2.25, sm: 2.5, md: 3 },
+    px: { xs: 2, sm: 2.5, md: 4 },
+    py: { xs: 2, sm: 2.5, md: 4 },
     borderRadius: 3,
     border: selected
       ? `2px solid ${theme.palette.primary.main}`
@@ -97,8 +98,8 @@ export const BookAppointmentStep1 = () => {
 
   const stepSx = (active: boolean) => (theme: any) => ({
     flex: 1,
-    py: 2.6,
-    px: 3,
+    py: { xs: 1.8, sm: 2.2, md: 2.6 },
+    px: { xs: 2, sm: 2.5, md: 3 },
     borderRadius: 3,
     backgroundColor: active
       ? theme.palette.primary.main
@@ -116,7 +117,12 @@ export const BookAppointmentStep1 = () => {
         ? `0 8px 20px ${alpha(theme.palette.primary.main, 0.18)}`
         : "0 8px 20px rgba(0,0,0,0.06)"
       : "none",
-    fontSize: scaleFont(18, settings?.textSize),
+    fontSize: {
+      xs: scaleFont(15, settings?.textSize),
+      sm: scaleFont(16, settings?.textSize),
+      md: scaleFont(18, settings?.textSize),
+    },
+    lineHeight: 1.2,
   });
 
   const formatPrice = (value?: number) => {
@@ -203,22 +209,24 @@ export const BookAppointmentStep1 = () => {
         py: { xs: 3, md: 5 },
       })}
     >
-      <Stack spacing={4}>
+      <Stack spacing={{ xs: 3, md: 4 }}>
         <Typography
           sx={(theme) => ({
             fontSize: {
-              xs: scaleFont(34, settings?.textSize),
+              xs: scaleFont(30, settings?.textSize),
+              sm: scaleFont(36, settings?.textSize),
               md: scaleFont(44, settings?.textSize),
             },
             fontWeight: 800,
             color: theme.palette.text.primary,
             lineHeight: 1.05,
+            wordBreak: "break-word",
           })}
         >
           {t("bookPageTitle")}
         </Typography>
 
-        <Stack direction={{ xs: "column", md: "row" }} spacing={2.5}>
+        <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
           <Box sx={stepSx(true)}>{`1. ${t("step1")}`}</Box>
           <Box sx={stepSx(false)}>{`2. ${t("step2")}`}</Box>
           <Box sx={stepSx(false)}>{`3. ${t("step3")}`}</Box>
@@ -229,7 +237,7 @@ export const BookAppointmentStep1 = () => {
             borderRadius: 4,
             backgroundColor: theme.palette.background.paper,
             border: `1px solid ${theme.palette.divider}`,
-            px: { xs: 2, md: 4 },
+            px: { xs: 2, sm: 3, md: 4 },
             py: { xs: 3, md: 4 },
             boxShadow:
               theme.palette.mode === "dark"
@@ -239,12 +247,16 @@ export const BookAppointmentStep1 = () => {
         >
           <Stack spacing={3}>
             <Stack
-              direction={{ xs: "column", md: "row" }}
+              direction={{ xs: "column", lg: "row" }}
               justifyContent="space-between"
-              alignItems={{ xs: "stretch", md: "center" }}
+              alignItems={{ xs: "stretch", lg: "center" }}
               spacing={2}
             >
-              <Stack direction="row" spacing={2} alignItems="center">
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={{ xs: 0.75, sm: 1.5 }}
+                alignItems={{ xs: "flex-start", sm: "center" }}
+              >
                 <Typography
                   sx={(theme) => ({
                     fontSize: scaleFont(18, settings?.textSize),
@@ -262,13 +274,18 @@ export const BookAppointmentStep1 = () => {
                     fontWeight: 600,
                     color: theme.palette.text.primary,
                     minWidth: 56,
+                    wordBreak: "break-word",
                   })}
                 >
                   {t("consult")}
                 </Typography>
               </Stack>
 
-              <Stack direction="row" spacing={2} alignItems="center">
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={{ xs: 1, sm: 2 }}
+                alignItems={{ xs: "stretch", sm: "center" }}
+              >
                 <Typography
                   sx={(theme) => ({
                     fontSize: scaleFont(18, settings?.textSize),
@@ -321,14 +338,14 @@ export const BookAppointmentStep1 = () => {
                     >
                       <Stack
                         direction="row"
-                        spacing={2.5}
+                        spacing={{ xs: 1.5, sm: 2, md: 2.5 }}
                         alignItems="center"
-                        sx={{ minWidth: 0 }}
+                        sx={{ minWidth: 0, flex: 1 }}
                       >
                         <Box
                           sx={(theme) => ({
-                            width: 82,
-                            height: 82,
+                            width: { xs: 60, sm: 70, md: 82 },
+                            height: { xs: 60, sm: 70, md: 82 },
                             borderRadius: 3,
                             backgroundColor: theme.palette.primary.main,
                             display: "flex",
@@ -338,16 +355,23 @@ export const BookAppointmentStep1 = () => {
                             flexShrink: 0,
                           })}
                         >
-                          <PetsRoundedIcon sx={{ fontSize: 38 }} />
+                          <PetsRoundedIcon
+                            sx={{ fontSize: { xs: 28, sm: 32, md: 38 } }}
+                          />
                         </Box>
 
-                        <Box sx={{ minWidth: 0 }}>
+                        <Box sx={{ minWidth: 0, flex: 1 }}>
                           <Typography
                             sx={(theme) => ({
-                              fontSize: scaleFont(22, settings?.textSize),
+                              fontSize: {
+                                xs: scaleFont(18, settings?.textSize),
+                                sm: scaleFont(20, settings?.textSize),
+                                md: scaleFont(22, settings?.textSize),
+                              },
                               fontWeight: 800,
                               color: theme.palette.text.primary,
                               lineHeight: 1.2,
+                              wordBreak: "break-word",
                             })}
                           >
                             {cabinet.name}
@@ -356,36 +380,43 @@ export const BookAppointmentStep1 = () => {
                           <Typography
                             sx={(theme) => ({
                               mt: 0.8,
-                              fontSize: scaleFont(15, settings?.textSize),
+                              fontSize: scaleFont(14, settings?.textSize),
                               color: theme.palette.text.secondary,
+                              wordBreak: "break-word",
                             })}
                           >
                             {cabinet.address || "—"}
                           </Typography>
 
                           <Stack
-                            direction="row"
-                            spacing={1}
-                            alignItems="center"
+                            direction={{ xs: "column", sm: "row" }}
+                            spacing={{ xs: 0.5, sm: 1 }}
+                            alignItems={{ xs: "flex-start", sm: "center" }}
                             sx={{ mt: 1.4 }}
                           >
-                            <StarRoundedIcon
-                              sx={(theme) => ({
-                                fontSize: 18,
-                                color: theme.palette.warning.main,
-                              })}
-                            />
-                            <Typography
-                              sx={(theme) => ({
-                                fontSize: scaleFont(15, settings?.textSize),
-                                fontWeight: 700,
-                                color: theme.palette.text.primary,
-                              })}
+                            <Stack
+                              direction="row"
+                              spacing={0.75}
+                              alignItems="center"
                             >
-                              {cabinet.rating != null
-                                ? cabinet.rating.toFixed(1)
-                                : "—"}
-                            </Typography>
+                              <StarRoundedIcon
+                                sx={(theme) => ({
+                                  fontSize: 18,
+                                  color: theme.palette.warning.main,
+                                })}
+                              />
+                              <Typography
+                                sx={(theme) => ({
+                                  fontSize: scaleFont(15, settings?.textSize),
+                                  fontWeight: 700,
+                                  color: theme.palette.text.primary,
+                                })}
+                              >
+                                {cabinet.rating != null
+                                  ? cabinet.rating.toFixed(1)
+                                  : "—"}
+                              </Typography>
+                            </Stack>
 
                             <Typography
                               sx={(theme) => ({
@@ -402,10 +433,12 @@ export const BookAppointmentStep1 = () => {
                       <Button
                         endIcon={<ChevronRightRoundedIcon />}
                         sx={(theme) => ({
+                          alignSelf: { xs: "stretch", sm: "center" },
+                          width: { xs: "100%", sm: "auto" },
                           px: 2.4,
                           py: 1.1,
                           borderRadius: 2.5,
-                          minWidth: 0,
+                          minWidth: { xs: "100%", sm: 130 },
                           textTransform: "none",
                           fontSize: scaleFont(15, settings?.textSize),
                           fontWeight: 700,
@@ -434,13 +467,18 @@ export const BookAppointmentStep1 = () => {
               </Stack>
             )}
 
-            <Stack direction="row" justifyContent="flex-end" sx={{ pt: 1 }}>
+            <Stack
+              direction="row"
+              justifyContent={{ xs: "stretch", sm: "flex-end" }}
+              sx={{ pt: 1 }}
+            >
               <Button
                 onClick={handleNext}
                 disabled={!selectedCabinet}
                 endIcon={<ChevronRightRoundedIcon />}
                 sx={(theme) => ({
-                  minWidth: 180,
+                  width: { xs: "100%", sm: "auto" },
+                  minWidth: { xs: "100%", sm: 180 },
                   px: 3.5,
                   py: 1.55,
                   borderRadius: 2.5,

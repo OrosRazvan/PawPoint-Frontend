@@ -14,10 +14,16 @@ import { useSnackbar } from "notistack";
 import { useQueryClient } from "@tanstack/react-query";
 import { useDeleteAnimal } from "../../hooks/useDeleteAnimal";
 import type { QuickActionItem, DashboardPet } from "./types/dashboard";
+import { useAppointments } from "../../hooks/useAppointments";
+import { useVaccinations } from "../../hooks/useVaccinations";
+import { useDewormings } from "../../hooks/useDewormings";
 
 export const Dashboard = () => {
   const { t } = useTranslation(["dashboard"]);
   const { data, isLoading, isError } = useDashboard();
+  const { data: appointments = [] } = useAppointments();
+  const { data: vaccinations = [] } = useVaccinations();
+  const { data: dewormings = [] } = useDewormings();
   const navigate = useNavigate();
 
   const [isAddPetOpen, setIsAddPetOpen] = useState(false);
@@ -36,7 +42,7 @@ export const Dashboard = () => {
         icon: "vaccination",
         textColor: "#1657ff",
         backgroundColor: "#edf3fb",
-        onClick: () => {},
+        onClick: () => navigate("/vaccinations"),
       },
       {
         id: "2",
@@ -44,7 +50,7 @@ export const Dashboard = () => {
         icon: "appointment",
         textColor: "#f59e0b",
         backgroundColor: "#f8ecd2",
-        onClick: () => {},
+        onClick: () => navigate("/appointments"),
       },
       {
         id: "3",
@@ -52,7 +58,7 @@ export const Dashboard = () => {
         icon: "deworming",
         textColor: "#05a533",
         backgroundColor: "#e5f2ea",
-        onClick: () => {},
+        onClick: () => navigate("/deworming"),
       },
       {
         id: "4",
@@ -63,8 +69,105 @@ export const Dashboard = () => {
         onClick: () => setIsAddPetOpen(true),
       },
     ],
-    []
+    [navigate, setIsAddPetOpen]
   );
+
+  const upcomingEvents = useMemo(() => {
+    const appointmentItems = appointments.map((item: any) => {
+      const rawDate =
+        item.slotStartTimeUtc ??
+        item.SlotStartTimeUtc ??
+        item.slotStartUtc ??
+        item.SlotStartUtc ??
+        item.startTimeUtc ??
+        item.StartTimeUtc ??
+        item.dateUtc ??
+        item.DateUtc ??
+        item.date ??
+        item.Date ??
+        "";
+
+      return {
+        id: `appointment-${item.id}`,
+        petName: item.animalName ?? item.petName ?? "Pet",
+        typeLabel: item.serviceType ?? "Appointment",
+        statusLabel: "Upcoming",
+        rawDate,
+      };
+    });
+
+    const vaccinationItems = vaccinations.map((item: any) => {
+      const rawDate =
+        item.dateUtc ??
+        item.DateUtc ??
+        item.slotStartUtc ??
+        item.SlotStartUtc ??
+        item.slotStartTimeUtc ??
+        item.SlotStartTimeUtc ??
+        item.startTimeUtc ??
+        item.StartTimeUtc ??
+        item.nextDateUtc ??
+        item.NextDateUtc ??
+        item.nextDate ??
+        item.NextDate ??
+        item.date ??
+        item.Date ??
+        "";
+
+      return {
+        id: `vaccination-${item.id}`,
+        petName: item.animalName ?? item.petName ?? "Pet",
+        typeLabel: item.vaccineName ?? "Vaccination",
+        statusLabel: "Upcoming",
+        rawDate,
+      };
+    });
+
+    const dewormingItems = dewormings.map((item: any) => {
+      const rawDate =
+        item.dateUtc ??
+        item.DateUtc ??
+        item.slotStartUtc ??
+        item.SlotStartUtc ??
+        item.slotStartTimeUtc ??
+        item.SlotStartTimeUtc ??
+        item.startTimeUtc ??
+        item.StartTimeUtc ??
+        item.nextDateUtc ??
+        item.NextDateUtc ??
+        item.nextDate ??
+        item.NextDate ??
+        item.date ??
+        item.Date ??
+        "";
+
+      return {
+        id: `deworming-${item.id}`,
+        petName: item.animalName ?? item.petName ?? "Pet",
+        typeLabel: item.productName ?? item.type ?? "Deworming",
+        statusLabel: "Upcoming",
+        rawDate,
+      };
+    });
+
+    return [...appointmentItems, ...vaccinationItems, ...dewormingItems]
+      .map((item) => {
+        const date = new Date(item.rawDate);
+        const time = date.getTime();
+
+        return {
+          ...item,
+          time,
+        };
+      })
+      .filter((item) => !Number.isNaN(item.time) && item.time >= Date.now())
+      .sort((a, b) => a.time - b.time)
+      .slice(0, 3)
+      .map(({ time, ...item }) => ({
+        ...item,
+        dateValue: item.rawDate,
+      }));
+  }, [appointments, vaccinations, dewormings]);
 
   const handleViewPet = (pet: DashboardPet) => {
     navigate(`/animals/${pet.id}`);
@@ -115,7 +218,7 @@ export const Dashboard = () => {
           <>
             <DashboardGrid
               quickActions={quickActions}
-              upcomingEvents={data?.upcomingEvents ?? []}
+              upcomingEvents={upcomingEvents}
             />
 
             <MyPetsSection

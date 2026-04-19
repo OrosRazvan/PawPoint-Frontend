@@ -27,11 +27,13 @@ import { ContactUs } from "../pages/ContactUs/ContactUs";
 import { MyContactMessages } from "../pages/ContactUs/MyContactMessages";
 import { AdminContactMessages } from "../pages/Admin/AdminContactMessages";
 import { AdminContactMessageDetails } from "../pages/Admin/AdminContactMessageDetails";
+import { PublicHome } from "../pages/PublicHome/PublicHome";
 
 export const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<PublicRoute><Register /></PublicRoute>} />
+      <Route path="/" element={<PublicHome />} />
+      <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
       <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />

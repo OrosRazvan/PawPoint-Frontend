@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import {
+  Box,
   Button,
   Menu,
   MenuItem,
@@ -7,7 +8,6 @@ import {
   Typography,
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
-import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import KeyboardArrowUpRoundedIcon from "@mui/icons-material/KeyboardArrowUpRounded";
@@ -39,30 +39,21 @@ const getIsAdminFromToken = (): boolean => {
   }
 };
 
-export const NavbarNav = () => {
+type NavbarNavProps = {
+  mobile?: boolean;
+  onNavigate?: () => void;
+};
+
+export const NavbarNav = ({
+  mobile = false,
+  onNavigate,
+}: NavbarNavProps) => {
   const { t } = useTranslation(["layout"]);
   const navigate = useNavigate();
   const location = useLocation();
   const { data: settings } = useSettings();
 
   const isAdmin = getIsAdminFromToken();
-
-  const navButtonSx = (theme: any) => ({
-    px: 2,
-    py: 1.25,
-    borderRadius: 999,
-    textTransform: "none",
-    fontSize: scaleFont(15, settings?.textSize),
-    fontWeight: 600,
-    color: theme.palette.text.secondary,
-    minWidth: "auto",
-    "&:hover": {
-      backgroundColor:
-        theme.palette.mode === "dark"
-          ? alpha("#ffffff", 0.06)
-          : "#f5f5f5",
-    },
-  });
 
   const [managementAnchor, setManagementAnchor] = useState<null | HTMLElement>(null);
   const managementOpen = Boolean(managementAnchor);
@@ -78,12 +69,40 @@ export const NavbarNav = () => {
     [location.pathname]
   );
 
+  const handleGo = (path: string) => {
+    navigate(path);
+    onNavigate?.();
+  };
+
+  const navButtonSx = (theme: any) => ({
+    px: mobile ? 1.5 : 2,
+    py: mobile ? 1.4 : 1.25,
+    borderRadius: mobile ? 3 : 999,
+    textTransform: "none",
+    fontSize: scaleFont(15, settings?.textSize),
+    fontWeight: 600,
+    color: theme.palette.text.secondary,
+    minWidth: "auto",
+    justifyContent: "flex-start",
+    width: mobile ? "100%" : "auto",
+    "&:hover": {
+      backgroundColor:
+        theme.palette.mode === "dark"
+          ? alpha("#ffffff", 0.06)
+          : "#f5f5f5",
+    },
+  });
+
   if (isAdmin) {
     return (
-      <Stack direction="row" spacing={1} alignItems="center">
+      <Stack
+        direction={mobile ? "column" : "row"}
+        spacing={mobile ? 1.25 : 1}
+        alignItems={mobile ? "stretch" : "center"}
+      >
         <Button
           startIcon={<AdminPanelSettingsOutlinedIcon />}
-          onClick={() => navigate("/admin")}
+          onClick={() => handleGo("/admin")}
           sx={(theme) => ({
             ...navButtonSx(theme),
             backgroundColor: isAdminPage
@@ -108,14 +127,14 @@ export const NavbarNav = () => {
   }
 
   return (
-    <Stack direction="row" spacing={1} alignItems="center">
-      <Button startIcon={<HomeOutlinedIcon />} sx={navButtonSx}>
-        {t("layout:home")}
-      </Button>
-
+    <Stack
+      direction={mobile ? "column" : "row"}
+      spacing={mobile ? 1.25 : 1}
+      alignItems={mobile ? "stretch" : "center"}
+    >
       <Button
         startIcon={<DashboardOutlinedIcon />}
-        onClick={() => navigate("/dashboard")}
+        onClick={() => handleGo("/dashboard")}
         sx={(theme) => ({
           ...navButtonSx(theme),
           backgroundColor: isDashboard
@@ -171,11 +190,11 @@ export const NavbarNav = () => {
         onClose={() => setManagementAnchor(null)}
         anchorOrigin={{
           vertical: "bottom",
-          horizontal: "left",
+          horizontal: mobile ? "right" : "left",
         }}
         transformOrigin={{
           vertical: "top",
-          horizontal: "left",
+          horizontal: mobile ? "right" : "left",
         }}
         PaperProps={{
           sx: (theme) => ({
@@ -195,7 +214,7 @@ export const NavbarNav = () => {
         <MenuItem
           onClick={() => {
             setManagementAnchor(null);
-            navigate("/vaccinations");
+            handleGo("/vaccinations");
           }}
           sx={{ borderRadius: 2, py: 1.2 }}
         >
@@ -215,7 +234,7 @@ export const NavbarNav = () => {
         <MenuItem
           onClick={() => {
             setManagementAnchor(null);
-            navigate("/appointments");
+            handleGo("/appointments");
           }}
           sx={{ borderRadius: 2, py: 1.2 }}
         >
@@ -235,7 +254,7 @@ export const NavbarNav = () => {
         <MenuItem
           onClick={() => {
             setManagementAnchor(null);
-            navigate("/deworming");
+            handleGo("/deworming");
           }}
           sx={{ borderRadius: 2, py: 1.2 }}
         >
@@ -253,9 +272,14 @@ export const NavbarNav = () => {
         </MenuItem>
       </Menu>
 
-      <Button startIcon={<AssistantOutlinedIcon />} sx={navButtonSx}>
+      <Button
+        startIcon={<AssistantOutlinedIcon />}
+        sx={navButtonSx}
+      >
         {t("layout:assistant")}
       </Button>
+
+      {mobile && <Box sx={{ height: 4 }} />}
     </Stack>
   );
 };

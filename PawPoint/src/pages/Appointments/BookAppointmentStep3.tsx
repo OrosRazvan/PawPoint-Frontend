@@ -161,6 +161,7 @@ export const BookAppointmentStep3 = () => {
               fontSize: scaleFont(24, settings?.textSize),
               fontWeight: 700,
               color: theme.palette.text.primary,
+              textAlign: "center",
             })}
           >
             {t("missingAppointmentData")}
@@ -245,14 +246,14 @@ export const BookAppointmentStep3 = () => {
   };
 
   const rowSx = (theme: any) => ({
-    py: 3.2,
+    py: { xs: 2.2, sm: 2.6, md: 3.2 },
     borderBottom: `1px solid ${theme.palette.divider}`,
   });
 
   const stepSx = (active: boolean) => (theme: any) => ({
     flex: 1,
-    py: 2.6,
-    px: 3,
+    py: { xs: 1.8, sm: 2.2, md: 2.6 },
+    px: { xs: 2, sm: 2.5, md: 3 },
     borderRadius: 3,
     backgroundColor: active
       ? theme.palette.primary.main
@@ -270,7 +271,36 @@ export const BookAppointmentStep3 = () => {
         ? `0 8px 20px ${alpha(theme.palette.primary.main, 0.18)}`
         : "0 8px 20px rgba(0,0,0,0.06)"
       : "none",
-    fontSize: scaleFont(18, settings?.textSize),
+    fontSize: {
+      xs: scaleFont(15, settings?.textSize),
+      sm: scaleFont(16, settings?.textSize),
+      md: scaleFont(18, settings?.textSize),
+    },
+    lineHeight: 1.2,
+  });
+
+  const selectFieldSx = (theme: any) => ({
+    width: { xs: "100%", sm: "auto" },
+    minWidth: { xs: "100%", sm: 220 },
+    "& .MuiOutlinedInput-root": {
+      borderRadius: 2.5,
+      backgroundColor:
+        theme.palette.mode === "dark"
+          ? alpha("#ffffff", 0.03)
+          : theme.palette.background.paper,
+      fontSize: scaleFont(14, settings?.textSize),
+      color: theme.palette.text.primary,
+      "& fieldset": {
+        borderColor: theme.palette.divider,
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: theme.palette.primary.main,
+        borderWidth: 1.5,
+      },
+      "& .MuiSvgIcon-root": {
+        color: theme.palette.text.secondary,
+      },
+    },
   });
 
   return (
@@ -282,22 +312,24 @@ export const BookAppointmentStep3 = () => {
         py: { xs: 3, md: 5 },
       })}
     >
-      <Stack spacing={4}>
+      <Stack spacing={{ xs: 3, md: 4 }}>
         <Typography
           sx={(theme) => ({
             fontSize: {
-              xs: scaleFont(34, settings?.textSize),
+              xs: scaleFont(30, settings?.textSize),
+              sm: scaleFont(36, settings?.textSize),
               md: scaleFont(44, settings?.textSize),
             },
             fontWeight: 800,
             color: theme.palette.text.primary,
             lineHeight: 1.05,
+            wordBreak: "break-word",
           })}
         >
           {t("bookPageTitle")}
         </Typography>
 
-        <Stack direction={{ xs: "column", md: "row" }} spacing={2.5}>
+        <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
           <Box sx={stepSx(false)}>{`1. ${t("step1")}`}</Box>
           <Box sx={stepSx(false)}>{`2. ${t("step2")}`}</Box>
           <Box sx={stepSx(true)}>{`3. ${t("step3")}`}</Box>
@@ -308,7 +340,7 @@ export const BookAppointmentStep3 = () => {
             borderRadius: 4,
             backgroundColor: theme.palette.background.paper,
             border: `1px solid ${theme.palette.divider}`,
-            px: { xs: 2, md: 4 },
+            px: { xs: 2, sm: 3, md: 4 },
             py: { xs: 3, md: 4 },
             boxShadow:
               theme.palette.mode === "dark"
@@ -316,15 +348,17 @@ export const BookAppointmentStep3 = () => {
                 : "0 10px 24px rgba(0,0,0,0.05)",
           })}
         >
-          <Stack spacing={4}>
+          <Stack spacing={{ xs: 3, md: 4 }}>
             <Typography
               sx={(theme) => ({
                 fontSize: {
-                  xs: scaleFont(28, settings?.textSize),
+                  xs: scaleFont(24, settings?.textSize),
+                  sm: scaleFont(28, settings?.textSize),
                   md: scaleFont(34, settings?.textSize),
                 },
                 fontWeight: 800,
                 color: theme.palette.text.primary,
+                wordBreak: "break-word",
               })}
             >
               {t("summary")}
@@ -332,10 +366,10 @@ export const BookAppointmentStep3 = () => {
 
             <Box sx={rowSx}>
               <Stack
-                direction="row"
+                direction={{ xs: "column", sm: "row" }}
                 justifyContent="space-between"
-                alignItems="center"
-                spacing={2}
+                alignItems={{ xs: "flex-start", sm: "center" }}
+                spacing={1}
               >
                 <Typography
                   sx={(theme) => ({
@@ -351,6 +385,8 @@ export const BookAppointmentStep3 = () => {
                     fontSize: scaleFont(18, settings?.textSize),
                     fontWeight: 700,
                     color: theme.palette.text.primary,
+                    textAlign: { xs: "left", sm: "right" },
+                    wordBreak: "break-word",
                   })}
                 >
                   {selectedCabinet.name}
@@ -360,10 +396,10 @@ export const BookAppointmentStep3 = () => {
 
             <Box sx={rowSx}>
               <Stack
-                direction="row"
+                direction={{ xs: "column", sm: "row" }}
                 justifyContent="space-between"
-                alignItems="center"
-                spacing={2}
+                alignItems={{ xs: "flex-start", sm: "center" }}
+                spacing={1}
               >
                 <Typography
                   sx={(theme) => ({
@@ -379,6 +415,8 @@ export const BookAppointmentStep3 = () => {
                     fontSize: scaleFont(18, settings?.textSize),
                     fontWeight: 700,
                     color: theme.palette.text.primary,
+                    textAlign: { xs: "left", sm: "right" },
+                    wordBreak: "break-word",
                   })}
                 >
                   {getServiceLabel(serviceType, t)}
@@ -414,28 +452,7 @@ export const BookAppointmentStep3 = () => {
                       const value = e.target.value;
                       setSelectedAnimalId(value === "" ? "" : Number(value));
                     }}
-                    sx={(theme) => ({
-                      minWidth: 180,
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: 2.5,
-                        backgroundColor:
-                          theme.palette.mode === "dark"
-                            ? alpha("#ffffff", 0.03)
-                            : theme.palette.background.paper,
-                        fontSize: scaleFont(14, settings?.textSize),
-                        color: theme.palette.text.primary,
-                        "& fieldset": {
-                          borderColor: theme.palette.divider,
-                        },
-                        "&.Mui-focused fieldset": {
-                          borderColor: theme.palette.primary.main,
-                          borderWidth: 1.5,
-                        },
-                        "& .MuiSvgIcon-root": {
-                          color: theme.palette.text.secondary,
-                        },
-                      },
-                    })}
+                    sx={selectFieldSx}
                   >
                     <MenuItem
                       value=""
@@ -460,10 +477,10 @@ export const BookAppointmentStep3 = () => {
 
             <Box sx={rowSx}>
               <Stack
-                direction="row"
+                direction={{ xs: "column", sm: "row" }}
                 justifyContent="space-between"
-                alignItems="center"
-                spacing={2}
+                alignItems={{ xs: "flex-start", sm: "center" }}
+                spacing={1}
               >
                 <Typography
                   sx={(theme) => ({
@@ -479,6 +496,7 @@ export const BookAppointmentStep3 = () => {
                     fontSize: scaleFont(18, settings?.textSize),
                     fontWeight: 700,
                     color: theme.palette.text.primary,
+                    textAlign: { xs: "left", sm: "right" },
                   })}
                 >
                   {formatDateBySettings(selectedSlot.startTimeUtc, dateFormat)}
@@ -488,10 +506,10 @@ export const BookAppointmentStep3 = () => {
 
             <Box sx={rowSx}>
               <Stack
-                direction="row"
+                direction={{ xs: "column", sm: "row" }}
                 justifyContent="space-between"
-                alignItems="center"
-                spacing={2}
+                alignItems={{ xs: "flex-start", sm: "center" }}
+                spacing={1}
               >
                 <Typography
                   sx={(theme) => ({
@@ -507,6 +525,7 @@ export const BookAppointmentStep3 = () => {
                     fontSize: scaleFont(18, settings?.textSize),
                     fontWeight: 700,
                     color: theme.palette.text.primary,
+                    textAlign: { xs: "left", sm: "right" },
                   })}
                 >
                   {formatTime(selectedSlot.startTimeUtc)}
@@ -516,10 +535,10 @@ export const BookAppointmentStep3 = () => {
 
             <Box sx={rowSx}>
               <Stack
-                direction="row"
+                direction={{ xs: "column", sm: "row" }}
                 justifyContent="space-between"
-                alignItems="center"
-                spacing={2}
+                alignItems={{ xs: "flex-start", sm: "center" }}
+                spacing={1}
               >
                 <Typography
                   sx={(theme) => ({
@@ -535,6 +554,7 @@ export const BookAppointmentStep3 = () => {
                     fontSize: scaleFont(18, settings?.textSize),
                     fontWeight: 700,
                     color: theme.palette.text.primary,
+                    textAlign: { xs: "left", sm: "right" },
                   })}
                 >
                   {formatPrice(estimatedPrice)}
@@ -549,20 +569,22 @@ export const BookAppointmentStep3 = () => {
                   theme.palette.mode === "dark"
                     ? alpha(theme.palette.success.main, 0.18)
                     : "#d9f1ee",
-                px: 2.4,
-                py: 2.4,
+                px: { xs: 2, sm: 2.4 },
+                py: { xs: 2, sm: 2.4 },
               })}
             >
               <Stack
-                direction="row"
+                direction={{ xs: "column", sm: "row" }}
                 justifyContent="space-between"
-                alignItems="center"
+                alignItems={{ xs: "flex-start", sm: "center" }}
+                spacing={1.5}
               >
                 <Typography
                   sx={(theme) => ({
                     fontSize: scaleFont(16, settings?.textSize),
                     fontWeight: 700,
                     color: theme.palette.text.primary,
+                    wordBreak: "break-word",
                   })}
                 >
                   {t("notification24h")}
@@ -583,6 +605,7 @@ export const BookAppointmentStep3 = () => {
                         : "#111827",
                     fontWeight: 700,
                     fontSize: scaleFont(14, settings?.textSize),
+                    whiteSpace: "nowrap",
                   })}
                 >
                   {t("active")}
@@ -591,15 +614,17 @@ export const BookAppointmentStep3 = () => {
             </Box>
 
             <Stack
-              direction="row"
+              direction={{ xs: "column-reverse", sm: "row" }}
               justifyContent="space-between"
+              spacing={2}
               sx={{ pt: 2 }}
             >
               <Button
                 onClick={handleBack}
                 startIcon={<ChevronLeftRoundedIcon />}
                 sx={(theme) => ({
-                  minWidth: 140,
+                  width: { xs: "100%", sm: "auto" },
+                  minWidth: { xs: "100%", sm: 140 },
                   px: 3.5,
                   py: 1.55,
                   borderRadius: 2.5,
@@ -626,7 +651,8 @@ export const BookAppointmentStep3 = () => {
                 onClick={handleConfirm}
                 disabled={!selectedAnimal || isCreating || isUpdating}
                 sx={(theme) => ({
-                  minWidth: 280,
+                  width: { xs: "100%", sm: "auto" },
+                  minWidth: { xs: "100%", sm: 280 },
                   px: 3.5,
                   py: 1.55,
                   borderRadius: 2.5,
