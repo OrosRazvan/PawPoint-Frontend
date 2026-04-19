@@ -20,11 +20,34 @@ import { AddDewormingDialog } from "./components/AddDewormingDialog";
 import { EditDewormingDialog } from "./components/EditDewormingDialog";
 import { DeleteDewormingDialog } from "./components/DeleteDewormingDialog";
 import type { DewormingCardItem, DewormingDto } from "./types/deworming";
+import { alpha } from "@mui/material/styles";
+
+const pickFirst = <T,>(
+  ...values: Array<T | undefined | null | "">
+): T | undefined => {
+  for (const value of values) {
+    if (value !== undefined && value !== null && value !== "") {
+      return value as T;
+    }
+  }
+  return undefined;
+};
 
 const resolveStatus = (item: DewormingDto): "completed" | "upcoming" => {
+  const raw = item as Record<string, unknown>;
+
   const slotValue =
-    item.slotStartTimeUtc ?? item.startTimeUtc ?? item.date ?? "";
-  const slotDate = new Date(slotValue).getTime();
+    pickFirst(
+      item.slotStartTimeUtc,
+      item.startTimeUtc,
+      item.date,
+      raw.SlotStartTimeUtc as string | undefined,
+      raw.StartTimeUtc as string | undefined,
+      raw.Date as string | undefined,
+      raw.NextDate as string | undefined
+    ) ?? "";
+
+  const slotDate = new Date(String(slotValue)).getTime();
 
   if (Number.isNaN(slotDate)) {
     return "upcoming";
@@ -34,27 +57,150 @@ const resolveStatus = (item: DewormingDto): "completed" | "upcoming" => {
 };
 
 const mapDewormings = (items: DewormingDto[]): DewormingCardItem[] => {
-  return items.map((item) => ({
-    id: item.id,
-    animalId: item.animalId,
-    animalName: item.animalName ?? "Pet",
-    type: item.type,
-    date: item.date ?? null,
-    nextDate: item.nextDate ?? null,
-    intervalDays: item.intervalDays ?? 0,
-    vetCabinetId: item.vetCabinetId,
-    vetCabinetName: item.vetCabinetName,
-    vetTimeSlotId: item.vetTimeSlotId,
-    slotStartTimeUtc:
-      item.slotStartTimeUtc ?? item.startTimeUtc ?? item.date ?? "",
-    slotEndTimeUtc: item.slotEndTimeUtc ?? item.endTimeUtc ?? "",
-    notes: item.notes ?? null,
-    status: resolveStatus({
-      ...item,
-      slotStartTimeUtc:
-        item.slotStartTimeUtc ?? item.startTimeUtc ?? item.date ?? "",
-    } as DewormingDto),
-  }));
+  return items.map((item) => {
+    const raw = item as Record<string, unknown>;
+
+    const animalName =
+      pickFirst(
+        item.animalName,
+        raw.AnimalName as string | undefined,
+        raw.petName as string | undefined,
+        raw.PetName as string | undefined
+      ) ?? "Pet";
+
+    const rawType = pickFirst(
+      item.type,
+      raw.Type as number | string | undefined,
+      raw.dewormingType as number | string | undefined,
+      raw.DewormingType as number | string | undefined,
+      raw.dewormingTypeId as number | string | undefined,
+      raw.DewormingTypeId as number | string | undefined
+    );
+
+    const type =
+      typeof rawType === "string"
+        ? rawType.toLowerCase() === "internal"
+          ? 1
+          : rawType.toLowerCase() === "external"
+          ? 2
+          : rawType.toLowerCase() === "combined"
+          ? 3
+          : rawType.toLowerCase() === "control"
+          ? 4
+          : 0
+        : Number(rawType ?? 0);
+
+    const date =
+      pickFirst(
+        item.date,
+        raw.Date as string | undefined,
+        raw.dateUtc as string | undefined,
+        raw.DateUtc as string | undefined,
+        raw.visitDate as string | undefined,
+        raw.VisitDate as string | undefined,
+        raw.dewormingDate as string | undefined,
+        raw.DewormingDate as string | undefined,
+        raw.scheduledDate as string | undefined,
+        raw.ScheduledDate as string | undefined,
+        item.slotStartTimeUtc,
+        raw.SlotStartTimeUtc as string | undefined,
+        raw.slotStartUtc as string | undefined,
+        raw.SlotStartUtc as string | undefined,
+        raw.timeSlotStartTimeUtc as string | undefined,
+        raw.TimeSlotStartTimeUtc as string | undefined,
+        item.startTimeUtc,
+        raw.StartTimeUtc as string | undefined
+      ) ?? null;
+
+    const intervalDays = Number(
+      pickFirst(
+        item.intervalDays,
+        raw.IntervalDays as number | undefined,
+        raw.interval as number | undefined,
+        raw.Interval as number | undefined,
+        0
+      )
+    );
+
+    const computedNextDate =
+      date && intervalDays > 0
+        ? new Date(
+            new Date(date).getTime() + intervalDays * 24 * 60 * 60 * 1000
+          ).toISOString()
+        : null;
+
+    const nextDate =
+      pickFirst(
+        item.nextDate,
+        raw.NextDate as string | undefined,
+        raw.nextDateUtc as string | undefined,
+        raw.NextDateUtc as string | undefined,
+        raw.nextDue as string | undefined,
+        raw.NextDue as string | undefined,
+        raw.nextDueDate as string | undefined,
+        raw.NextDueDate as string | undefined
+      ) ?? computedNextDate;
+
+    const slotStartTimeUtc =
+      pickFirst(
+        item.slotStartTimeUtc,
+        raw.SlotStartTimeUtc as string | undefined,
+        raw.slotStartUtc as string | undefined,
+        raw.SlotStartUtc as string | undefined,
+        raw.timeSlotStartTimeUtc as string | undefined,
+        raw.TimeSlotStartTimeUtc as string | undefined,
+        item.startTimeUtc,
+        raw.StartTimeUtc as string | undefined,
+        date ?? undefined
+      ) ?? "";
+
+    const slotEndTimeUtc =
+      pickFirst(
+        item.slotEndTimeUtc,
+        raw.SlotEndTimeUtc as string | undefined,
+        raw.slotEndUtc as string | undefined,
+        raw.SlotEndUtc as string | undefined,
+        raw.timeSlotEndTimeUtc as string | undefined,
+        raw.TimeSlotEndTimeUtc as string | undefined,
+        item.endTimeUtc,
+        raw.EndTimeUtc as string | undefined
+      ) ?? "";
+
+    const vetCabinetName =
+      pickFirst(
+        item.vetCabinetName,
+        raw.VetCabinetName as string | undefined,
+        raw.veterinarianName as string | undefined,
+        raw.VeterinarianName as string | undefined,
+        raw.clinicName as string | undefined,
+        raw.ClinicName as string | undefined
+      ) ?? "";
+
+    const notes =
+      pickFirst(item.notes, raw.Notes as string | undefined) ?? null;
+
+    return {
+      id: item.id,
+      animalId: item.animalId,
+      animalName,
+      type,
+      date,
+      nextDate,
+      intervalDays,
+      vetCabinetId: item.vetCabinetId,
+      vetCabinetName,
+      vetTimeSlotId: item.vetTimeSlotId,
+      slotStartTimeUtc,
+      slotEndTimeUtc,
+      notes,
+      status: resolveStatus({
+        ...item,
+        slotStartTimeUtc,
+        date,
+        nextDate,
+      } as DewormingDto),
+    };
+  });
 };
 
 export const Deworming = () => {
@@ -141,21 +287,24 @@ export const Deworming = () => {
           <Button
             startIcon={<AddOutlinedIcon />}
             onClick={() => setIsAddOpen(true)}
-            sx={{
+            sx={(theme) => ({
               px: 2.5,
               py: 1.2,
               borderRadius: 2.5,
-              color: "#fff",
+              color: theme.palette.primary.contrastText,
               textTransform: "none",
               fontSize: scaleFont(14, settings?.textSize),
               fontWeight: 700,
               letterSpacing: "-0.1px",
-              background: "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
-              boxShadow: "0 4px 12px rgba(245,166,35,0.35)",
-              "&:hover": {
-                background: "linear-gradient(135deg, #f0981a 0%, #e88510 100%)",
-              },
-            }}
+              background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+              boxShadow:
+              theme.palette.mode === "dark"
+                ? `0 6px 18px ${alpha(theme.palette.primary.main, 0.28)}`
+                : `0 4px 12px ${alpha(theme.palette.primary.main, 0.35)}`,
+                "&:hover": {
+              background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.main} 100%)`,
+               },
+            })}
           >
             {t("deworming:addButton")}
           </Button>

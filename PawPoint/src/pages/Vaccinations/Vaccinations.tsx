@@ -14,10 +14,32 @@ import { AddVaccinationDialog } from "./components/AddVaccinationDialog";
 import { EditVaccinationDialog } from "./components/EditVaccinationDialog";
 import { DeleteVaccinationDialog } from "./components/DeleteVaccinationDialog";
 import type { VaccinationCardItem, VaccinationDto } from "./types/vaccination";
+import { alpha } from "@mui/material/styles";
+
+const pickFirst = <T,>(...values: T[]) => {
+  for (const value of values) {
+    if (value !== undefined && value !== null && value !== "") {
+      return value;
+    }
+  }
+  return undefined;
+};
 
 const resolveStatus = (item: VaccinationDto): "completed" | "upcoming" => {
-  const slotValue = item.slotStartTimeUtc ?? item.startTimeUtc ?? "";
-  const slotDate = new Date(slotValue).getTime();
+  const raw = item as Record<string, unknown>;
+
+  const slotValue = pickFirst(
+    item.slotStartTimeUtc,
+    item.startTimeUtc,
+    raw.SlotStartTimeUtc as string | undefined,
+    raw.StartTimeUtc as string | undefined,
+    item.nextDate,
+    raw.NextDate as string | undefined,
+    item.lastDate,
+    raw.LastDate as string | undefined
+  );
+
+  const slotDate = new Date(String(slotValue ?? "")).getTime();
 
   if (Number.isNaN(slotDate)) {
     return "upcoming";
@@ -27,24 +49,95 @@ const resolveStatus = (item: VaccinationDto): "completed" | "upcoming" => {
 };
 
 const mapVaccinations = (items: VaccinationDto[]): VaccinationCardItem[] => {
-  return items.map((item) => ({
-    id: item.id,
-    animalId: item.animalId,
-    animalName: item.animalName ?? "Pet",
-    vaccineName: item.vaccineName ?? "Vaccination",
-    lastDate: item.lastDate ?? null,
-    nextDate: item.nextDate ?? null,
-    vetCabinetId: item.vetCabinetId,
-    vetCabinetName: item.vetCabinetName,
-    vetTimeSlotId: item.vetTimeSlotId,
-    slotStartTimeUtc: item.slotStartTimeUtc ?? item.startTimeUtc ?? "",
-    slotEndTimeUtc: item.slotEndTimeUtc ?? item.endTimeUtc ?? "",
-    notes: item.notes ?? null,
-    status: resolveStatus({
-      ...item,
-      slotStartTimeUtc: item.slotStartTimeUtc ?? item.startTimeUtc ?? "",
-    } as VaccinationDto),
-  }));
+  return items.map((item) => {
+    const raw = item as Record<string, unknown>;
+
+    const animalName =
+      pickFirst(
+        item.animalName,
+        raw.AnimalName as string | undefined,
+        raw.petName as string | undefined,
+        raw.PetName as string | undefined
+      ) ?? "Pet";
+
+    const vaccineName =
+      pickFirst(
+        item.vaccineName,
+        raw.VaccineName as string | undefined,
+        raw.name as string | undefined,
+        raw.Name as string | undefined
+      ) ?? "Vaccination";
+
+    const lastDate = pickFirst(
+      item.lastDate,
+      raw.LastDate as string | undefined,
+      raw.date as string | undefined,
+      raw.Date as string | undefined
+    );
+
+    const nextDate = pickFirst(
+      item.nextDate,
+      raw.NextDate as string | undefined,
+      item.slotStartTimeUtc,
+      raw.SlotStartTimeUtc as string | undefined,
+      item.startTimeUtc,
+      raw.StartTimeUtc as string | undefined
+    );
+
+   const slotStartTimeUtc =
+    pickFirst(
+      item.slotStartTimeUtc,
+      raw.SlotStartTimeUtc as string | undefined,
+      item.startTimeUtc,
+      raw.StartTimeUtc as string | undefined,
+      item.nextDate,
+      raw.NextDate as string | undefined,
+      item.lastDate,
+      raw.LastDate as string | undefined
+    ) ?? "";
+
+  const slotEndTimeUtc =
+    pickFirst(
+      item.slotEndTimeUtc,
+      raw.SlotEndTimeUtc as string | undefined,
+      item.endTimeUtc,
+      raw.EndTimeUtc as string | undefined
+    ) ?? "";
+
+   const vetCabinetName =
+    pickFirst(
+      item.vetCabinetName,
+      raw.VetCabinetName as string | undefined,
+      raw.veterinarianName as string | undefined,
+      raw.VeterinarianName as string | undefined,
+      raw.clinicName as string | undefined,
+      raw.ClinicName as string | undefined
+    ) ?? "";
+
+    const notes = pickFirst(
+      item.notes,
+      raw.Notes as string | undefined
+    );
+
+    return {
+      id: item.id,
+      animalId: item.animalId,
+      animalName,
+      vaccineName,
+      lastDate: lastDate ?? null,
+      nextDate: nextDate ?? null,
+      vetCabinetId: item.vetCabinetId,
+      vetCabinetName,
+      vetTimeSlotId: item.vetTimeSlotId,
+      slotStartTimeUtc,
+      slotEndTimeUtc,
+      notes: notes ?? null,
+      status: resolveStatus({
+        ...item,
+        slotStartTimeUtc,
+      } as VaccinationDto),
+    };
+  });
 };
 
 export const Vaccinations = () => {
@@ -131,21 +224,24 @@ export const Vaccinations = () => {
           <Button
             startIcon={<AddOutlinedIcon />}
             onClick={() => setIsAddOpen(true)}
-            sx={{
+            sx={(theme) => ({
               px: 2.5,
               py: 1.2,
               borderRadius: 2.5,
-              color: "#fff",
+              color: theme.palette.primary.contrastText,
               textTransform: "none",
               fontSize: scaleFont(14, settings?.textSize),
               fontWeight: 700,
               letterSpacing: "-0.1px",
-              background: "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
-              boxShadow: "0 4px 12px rgba(245,166,35,0.35)",
-              "&:hover": {
-                background: "linear-gradient(135deg, #f0981a 0%, #e88510 100%)",
+              background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+              boxShadow:
+              theme.palette.mode === "dark"
+                ? `0 6px 18px ${alpha(theme.palette.primary.main, 0.28)}`
+                : `0 4px 12px ${alpha(theme.palette.primary.main, 0.35)}`,
+                "&:hover": {
+              background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.main} 100%)`,
               },
-            }}
+            })}
           >
             {t("vaccination:addButton")}
           </Button>

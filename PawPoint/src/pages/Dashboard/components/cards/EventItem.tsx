@@ -1,6 +1,8 @@
-import { Box, Chip, Paper, Stack, Typography } from "@mui/material";
+import { Box, Chip, Stack, Typography } from "@mui/material";
 import { alpha } from "@mui/material/styles";
-import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
+import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
+import VaccinesRoundedIcon from "@mui/icons-material/VaccinesRounded";
+import BugReportRoundedIcon from "@mui/icons-material/BugReportRounded";
 import { useSettings } from "../../../../hooks/useSettings";
 import { scaleFont } from "../../../../utils/fontScale";
 
@@ -21,104 +23,102 @@ export const EventItem = ({
 }: Props) => {
   const { data: settings } = useSettings();
 
+  const normalizedType = typeLabel.toLowerCase();
+
+  const icon =
+    normalizedType.includes("appointment") ? (
+      <CalendarMonthRoundedIcon
+        sx={(theme) => ({ color: theme.palette.secondary.main })}
+      />
+    ) : normalizedType.includes("vacc") ? (
+      <VaccinesRoundedIcon
+        sx={(theme) => ({ color: theme.palette.info.main })}
+      />
+    ) : (
+      <BugReportRoundedIcon
+        sx={(theme) => ({ color: theme.palette.success.main })}
+      />
+    );
+
   return (
-    <Paper
-      elevation={0}
+    <Box
       sx={(theme) => ({
-        p: 2.5,
-        borderRadius: 3,
         border: `1px solid ${theme.palette.divider}`,
+        borderRadius: 3,
         backgroundColor:
           theme.palette.mode === "dark"
             ? alpha("#ffffff", 0.03)
-            : "#f9f9f9",
+            : "#fff",
+        px: { xs: 1.75, sm: 2.25, md: 2.5 },
+        py: { xs: 1.75, sm: 2.25, md: 2.5 },
       })}
     >
-      <Stack direction="row" alignItems="center" justifyContent="space-between">
-        <Stack direction="row" spacing={2} alignItems="center">
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        justifyContent="space-between"
+        alignItems={{ xs: "flex-start", sm: "flex-start" }}
+        spacing={2}
+      >
+        <Stack direction="row" spacing={2} alignItems="flex-start">
           <Box
             sx={(theme) => ({
-              width: 56,
-              height: 56,
-              borderRadius: 3,
+              width: { xs: 46, sm: 54 },
+              height: { xs: 46, sm: 54 },
+              borderRadius: 2.5,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               backgroundColor:
-                theme.palette.mode === "dark"
+                normalizedType.includes("appointment")
                   ? alpha(theme.palette.secondary.main, 0.16)
-                  : "#efe2ff",
-              color:
-                theme.palette.mode === "dark"
-                  ? theme.palette.secondary.main
-                  : "#8a2be2",
+                  : normalizedType.includes("vacc")
+                  ? alpha(theme.palette.info.main, 0.14)
+                  : alpha(theme.palette.success.main, 0.14),
+              flexShrink: 0,
             })}
           >
-            <CalendarTodayOutlinedIcon />
+            {icon}
           </Box>
 
-          <Stack spacing={0.5}>
-            <Stack direction="row" spacing={1} alignItems="center">
-              <Typography
-                sx={(theme) => ({
-                  fontSize: scaleFont(18, settings?.textSize),
-                  fontWeight: 700,
-                  color: theme.palette.text.primary,
-                })}
-              >
-                {petName}
-              </Typography>
-
-              <Chip
-                label={statusLabel}
-                size="small"
-                sx={(theme) => ({
-                  backgroundColor:
-                    theme.palette.mode === "dark"
-                      ? alpha(theme.palette.warning.main, 0.18)
-                      : "#f5e3a1",
-                  color:
-                    theme.palette.mode === "dark"
-                      ? theme.palette.warning.main
-                      : "#9a6a00",
-                  borderRadius: 999,
-                  fontWeight: 500,
-                })}
-              />
-            </Stack>
+          <Box sx={{ minWidth: 0 }}>
+            <Typography
+              sx={(theme) => ({
+                fontSize: scaleFont(18, settings?.textSize),
+                fontWeight: 800,
+                color: theme.palette.text.primary,
+                wordBreak: "break-word",
+              })}
+            >
+              {typeLabel} for {petName}
+            </Typography>
 
             <Typography
               sx={(theme) => ({
-                fontSize: scaleFont(16, settings?.textSize),
+                mt: 1,
+                fontSize: scaleFont(15, settings?.textSize),
                 color: theme.palette.text.secondary,
               })}
             >
-              {typeLabel}
+              {dateLabel}
+              {timeLabel && timeLabel !== "—" ? ` • ${timeLabel}` : ""}
             </Typography>
-          </Stack>
+          </Box>
         </Stack>
 
-        <Stack alignItems="flex-end">
-          <Typography
-            sx={(theme) => ({
-              fontSize: scaleFont(18, settings?.textSize),
-              fontWeight: 700,
-              color: theme.palette.text.primary,
-            })}
-          >
-            {dateLabel}
-          </Typography>
-
-          <Typography
-            sx={(theme) => ({
-              fontSize: scaleFont(16, settings?.textSize),
-              color: theme.palette.text.secondary,
-            })}
-          >
-            {timeLabel}
-          </Typography>
-        </Stack>
+        <Chip
+          label={statusLabel}
+          sx={(theme) => ({
+            borderRadius: 999,
+            backgroundColor:
+              theme.palette.mode === "dark"
+                ? alpha("#ffffff", 0.06)
+                : "#f2f4f7",
+            color: theme.palette.text.secondary,
+            fontSize: scaleFont(13, settings?.textSize),
+            alignSelf: { xs: "flex-start", sm: "flex-start" },
+          })}
+        />
       </Stack>
-    </Paper>
+    </Box>
   );
 };

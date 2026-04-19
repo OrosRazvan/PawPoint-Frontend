@@ -156,7 +156,7 @@ export const NotificationsDropdown = ({ showCount = true }: Props) => {
         onClick={(e) => setAnchorEl(e.currentTarget)}
         sx={(theme) => ({
           color: theme.palette.text.secondary,
-          display: { xs: "none", md: "inline-flex" },
+          display: "inline-flex",
           "&:hover": {
             backgroundColor:
               theme.palette.mode === "dark"

@@ -141,11 +141,11 @@ export const DewormingCard = ({ item, onEdit, onDelete }: Props) => {
             >
               {isCompleted
                 ? `Done: ${formatDateBySettings(
-                    item.date ?? item.slotStartTimeUtc,
+                    item.date ?? item.slotStartTimeUtc ?? item.nextDate,
                     dateFormat
                   )}`
                 : `Scheduled: ${formatDateBySettings(
-                    item.slotStartTimeUtc,
+                    item.slotStartTimeUtc ?? item.date ?? item.nextDate,
                     dateFormat
                   )}`}
             </Typography>
@@ -166,7 +166,7 @@ export const DewormingCard = ({ item, onEdit, onDelete }: Props) => {
               color: theme.palette.text.secondary,
             })}
           >
-            Next due: {formatDateBySettings(item.nextDate, dateFormat)}
+            Next due: {formatDateBySettings(item.nextDate ?? item.date ?? item.slotStartTimeUtc, dateFormat)}
           </Typography>
 
           <Typography

@@ -3,10 +3,12 @@ import {
   AccordionDetails,
   AccordionSummary,
   Alert,
+  Avatar,
   Box,
   Button,
   Card,
   CardContent,
+  Chip,
   CircularProgress,
   Divider,
   MenuItem,
@@ -14,8 +16,6 @@ import {
   Switch,
   TextField,
   Typography,
-  Chip,
-  Avatar,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -53,52 +53,53 @@ type SettingsForm = {
   notificationBadgeMode: string;
 };
 
-// ─── Shared style tokens ─────────────────────────────────────────────────────
 const navy = "#071c42";
 const slate = "#64748b";
 const accent = "#2563eb";
 const accentLight = "#eff6ff";
-const border = "1.5px solid #e2e8f0";
-const radius = 4;
+const border = "1px solid rgba(7,28,66,0.08)";
+const radius = 5;
 
 const sectionCard = {
   borderRadius: radius,
   border,
-  boxShadow: "0 1px 4px 0 rgba(7,28,66,0.06)",
-  transition: "box-shadow 0.2s",
-  "&:hover": { boxShadow: "0 4px 16px 0 rgba(7,28,66,0.10)" },
+  boxShadow: "0 10px 30px rgba(15, 23, 42, 0.06)",
+  transition: "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease",
+  "&:hover": {
+    transform: "translateY(-1px)",
+    boxShadow: "0 16px 40px rgba(15, 23, 42, 0.10)",
+    borderColor: "rgba(7,28,66,0.14)",
+  },
 };
 
 const sectionTitle = {
   fontSize: 13,
-  fontWeight: 700,
+  fontWeight: 800,
   letterSpacing: "0.08em",
   textTransform: "uppercase" as const,
   color: slate,
-  mb: 2.5,
   display: "flex",
   alignItems: "center",
   gap: 1,
 };
 
 const primaryBtn = {
-  borderRadius: 2,
+  borderRadius: 3,
   textTransform: "none" as const,
-  fontWeight: 700,
+  fontWeight: 800,
   fontSize: 14,
-  px: 3,
-  py: 1.1,
-  boxShadow: "none",
-  "&:hover": { boxShadow: "0 2px 8px rgba(37,99,235,0.18)" },
+  px: 2.5,
+  py: 1.15,
+  boxShadow: "0 10px 24px rgba(25, 118, 210, 0.22)",
 };
 
 const outlinedBtn = {
-  borderRadius: 2,
+  borderRadius: 3,
   textTransform: "none" as const,
-  fontWeight: 700,
+  fontWeight: 800,
   fontSize: 14,
-  px: 3,
-  py: 1.1,
+  px: 2.5,
+  py: 1.05,
   borderColor: "#cbd5e1",
   color: navy,
   "&:hover": { borderColor: navy, background: "#f8fafc" },
@@ -108,14 +109,14 @@ const fieldProps = {
   size: "small" as const,
   sx: {
     "& .MuiOutlinedInput-root": {
-      borderRadius: 2,
+      borderRadius: 3,
       fontSize: 14,
+      backgroundColor: "#fff",
     },
     "& .MuiInputLabel-root": { fontSize: 13 },
   },
 };
 
-// ─── Toggle row ───────────────────────────────────────────────────────────────
 const ToggleRow = ({
   label,
   checked,
@@ -131,16 +132,16 @@ const ToggleRow = ({
     justifyContent="space-between"
     sx={{
       px: 2,
-      py: 1.2,
-      borderRadius: 2,
+      py: 1.3,
+      borderRadius: 3,
       border,
       background: checked ? accentLight : "#f8fafc",
-      transition: "background 0.15s",
       minWidth: 220,
       flex: "1 1 220px",
+      transition: "all 0.15s ease",
     }}
   >
-    <Typography sx={{ fontSize: 13.5, fontWeight: 600, color: navy }}>
+    <Typography sx={{ fontSize: 13.5, fontWeight: 700, color: navy }}>
       {label}
     </Typography>
     <Switch
@@ -157,7 +158,6 @@ const ToggleRow = ({
   </Stack>
 );
 
-// ─── Component ────────────────────────────────────────────────────────────────
 export const AdminUserDetails = () => {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
@@ -306,19 +306,36 @@ export const AdminUserDetails = () => {
     .toUpperCase();
 
   return (
-    <Stack spacing={3} sx={{ maxWidth: 1100, mx: "auto", pb: 6 }}>
-      {/* ── Page header ── */}
-      <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+    <Stack
+      spacing={3.5}
+      sx={{
+        px: { xs: 2, sm: 3, md: 5, lg: 7 },
+        py: { xs: 2, md: 3 },
+      }}
+    >
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        justifyContent="space-between"
+        alignItems={{ xs: "flex-start", sm: "center" }}
+        spacing={2}
+      >
         <Box>
           <Typography
-            sx={{ fontSize: 28, fontWeight: 900, color: navy, letterSpacing: "-0.5px", lineHeight: 1.2 }}
+            sx={{
+              fontSize: { xs: 28, md: 34 },
+              fontWeight: 900,
+              color: navy,
+              lineHeight: 1.1,
+              letterSpacing: "-0.02em",
+            }}
           >
             Manage User
           </Typography>
-          <Typography sx={{ color: slate, mt: 0.5, fontSize: 14 }}>
+          <Typography sx={{ color: slate, mt: 0.75, fontSize: 15 }}>
             Full control over profile, settings, password and animals.
           </Typography>
         </Box>
+
         <Button
           variant="outlined"
           startIcon={<ArrowBackIcon sx={{ fontSize: 16 }} />}
@@ -329,51 +346,84 @@ export const AdminUserDetails = () => {
         </Button>
       </Stack>
 
-      {/* ── Identity banner ── */}
-      <Card sx={{ ...sectionCard, background: navy, color: "#fff" }}>
-        <CardContent sx={{ py: 2.5, "&:last-child": { pb: 2.5 } }}>
+      <Card
+        elevation={0}
+        sx={{
+          ...sectionCard,
+          background: `linear-gradient(135deg, ${navy} 0%, #0b2557 100%)`,
+          color: "#fff",
+        }}
+      >
+        <CardContent sx={{ p: { xs: 2.25, md: 3 } }}>
           <Stack
             direction={{ xs: "column", md: "row" }}
             justifyContent="space-between"
             alignItems={{ xs: "flex-start", md: "center" }}
-            spacing={2}
+            spacing={2.5}
           >
             <Stack direction="row" alignItems="center" spacing={2}>
               <Avatar
                 sx={{
-                  width: 52,
-                  height: 52,
+                  width: 60,
+                  height: 60,
                   background: accent,
-                  fontSize: 18,
-                  fontWeight: 800,
-                  border: "2px solid rgba(255,255,255,0.2)",
+                  fontSize: 20,
+                  fontWeight: 900,
+                  border: "2px solid rgba(255,255,255,0.16)",
+                  boxShadow: "0 8px 24px rgba(0,0,0,0.18)",
                 }}
               >
                 {initials}
               </Avatar>
+
               <Box>
-                <Stack direction="row" alignItems="center" spacing={1.5}>
-                  <Typography sx={{ fontSize: 20, fontWeight: 800, color: "#fff" }}>
+                <Stack
+                  direction={{ xs: "column", sm: "row" }}
+                  alignItems={{ xs: "flex-start", sm: "center" }}
+                  spacing={1.25}
+                >
+                  <Typography sx={{ fontSize: 22, fontWeight: 900, color: "#fff" }}>
                     {String(user.FullName ?? "")}
                   </Typography>
+
                   {isDeleted ? (
                     <Chip
                       label="Deactivated"
                       size="small"
-                      sx={{ background: "#ef4444", color: "#fff", fontWeight: 700, fontSize: 11, height: 20 }}
+                      sx={{
+                        background: "#ef4444",
+                        color: "#fff",
+                        fontWeight: 800,
+                        fontSize: 11,
+                        height: 22,
+                      }}
                     />
                   ) : (
                     <Chip
                       label="Active"
                       size="small"
-                      sx={{ background: "#22c55e", color: "#fff", fontWeight: 700, fontSize: 11, height: 20 }}
+                      sx={{
+                        background: "#22c55e",
+                        color: "#fff",
+                        fontWeight: 800,
+                        fontSize: 11,
+                        height: 22,
+                      }}
                     />
                   )}
                 </Stack>
-                <Typography sx={{ color: "rgba(255,255,255,0.65)", fontSize: 13.5, mt: 0.3 }}>
+
+                <Typography
+                  sx={{
+                    color: "rgba(255,255,255,0.72)",
+                    fontSize: 14,
+                    mt: 0.5,
+                    wordBreak: "break-word",
+                  }}
+                >
                   {String(user.Email ?? "")}
                   {user.Role ? (
-                    <Box component="span" sx={{ ml: 1.5, opacity: 0.55 }}>
+                    <Box component="span" sx={{ ml: 1.25, opacity: 0.6 }}>
                       · {String(user.Role)}
                     </Box>
                   ) : null}
@@ -385,7 +435,11 @@ export const AdminUserDetails = () => {
               <Button
                 variant="contained"
                 onClick={handleRestore}
-                sx={{ ...primaryBtn, background: "#22c55e", "&:hover": { background: "#16a34a" } }}
+                sx={{
+                  ...primaryBtn,
+                  background: "#22c55e",
+                  "&:hover": { background: "#16a34a" },
+                }}
               >
                 Restore User
               </Button>
@@ -396,9 +450,13 @@ export const AdminUserDetails = () => {
                 onClick={handleDeactivate}
                 sx={{
                   ...primaryBtn,
+                  boxShadow: "none",
                   borderColor: "#ef4444",
                   color: "#ef4444",
-                  "&:hover": { background: "rgba(239,68,68,0.08)", borderColor: "#dc2626" },
+                  "&:hover": {
+                    background: "rgba(239,68,68,0.08)",
+                    borderColor: "#dc2626",
+                  },
                 }}
               >
                 Deactivate User
@@ -408,331 +466,389 @@ export const AdminUserDetails = () => {
         </CardContent>
       </Card>
 
-      {/* ── Profile + Security row ── */}
-      <Stack direction={{ xs: "column", lg: "row" }} spacing={3}>
-        {/* Profile */}
-        <Card sx={{ ...sectionCard, flex: 1 }}>
-          <CardContent sx={{ p: 3 }}>
-            <Typography sx={sectionTitle}>
-              <PersonIcon sx={{ fontSize: 15, color: accent }} />
-              Profile
-            </Typography>
-            <Stack spacing={2}>
-              <TextField
-                label="Full Name"
-                value={profileForm.fullName}
-                onChange={(e) => setProfileForm((p) => ({ ...p, fullName: e.target.value }))}
-                fullWidth
-                {...fieldProps}
-              />
-              <TextField
-                label="Email"
-                value={profileForm.email}
-                onChange={(e) => setProfileForm((p) => ({ ...p, email: e.target.value }))}
-                fullWidth
-                {...fieldProps}
-              />
-              <TextField
-                label="Phone Number"
-                value={profileForm.phoneNumber}
-                onChange={(e) => setProfileForm((p) => ({ ...p, phoneNumber: e.target.value }))}
-                fullWidth
-                {...fieldProps}
-              />
+      <Stack direction={{ xs: "column", xl: "row" }} spacing={3}>
+        <Card elevation={0} sx={{ ...sectionCard, flex: 1 }}>
+          <CardContent sx={{ p: { xs: 2.25, md: 3 } }}>
+            <Stack spacing={2.5}>
+              <Typography sx={sectionTitle}>
+                <PersonIcon sx={{ fontSize: 16, color: accent }} />
+                Profile
+              </Typography>
 
-              <ToggleRow
-                label="Email confirmed"
-                checked={profileForm.isEmailConfirmed}
-                onChange={(v) => setProfileForm((p) => ({ ...p, isEmailConfirmed: v }))}
-              />
+              <Stack spacing={2}>
+                <TextField
+                  label="Full Name"
+                  value={profileForm.fullName}
+                  onChange={(e) => setProfileForm((p) => ({ ...p, fullName: e.target.value }))}
+                  fullWidth
+                  {...fieldProps}
+                />
+                <TextField
+                  label="Email"
+                  value={profileForm.email}
+                  onChange={(e) => setProfileForm((p) => ({ ...p, email: e.target.value }))}
+                  fullWidth
+                  {...fieldProps}
+                />
+                <TextField
+                  label="Phone Number"
+                  value={profileForm.phoneNumber}
+                  onChange={(e) => setProfileForm((p) => ({ ...p, phoneNumber: e.target.value }))}
+                  fullWidth
+                  {...fieldProps}
+                />
 
-              <Box>
-                <Button variant="contained" onClick={handleSaveProfile} sx={primaryBtn}>
-                  Save Profile
-                </Button>
-              </Box>
+                <ToggleRow
+                  label="Email confirmed"
+                  checked={profileForm.isEmailConfirmed}
+                  onChange={(v) => setProfileForm((p) => ({ ...p, isEmailConfirmed: v }))}
+                />
+
+                <Box>
+                  <Button variant="contained" onClick={handleSaveProfile} sx={primaryBtn}>
+                    Save Profile
+                  </Button>
+                </Box>
+              </Stack>
             </Stack>
           </CardContent>
         </Card>
 
-        {/* Security */}
-        <Card sx={{ ...sectionCard, flex: 1 }}>
-          <CardContent sx={{ p: 3 }}>
-            <Typography sx={sectionTitle}>
-              <LockIcon sx={{ fontSize: 15, color: accent }} />
-              Security
-            </Typography>
-            <Stack spacing={2}>
-              <TextField
-                label="New Password"
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                fullWidth
-                {...fieldProps}
-              />
-              <TextField
-                label="Confirm Password"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                fullWidth
-                {...fieldProps}
-              />
-              <Box>
-                <Button variant="contained" onClick={handleSavePassword} sx={primaryBtn}>
-                  Save New Password
-                </Button>
-              </Box>
+        <Card elevation={0} sx={{ ...sectionCard, flex: 1 }}>
+          <CardContent sx={{ p: { xs: 2.25, md: 3 } }}>
+            <Stack spacing={2.5}>
+              <Typography sx={sectionTitle}>
+                <LockIcon sx={{ fontSize: 16, color: accent }} />
+                Security
+              </Typography>
+
+              <Stack spacing={2}>
+                <TextField
+                  label="New Password"
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  fullWidth
+                  {...fieldProps}
+                />
+                <TextField
+                  label="Confirm Password"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  fullWidth
+                  {...fieldProps}
+                />
+
+                <Box>
+                  <Button variant="contained" onClick={handleSavePassword} sx={primaryBtn}>
+                    Save New Password
+                  </Button>
+                </Box>
+              </Stack>
             </Stack>
           </CardContent>
         </Card>
       </Stack>
 
-      {/* ── Settings ── */}
-      <Card sx={sectionCard}>
-        <CardContent sx={{ p: 3 }}>
-          <Typography sx={sectionTitle}>
-            <TuneIcon sx={{ fontSize: 15, color: accent }} />
-            Settings
-          </Typography>
+      <Card elevation={0} sx={sectionCard}>
+        <CardContent sx={{ p: { xs: 2.25, md: 3 } }}>
+          <Stack spacing={2.75}>
+            <Typography sx={sectionTitle}>
+              <TuneIcon sx={{ fontSize: 16, color: accent }} />
+              Settings
+            </Typography>
 
-          <Stack spacing={2.5}>
-            {/* Row 1: dropdowns */}
-            <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
-              <TextField
-                label="Text Size"
-                value={settingsForm.textSize}
-                onChange={(e) => setSettingsForm((p) => ({ ...p, textSize: e.target.value }))}
-                fullWidth
-                select
-                {...fieldProps}
-              >
-                <MenuItem value="Small">Small</MenuItem>
-                <MenuItem value="Medium">Medium</MenuItem>
-                <MenuItem value="Large">Large</MenuItem>
-              </TextField>
+            <Stack spacing={2.25}>
+              <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
+                <TextField
+                  label="Text Size"
+                  value={settingsForm.textSize}
+                  onChange={(e) => setSettingsForm((p) => ({ ...p, textSize: e.target.value }))}
+                  fullWidth
+                  select
+                  {...fieldProps}
+                >
+                  <MenuItem value="Small">Small</MenuItem>
+                  <MenuItem value="Medium">Medium</MenuItem>
+                  <MenuItem value="Large">Large</MenuItem>
+                </TextField>
 
-              <TextField
-                label="Weight Unit"
-                value={settingsForm.weightUnit}
-                onChange={(e) => setSettingsForm((p) => ({ ...p, weightUnit: e.target.value }))}
-                fullWidth
-                select
-                {...fieldProps}
-              >
-                <MenuItem value="kg">kg</MenuItem>
-                <MenuItem value="lb">lb</MenuItem>
-              </TextField>
+                <TextField
+                  label="Weight Unit"
+                  value={settingsForm.weightUnit}
+                  onChange={(e) => setSettingsForm((p) => ({ ...p, weightUnit: e.target.value }))}
+                  fullWidth
+                  select
+                  {...fieldProps}
+                >
+                  <MenuItem value="kg">kg</MenuItem>
+                  <MenuItem value="lb">lb</MenuItem>
+                </TextField>
 
-              <TextField
-                label="Date Format"
-                value={settingsForm.dateFormat}
-                onChange={(e) => setSettingsForm((p) => ({ ...p, dateFormat: e.target.value }))}
-                fullWidth
-                {...fieldProps}
-              />
-            </Stack>
-
-            {/* Row 2: notification fields */}
-            <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
-              <TextField
-                label="Notification Preference Id"
-                type="number"
-                value={settingsForm.notificationPreferenceId}
-                onChange={(e) =>
-                  setSettingsForm((p) => ({ ...p, notificationPreferenceId: Number(e.target.value) }))
-                }
-                fullWidth
-                {...fieldProps}
-              />
-              <TextField
-                label="Notification Badge Mode"
-                value={settingsForm.notificationBadgeMode}
-                onChange={(e) => setSettingsForm((p) => ({ ...p, notificationBadgeMode: e.target.value }))}
-                fullWidth
-                {...fieldProps}
-              />
-            </Stack>
-
-            {/* Toggles */}
-            <Divider sx={{ borderColor: "#f1f5f9" }} />
-            <Stack direction="row" flexWrap="wrap" gap={1.5}>
-              {(
-                [
-                  ["Dark Mode", "darkMode"],
-                  ["Enable Notifications", "enableNotifications"],
-                  ["Vaccination Notifications", "vaccinationNotifications"],
-                  ["Appointment Notifications", "appointmentNotifications"],
-                  ["Deworming Notifications", "dewormingNotifications"],
-                ] as [string, keyof SettingsForm][]
-              ).map(([label, key]) => (
-                <ToggleRow
-                  key={key}
-                  label={label}
-                  checked={Boolean(settingsForm[key])}
-                  onChange={(v) => setSettingsForm((p) => ({ ...p, [key]: v }))}
+                <TextField
+                  label="Date Format"
+                  value={settingsForm.dateFormat}
+                  onChange={(e) => setSettingsForm((p) => ({ ...p, dateFormat: e.target.value }))}
+                  fullWidth
+                  {...fieldProps}
                 />
-              ))}
-            </Stack>
+              </Stack>
 
-            <Box>
-              <Button variant="contained" onClick={handleSaveSettings} sx={primaryBtn}>
-                Save Settings
-              </Button>
-            </Box>
+              <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
+                <TextField
+                  label="Notification Preference Id"
+                  type="number"
+                  value={settingsForm.notificationPreferenceId}
+                  onChange={(e) =>
+                    setSettingsForm((p) => ({
+                      ...p,
+                      notificationPreferenceId: Number(e.target.value),
+                    }))
+                  }
+                  fullWidth
+                  {...fieldProps}
+                />
+                <TextField
+                  label="Notification Badge Mode"
+                  value={settingsForm.notificationBadgeMode}
+                  onChange={(e) =>
+                    setSettingsForm((p) => ({
+                      ...p,
+                      notificationBadgeMode: e.target.value,
+                    }))
+                  }
+                  fullWidth
+                  {...fieldProps}
+                />
+              </Stack>
+
+              <Divider sx={{ borderColor: "#eef2f7" }} />
+
+              <Stack direction="row" flexWrap="wrap" gap={1.5}>
+                {(
+                  [
+                    ["Dark Mode", "darkMode"],
+                    ["Enable Notifications", "enableNotifications"],
+                    ["Vaccination Notifications", "vaccinationNotifications"],
+                    ["Appointment Notifications", "appointmentNotifications"],
+                    ["Deworming Notifications", "dewormingNotifications"],
+                  ] as [string, keyof SettingsForm][]
+                ).map(([label, key]) => (
+                  <ToggleRow
+                    key={key}
+                    label={label}
+                    checked={Boolean(settingsForm[key])}
+                    onChange={(v) => setSettingsForm((p) => ({ ...p, [key]: v }))}
+                  />
+                ))}
+              </Stack>
+
+              <Box>
+                <Button variant="contained" onClick={handleSaveSettings} sx={primaryBtn}>
+                  Save Settings
+                </Button>
+              </Box>
+            </Stack>
           </Stack>
         </CardContent>
       </Card>
 
-      {/* ── Animals & Records ── */}
-      <Card sx={sectionCard}>
-        <CardContent sx={{ p: 3 }}>
-          <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2.5}>
-            <Typography sx={sectionTitle}>
-              <PetsIcon sx={{ fontSize: 15, color: accent }} />
-              Animals & Records
-            </Typography>
-            <Chip
-              label={`${animals.length} animal${animals.length !== 1 ? "s" : ""}`}
-              size="small"
-              sx={{
-                background: accentLight,
-                color: accent,
-                fontWeight: 700,
-                fontSize: 12,
-                height: 22,
-              }}
-            />
-          </Stack>
+      <Card elevation={0} sx={sectionCard}>
+        <CardContent sx={{ p: { xs: 2.25, md: 3 } }}>
+          <Stack spacing={2.5}>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              alignItems={{ xs: "flex-start", sm: "center" }}
+              justifyContent="space-between"
+              spacing={1.5}
+            >
+              <Typography sx={sectionTitle}>
+                <PetsIcon sx={{ fontSize: 16, color: accent }} />
+                Animals & Records
+              </Typography>
 
-          <Stack spacing={1.5}>
-            {animals.map((item, index) => {
-              const animal = item.animal;
-              return (
-                <Accordion
-                  key={index}
-                  disableGutters
-                  sx={{
-                    borderRadius: "10px !important",
-                    border,
-                    boxShadow: "none",
-                    overflow: "hidden",
-                    "&:before": { display: "none" },
-                    "&.Mui-expanded": {
-                      boxShadow: "0 2px 12px rgba(7,28,66,0.08)",
-                    },
-                  }}
-                >
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon sx={{ color: slate, fontSize: 20 }} />}
+              <Chip
+                label={`${animals.length} animal${animals.length !== 1 ? "s" : ""}`}
+                size="small"
+                sx={{
+                  background: accentLight,
+                  color: accent,
+                  fontWeight: 800,
+                  fontSize: 12,
+                  height: 24,
+                }}
+              />
+            </Stack>
+
+            <Stack spacing={1.5}>
+              {animals.map((item, index) => {
+                const animal = item.animal;
+
+                return (
+                  <Accordion
+                    key={index}
+                    disableGutters
+                    elevation={0}
                     sx={{
-                      px: 2.5,
-                      py: 1,
-                      minHeight: 56,
-                      "&.Mui-expanded": { minHeight: 56, background: accentLight },
-                      "& .MuiAccordionSummary-content": { my: 1 },
+                      borderRadius: "16px !important",
+                      border,
+                      overflow: "hidden",
+                      backgroundColor: "#fff",
+                      boxShadow: "0 4px 14px rgba(15, 23, 42, 0.04)",
+                      "&:before": { display: "none" },
+                      "&.Mui-expanded": {
+                        boxShadow: "0 12px 28px rgba(15, 23, 42, 0.08)",
+                        borderColor: "rgba(7,28,66,0.14)",
+                      },
                     }}
                   >
-                    <Stack direction="row" alignItems="center" spacing={2}>
-                      <Avatar
-                        sx={{
-                          width: 36,
-                          height: 36,
-                          background: "#e0e7ff",
-                          color: accent,
-                          fontSize: 18,
-                        }}
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon sx={{ color: slate, fontSize: 20 }} />}
+                      sx={{
+                        px: { xs: 2, md: 2.5 },
+                        py: 1,
+                        minHeight: 72,
+                        "&.Mui-expanded": {
+                          minHeight: 72,
+                          background: accentLight,
+                        },
+                        "& .MuiAccordionSummary-content": {
+                          my: 1,
+                          alignItems: "center",
+                        },
+                      }}
+                    >
+                      <Stack
+                        direction={{ xs: "column", md: "row" }}
+                        alignItems={{ xs: "flex-start", md: "center" }}
+                        spacing={2}
+                        sx={{ width: "100%" }}
                       >
-                        <PetsIcon sx={{ fontSize: 18 }} />
-                      </Avatar>
-                      <Box>
-                        <Typography sx={{ fontWeight: 700, color: navy, fontSize: 14.5, lineHeight: 1.3 }}>
-                          {String(animal.Name ?? `Animal #${index + 1}`)}
-                        </Typography>
-                        <Typography sx={{ color: slate, fontSize: 12.5 }}>
-                          {String(animal.Species ?? "")}
-                          {animal.Breed ? ` · ${String(animal.Breed)}` : ""}
-                        </Typography>
-                      </Box>
-                    </Stack>
-
-                    <Stack direction="row" spacing={1} ml="auto" mr={1} alignItems="center">
-                      {[
-                        { label: "Vax", count: item.vaccinations.length },
-                        { label: "Deworm", count: item.dewormings.length },
-                        { label: "Feed", count: item.feedings.length },
-                        { label: "Appt", count: item.appointments.length },
-                      ].map(({ label, count }) => (
-                        <Chip
-                          key={label}
-                          label={`${count} ${label}`}
-                          size="small"
-                          sx={{
-                            background: "#f1f5f9",
-                            color: slate,
-                            fontSize: 11,
-                            fontWeight: 600,
-                            height: 20,
-                          }}
-                        />
-                      ))}
-                    </Stack>
-                  </AccordionSummary>
-
-                  <AccordionDetails sx={{ p: 0 }}>
-                    <Stack divider={<Divider sx={{ borderColor: "#f1f5f9" }} />}>
-                      {[
-                        { label: "Animal Details", data: animal, count: null },
-                        { label: "Vaccinations", data: item.vaccinations, count: item.vaccinations.length },
-                        { label: "Dewormings", data: item.dewormings, count: item.dewormings.length },
-                        { label: "Feedings", data: item.feedings, count: item.feedings.length },
-                        { label: "Appointments", data: item.appointments, count: item.appointments.length },
-                      ].map(({ label, data, count }) => (
-                        <Box key={label} sx={{ px: 3, py: 2 }}>
-                          <Stack direction="row" alignItems="center" spacing={1} mb={1}>
-                            <Typography sx={{ fontWeight: 700, fontSize: 13, color: navy }}>
-                              {label}
-                            </Typography>
-                            {count !== null && (
-                              <Chip
-                                label={count}
-                                size="small"
-                                sx={{
-                                  background: accentLight,
-                                  color: accent,
-                                  fontWeight: 700,
-                                  fontSize: 11,
-                                  height: 18,
-                                  minWidth: 24,
-                                }}
-                              />
-                            )}
-                          </Stack>
-                          <Box
-                            component="pre"
+                        <Stack direction="row" alignItems="center" spacing={1.75}>
+                          <Avatar
                             sx={{
-                              m: 0,
-                              p: 2,
-                              background: "#f8fafc",
-                              border,
-                              borderRadius: 2,
-                              fontSize: 12,
-                              color: "#334155",
-                              whiteSpace: "pre-wrap",
-                              lineHeight: 1.6,
-                              fontFamily: "'Fira Mono', 'Cascadia Code', monospace",
+                              width: 42,
+                              height: 42,
+                              background: "#e0e7ff",
+                              color: accent,
                             }}
                           >
-                            {JSON.stringify(data, null, 2)}
+                            <PetsIcon sx={{ fontSize: 20 }} />
+                          </Avatar>
+
+                          <Box>
+                            <Typography
+                              sx={{
+                                fontWeight: 800,
+                                color: navy,
+                                fontSize: 15,
+                                lineHeight: 1.3,
+                              }}
+                            >
+                              {String(animal.Name ?? `Animal #${index + 1}`)}
+                            </Typography>
+                            <Typography sx={{ color: slate, fontSize: 12.5, mt: 0.25 }}>
+                              {String(animal.Species ?? "")}
+                              {animal.Breed ? ` · ${String(animal.Breed)}` : ""}
+                            </Typography>
                           </Box>
-                        </Box>
-                      ))}
-                    </Stack>
-                  </AccordionDetails>
-                </Accordion>
-              );
-            })}
+                        </Stack>
+
+                        <Stack
+                          direction="row"
+                          spacing={1}
+                          useFlexGap
+                          flexWrap="wrap"
+                          sx={{ ml: { md: "auto" } }}
+                        >
+                          {[
+                            { label: "Vax", count: item.vaccinations.length },
+                            { label: "Deworm", count: item.dewormings.length },
+                            { label: "Feed", count: item.feedings.length },
+                            { label: "Appt", count: item.appointments.length },
+                          ].map(({ label, count }) => (
+                            <Chip
+                              key={label}
+                              label={`${count} ${label}`}
+                              size="small"
+                              sx={{
+                                background: "#f1f5f9",
+                                color: slate,
+                                fontSize: 11,
+                                fontWeight: 700,
+                                height: 22,
+                                borderRadius: 2.5,
+                              }}
+                            />
+                          ))}
+                        </Stack>
+                      </Stack>
+                    </AccordionSummary>
+
+                    <AccordionDetails sx={{ p: 0 }}>
+                      <Stack divider={<Divider sx={{ borderColor: "#eef2f7" }} />}>
+                        {[
+                          { label: "Animal Details", data: animal, count: null },
+                          { label: "Vaccinations", data: item.vaccinations, count: item.vaccinations.length },
+                          { label: "Dewormings", data: item.dewormings, count: item.dewormings.length },
+                          { label: "Feedings", data: item.feedings, count: item.feedings.length },
+                          { label: "Appointments", data: item.appointments, count: item.appointments.length },
+                        ].map(({ label, data, count }) => (
+                          <Box key={label} sx={{ px: { xs: 2, md: 3 }, py: 2.25 }}>
+                            <Stack direction="row" alignItems="center" spacing={1} mb={1.25}>
+                              <Typography
+                                sx={{
+                                  fontWeight: 800,
+                                  fontSize: 13,
+                                  color: navy,
+                                }}
+                              >
+                                {label}
+                              </Typography>
+
+                              {count !== null && (
+                                <Chip
+                                  label={count}
+                                  size="small"
+                                  sx={{
+                                    background: accentLight,
+                                    color: accent,
+                                    fontWeight: 800,
+                                    fontSize: 11,
+                                    height: 20,
+                                    minWidth: 26,
+                                  }}
+                                />
+                              )}
+                            </Stack>
+
+                            <Box
+                              component="pre"
+                              sx={{
+                                m: 0,
+                                p: 2,
+                                background: "#f8fafc",
+                                border,
+                                borderRadius: 3,
+                                fontSize: 12,
+                                color: "#334155",
+                                whiteSpace: "pre-wrap",
+                                lineHeight: 1.65,
+                                fontFamily: "'Fira Mono', 'Cascadia Code', monospace",
+                                overflowX: "auto",
+                              }}
+                            >
+                              {JSON.stringify(data, null, 2)}
+                            </Box>
+                          </Box>
+                        ))}
+                      </Stack>
+                    </AccordionDetails>
+                  </Accordion>
+                );
+              })}
+            </Stack>
           </Stack>
         </CardContent>
       </Card>
