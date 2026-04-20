@@ -42,5 +42,14 @@
   "editPetDialogSubtitle": "Actualizează informațiile animalului tău.",
   "saveChanges": "Salvează modificările",
   "updatePetSuccess": "Animalul a fost actualizat cu succes.",
-  "updatePetError": "Nu s-a putut actualiza animalul."
+  "updatePetError": "Nu s-a putut actualiza animalul.",
+  "view": "Vizualizează",
+  "eventForPet": "{{type}} pentru {{pet}}",
+  "petFallback": "Animal",
+  "eventFallback": "Eveniment",
+  "upcomingStatus": "În curând",
+  "appointmentFallback": "Consultație",
+  "vaccinationFallback": "Vaccinare",
+  "dewormingFallback": "Deparazitare",
+  "noUpcomingEvents": "Nu există evenimente viitoare."
 }

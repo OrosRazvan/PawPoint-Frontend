@@ -5,9 +5,38 @@
   "messageTitle": "Title",
   "description": "Description",
   "send": "Send message",
+  "sending": "Sending...",
+  "responseTime": "Usually responds within 24h",
+  "newMessage": "New Message",
+  "fillDetails": "Fill in the details below",
+  "whatToExpect": "What to expect",
   "myMessages": "My messages",
   "myMessagesSubtitle": "See your contact requests and admin replies.",
   "replies": "Replies",
   "noReplies": "No replies yet.",
-  "loadFailed": "Could not load your messages."
+  "loadFailed": "Could not load your messages.",
+  "emptyTitle": "No messages yet",
+  "emptySubtitle": "Your contact messages will appear here",
+  "admin": "Admin",
+  "user": "User",
+  "repliesCount_one": "{{count}} reply",
+  "repliesCount_other": "{{count}} replies",
+  "totalCount": "{{count}} total",
+  "stats": {
+    "total": "Total",
+    "open": "Open"
+  },
+  "status": {
+    "open": "Open",
+    "closed": "Closed",
+    "pending": "Pending"
+  },
+  "info": {
+    "fastResponseTitle": "Fast response",
+    "fastResponseSubtitle": "Usually within 24 hours",
+    "securePrivateTitle": "Secure & private",
+    "securePrivateSubtitle": "Only admins can see this",
+    "fullThreadTitle": "Full thread",
+    "fullThreadSubtitle": "Track replies in one place"
+  }
 }

@@ -29,28 +29,39 @@ const spin = keyframes`
 `;
 
 /* ─── status chip ─────────────────────────────────────── */
-const StatusBadge = ({ label, isDark }: { label: string; isDark: boolean }) => {
+const StatusBadge = ({
+  label,
+  isDark,
+  t,
+}: {
+  label: string;
+  isDark: boolean;
+  t: (key: string) => string;
+}) => {
   const map: Record<
     string,
-    { bg: string; text: string; border: string; dot: string }
+    { bg: string; text: string; border: string; dot: string; translated: string }
   > = {
     Open: {
       bg: isDark ? alpha("#22c55e", 0.15) : alpha("#22c55e", 0.1),
       text: isDark ? "#86efac" : "#15803d",
       border: isDark ? alpha("#22c55e", 0.3) : alpha("#22c55e", 0.25),
       dot: "#22c55e",
+      translated: t("status.open"),
     },
     Closed: {
       bg: isDark ? alpha("#94a3b8", 0.12) : alpha("#94a3b8", 0.1),
       text: isDark ? "#94a3b8" : "#64748b",
       border: isDark ? alpha("#94a3b8", 0.2) : alpha("#94a3b8", 0.18),
       dot: "#94a3b8",
+      translated: t("status.closed"),
     },
     Pending: {
       bg: isDark ? alpha("#f59e0b", 0.15) : alpha("#f59e0b", 0.1),
       text: isDark ? "#fcd34d" : "#b45309",
       border: isDark ? alpha("#f59e0b", 0.3) : alpha("#f59e0b", 0.25),
       dot: "#f59e0b",
+      translated: t("status.pending"),
     },
   };
 
@@ -59,6 +70,7 @@ const StatusBadge = ({ label, isDark }: { label: string; isDark: boolean }) => {
     text: "#ea580c",
     border: alpha("#f97316", 0.2),
     dot: "#f97316",
+    translated: label,
   };
 
   return (
@@ -96,7 +108,7 @@ const StatusBadge = ({ label, isDark }: { label: string; isDark: boolean }) => {
           whiteSpace: "nowrap",
         }}
       >
-        {label}
+        {s.translated}
       </Typography>
     </Box>
   );
@@ -107,6 +119,7 @@ const ReplyBubble = ({
   reply,
   isDark,
   isAdmin,
+  t,
 }: {
   reply: {
     id: number;
@@ -117,6 +130,7 @@ const ReplyBubble = ({
   };
   isDark: boolean;
   isAdmin: boolean;
+  t: (key: string) => string;
 }) => (
   <Stack
     key={reply.id}
@@ -211,7 +225,7 @@ const ReplyBubble = ({
               lineHeight: 1.2,
             }}
           >
-            {reply.senderType}
+            {isAdmin ? t("admin") : t("user")}
           </Typography>
         </Box>
       </Stack>
@@ -395,7 +409,7 @@ const MessageCard = ({
             justifyContent={{ xs: "space-between", sm: "flex-end" }}
             sx={{ flexShrink: 0, flexWrap: "wrap", rowGap: 0.75 }}
           >
-            <StatusBadge label={message.status} isDark={isDark} />
+            <StatusBadge label={message.status} isDark={isDark} t={t} />
 
             {message.replies.length > 0 && (
               <Box
@@ -420,8 +434,7 @@ const MessageCard = ({
                     whiteSpace: "nowrap",
                   }}
                 >
-                  {message.replies.length}{" "}
-                  {message.replies.length === 1 ? "reply" : "replies"}
+                  {t("repliesCount", { count: message.replies.length })}
                 </Typography>
               </Box>
             )}
@@ -520,7 +533,7 @@ const MessageCard = ({
                   whiteSpace: "nowrap",
                 }}
               >
-                {message.replies.length} total
+                {t("totalCount", { count: message.replies.length })}
               </Typography>
             </Stack>
 
@@ -556,6 +569,7 @@ const MessageCard = ({
                     reply={reply}
                     isDark={isDark}
                     isAdmin={reply.senderType?.toLowerCase() === "admin"}
+                    t={t}
                   />
                 ))}
               </Stack>
@@ -578,7 +592,11 @@ export const MyContactMessages = () => {
 
   if (messagesQuery.isLoading) {
     return (
-      <Stack alignItems="center" justifyContent="center" sx={{ minHeight: "40vh", zoom: textZoom, width: "100%", }}>
+      <Stack
+        alignItems="center"
+        justifyContent="center"
+        sx={{ minHeight: "40vh", zoom: textZoom, width: "100%" }}
+      >
         <Box
           sx={{
             width: 20,
@@ -700,8 +718,8 @@ export const MyContactMessages = () => {
             justifyContent={{ xs: "flex-start", sm: "flex-end" }}
           >
             {[
-              { label: "Total", value: messages.length },
-              { label: "Open", value: openCount },
+              { label: t("stats.total"), value: messages.length },
+              { label: t("stats.open"), value: openCount },
             ].map((stat) => (
               <Box
                 key={stat.label}
@@ -759,7 +777,7 @@ export const MyContactMessages = () => {
               fontSize: "0.95rem",
             }}
           >
-            No messages yet
+            {t("emptyTitle")}
           </Typography>
           <Typography
             sx={{
@@ -769,7 +787,7 @@ export const MyContactMessages = () => {
               lineHeight: 1.5,
             }}
           >
-            Your contact messages will appear here
+            {t("emptySubtitle")}
           </Typography>
         </Box>
       ) : (

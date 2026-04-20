@@ -29,5 +29,22 @@
   "updateSuccess": "Vaccinarea a fost actualizată cu succes.",
   "updateError": "Nu s-a putut actualiza vaccinarea.",
   "deleteSuccess": "Vaccinarea a fost ștearsă cu succes.",
-  "deleteError": "Nu s-a putut șterge vaccinarea."
+  "deleteError": "Nu s-a putut șterge vaccinarea.",
+
+  "lastDate": "Data anterioară",
+  "nextDate": "Data următoare",
+  "notes": "Observații",
+  "vetCabinet": "Cabinet veterinar",
+  "selectVetCabinet": "Selectează cabinetul",
+  "timeSlot": "Interval orar",
+  "selectTimeSlot": "Selectează intervalul",
+  "petFallback": "Animal",
+  "vaccinationFallback": "Vaccinare",
+  "givenOn": "Administrat: {{date}}",
+  "scheduledOn": "Programat: {{date}}",
+  "veterinarianLabel": "Veterinar: {{value}}",
+  "status": {
+    "completed": "Finalizată",
+    "upcoming": "Urmează"
+  }
 }

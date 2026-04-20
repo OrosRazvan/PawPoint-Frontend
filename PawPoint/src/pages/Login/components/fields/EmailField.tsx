@@ -22,7 +22,7 @@ export const EmailField = () => {
           type="email"
           autoComplete="email"
           error={!!errors.email}
-          helperText={errors.email?.message}
+          helperText={errors.email?.message ? t(`errors.${errors.email.message}`) : ""}
         />
       )}
     />

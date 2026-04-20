@@ -1,31 +1,33 @@
 {
+  "dashboard": "Dashboard",
+  "management": "Management",
+  "vaccinations": "Vaccinări",
+  "appointments": "Programări",
+  "deworming": "Deparazitare",
+  "assistant": "Asistent",
   "navbar": {
-    "home": "Acasă",
-    "dashboard": "Dashboard",
-    "management": "Management",
-    "vaccinations": "Vaccinări",
-    "appointments": "Programări",
-    "deworming": "Deparazitare",
-    "assistant": "Asistent",
-    "logout": "Logout",
     "profile": "Profil",
-    "settings": "Setări"
+    "settings": "Setări",
+    "logout": "Deconectare",
+    "contactUs": "Contactează-ne",
+    "myMessages": "Mesajele mele",
+    "adminMessages": "Mesaje admin",
+    "admin": "Admin"
   },
   "footer": {
-    "aboutTitle": "Despre PawPoint",
-    "aboutText": "Platforma ta completă pentru gestionarea animalelor, urmărirea sănătății, programărilor și îngrijirii.",
+    "aboutTitle": "PawPoint",
+    "aboutText": "Un loc simplu pentru a gestiona animalele tale, programările, vaccinările și deparazitările.",
     "quickLinks": "Linkuri rapide",
     "dashboard": "Dashboard",
     "vaccinations": "Vaccinări",
     "appointments": "Programări",
     "support": "Suport",
-    "contactUs": "Contact",
+    "contactUs": "Contactează-ne",
     "aiAssistant": "Asistent AI",
     "helpCenter": "Centru de ajutor",
     "legal": "Legal",
     "privacyPolicy": "Politica de confidențialitate",
     "termsOfService": "Termeni și condiții",
-    "copyright": "© 2026 PawPoint. Toate drepturile rezervate.",
-    "myMessages": "Mesajele mele"
+    "copyright": "© 2026 PawPoint. Toate drepturile rezervate."
   }
 }

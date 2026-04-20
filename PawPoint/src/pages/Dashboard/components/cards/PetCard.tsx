@@ -12,6 +12,7 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import { useSettings } from "../../../../hooks/useSettings";
 import { scaleFont } from "../../../../utils/fontScale";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   name: string;
@@ -35,6 +36,7 @@ export const PetCard = ({
   onDelete,
 }: Props) => {
   const { data: settings } = useSettings();
+  const { t } = useTranslation("dashboard");
 
   return (
     <Paper
@@ -198,7 +200,7 @@ export const PetCard = ({
             },
           })}
         >
-          View
+          {t("view")}
         </Button>
 
         <IconButton

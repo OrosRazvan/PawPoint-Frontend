@@ -71,15 +71,16 @@ const formatDateBySettings = (
 const formatSlotLabel = (
   start: string,
   end: string,
-  dateFormat: AppDateFormat
+  dateFormat: AppDateFormat,
+  locale: string
 ) => {
   const startDate = new Date(start);
   const endDate = new Date(end);
 
   return `${formatDateBySettings(startDate, dateFormat)} • ${startDate.toLocaleTimeString(
-    "ro-RO",
+    locale,
     { hour: "2-digit", minute: "2-digit" }
-  )} - ${endDate.toLocaleTimeString("ro-RO", {
+  )} - ${endDate.toLocaleTimeString(locale, {
     hour: "2-digit",
     minute: "2-digit",
   })}`;
@@ -92,11 +93,12 @@ const getComparableDate = (item: VaccinationDto) => {
 };
 
 export const AddVaccinationDialog = ({ open, onClose }: Props) => {
-  const { t } = useTranslation(["vaccination"]);
+  const { t, i18n } = useTranslation(["vaccination"]);
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
   const createVaccinationMutation = useCreateVaccination();
   const { data: settings } = useSettings();
+  const locale = i18n.language === "ro" ? "ro-RO" : "en-GB";
 
   const dateFormat: AppDateFormat = settings?.dateFormat ?? "DD/MM/YYYY";
 
@@ -471,7 +473,7 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
                   {Array.isArray(slots) &&
                     slots.map((slot) => (
                       <MenuItem key={slot.id} value={slot.id}>
-                        {formatSlotLabel(slot.startTimeUtc, slot.endTimeUtc, dateFormat)}
+                        {formatSlotLabel(slot.startTimeUtc, slot.endTimeUtc, dateFormat, locale)}                      
                       </MenuItem>
                     ))}
                 </TextField>

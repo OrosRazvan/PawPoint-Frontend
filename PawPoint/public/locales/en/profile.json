@@ -12,6 +12,16 @@
   "vaccination": "Vaccination",
   "deworming": "Deworming",
   "atClinic": "at {{clinic}}",
+  "activityForPet": "{{activity}} for {{pet}}",
+  "petFallback": "Pet",
+  "clinicFallback": "Veterinary Clinic",
+  "appointmentFallback": "Consult",
+  "vaccinationFallback": "Vaccination",
+  "dewormingFallback": "Deworming",
+  "myPets": "My Pets",
+  "view": "View",
+  "noPets": "No pets yet.",
+  "loadError": "Failed to load profile.",
   "nameUpdatedSuccess": "Name updated successfully.",
   "nameUpdatedError": "Failed to update name.",
   "phoneUpdatedSuccess": "Phone updated successfully.",
@@ -31,7 +41,7 @@
     "newPassword": "New Password",
     "confirmPassword": "Confirm New Password",
     "backToLoginText": "Want to go back?",
-    "backToDashboard": "Dashboard"
+    "backToDashboard": "Back to dashboard"
   },
   "messages": {
     "passwordChangedSuccess": "Password changed successfully. Please log in again.",

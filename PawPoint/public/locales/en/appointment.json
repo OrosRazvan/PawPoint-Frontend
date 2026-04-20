@@ -19,6 +19,7 @@
   "workingHours": "Schedule",
   "price": "Price",
   "select": "Select",
+  "selected": "Selected",
   "next": "Next",
   "back": "Back",
 
@@ -38,6 +39,7 @@
   "availabilityLoadError": "Failed to load availability.",
   "availableHours": "Available hours",
   "availableHoursFor": "Available hours for {{date}}:",
+  "availableSlots": "available slots",
   "selectDayPrompt": "Select a day to see the available hours.",
   "noHoursOnDay": "No available hours on this day.",
   "noCabinetSelected": "No cabinet selected",
@@ -61,5 +63,39 @@
   "notification24h": "Receive a notification 24h in advance",
   "active": "Active",
   "confirmAppointment": "Confirm Appointment",
-  "confirming": "Confirming..."
+  "confirming": "Confirming...",
+
+  "petFallback": "Pet",
+  "clinicFallback": "Veterinary Clinic",
+  "serviceFallback": "Consult",
+  "dateTimeLabel": "{{date}} at {{time}}",
+
+  "noSlots": "No slots",
+  "selectDate": "Select date",
+
+  "weekSun": "Sun",
+  "weekMon": "Mon",
+  "weekTue": "Tue",
+  "weekWed": "Wed",
+  "weekThu": "Thu",
+  "weekFri": "Fri",
+  "weekSat": "Sat",
+
+  "monthJanuary": "January",
+  "monthFebruary": "February",
+  "monthMarch": "March",
+  "monthApril": "April",
+  "monthMay": "May",
+  "monthJune": "June",
+  "monthJuly": "July",
+  "monthAugust": "August",
+  "monthSeptember": "September",
+  "monthOctober": "October",
+  "monthNovember": "November",
+  "monthDecember": "December",
+
+  "status": {
+    "completed": "Completed",
+    "upcoming": "Upcoming"
+  }
 }

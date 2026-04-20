@@ -23,6 +23,7 @@ import type {
   UpdateUserSettingsDto,
   UserSettingsDto,
 } from "./types/settings";
+import { LanguageSwitcher } from "../../components/LanguageSwitcher";
 
 const orangeSwitchSx = {
   "& .MuiSwitch-switchBase.Mui-checked": {
@@ -205,7 +206,9 @@ export const Settings = () => {
         <Box sx={sectionCardSx}>
           <Stack spacing={4}>
             <Stack direction="row" spacing={1.5} alignItems="center">
-              <PaletteOutlinedIcon sx={(theme) => ({ color: theme.palette.text.secondary })} />
+              <PaletteOutlinedIcon
+                sx={(theme) => ({ color: theme.palette.text.secondary })}
+              />
               <Typography
                 sx={(theme) => ({
                   fontSize: scaleFont(24, form.textSize),
@@ -215,6 +218,26 @@ export const Settings = () => {
               >
                 {t("settings:appearance")}
               </Typography>
+            </Stack>
+
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Box>
+                <Typography
+                  sx={(theme) => ({
+                    fontSize: scaleFont(18, form.textSize),
+                    fontWeight: 700,
+                    color: theme.palette.text.primary,
+                  })}
+                >
+                  {t("settings:changeLanguage")}
+                </Typography>
+              </Box>
+
+              <LanguageSwitcher />
             </Stack>
 
             <Stack

@@ -21,6 +21,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { useSnackbar } from "notistack";
 import { useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { useAnimalById } from "../../hooks/useAnimalById";
 import { useDeleteAnimal } from "../../hooks/useDeleteAnimal";
 import { useSettings } from "../../hooks/useSettings";
@@ -76,6 +77,7 @@ export const AnimalDetails = () => {
   const { animalId } = useParams();
   const parsedAnimalId = animalId ? Number(animalId) : undefined;
 
+  const { t } = useTranslation("animalDetails");
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
   const deleteAnimalMutation = useDeleteAnimal();
@@ -117,7 +119,7 @@ export const AnimalDetails = () => {
     return {
       id: String(data.id),
       name: data.name,
-      breed: data.breed ?? data.species ?? "Unknown",
+      breed: data.breed ?? data.species ?? t("unknown"),
       weight: formatWeightByUnit(petWeightValue, weightUnit),
       imageLetter: getInitial(data.name),
       imageUrl: data.profilePictureUrl ?? null,
@@ -127,19 +129,19 @@ export const AnimalDetails = () => {
       sex: data.sex ?? "",
       microchipNumber: data.microchipNumber ?? "",
     };
-  }, [data, weightUnit]);
+  }, [data, weightUnit, t]);
 
   const handleDelete = () => {
     if (!dashboardPet) return;
 
     deleteAnimalMutation.mutate(Number(dashboardPet.id), {
       onSuccess: () => {
-        enqueueSnackbar("Pet deleted successfully.", { variant: "success" });
+        enqueueSnackbar(t("messages.deleteSuccess"), { variant: "success" });
         queryClient.invalidateQueries({ queryKey: ["dashboardData"] });
         navigate("/dashboard");
       },
       onError: () => {
-        enqueueSnackbar("An error occurred while deleting the pet.", {
+        enqueueSnackbar(t("messages.deleteError"), {
           variant: "error",
         });
       },
@@ -169,7 +171,7 @@ export const AnimalDetails = () => {
         </Box>
       ) : isError || !data || !dashboardPet ? (
         <Box sx={{ px: 6, py: 8 }}>
-          <Typography color="error">Failed to load pet details.</Typography>
+          <Typography color="error">{t("messages.loadError")}</Typography>
         </Box>
       ) : (
         <Grid container sx={{ flex: 1, minHeight: "100vh" }}>
@@ -263,7 +265,7 @@ export const AnimalDetails = () => {
                   },
                 })}
               >
-                Back to dashboard
+                {t("backToDashboard")}
               </Button>
             </Box>
 
@@ -395,20 +397,20 @@ export const AnimalDetails = () => {
               <Stack spacing={1.2} sx={{ mt: 4, width: "100%" }}>
                 <StatPill
                   icon={<ScaleOutlinedIcon sx={{ fontSize: 15 }} />}
-                  label="Weight"
+                  label={t("labels.weight")}
                   value={formattedWeight}
                   textSize={textSize}
                 />
                 <StatPill
                   icon={<CakeOutlinedIcon sx={{ fontSize: 15 }} />}
-                  label="Born"
+                  label={t("labels.born")}
                   value={formattedBirthDate}
                   textSize={textSize}
                 />
                 {data.species && (
                   <StatPill
                     icon={<PetsRoundedIcon sx={{ fontSize: 15 }} />}
-                    label="Species"
+                    label={t("labels.species")}
                     value={data.species}
                     textSize={textSize}
                   />
@@ -446,7 +448,7 @@ export const AnimalDetails = () => {
                   "&:active": { transform: "translateY(0)" },
                 }}
               >
-                Edit pet
+                {t("actions.editPet")}
               </Button>
 
               <Button
@@ -487,7 +489,7 @@ export const AnimalDetails = () => {
                   },
                 })}
               >
-                Delete pet
+                {t("actions.deletePet")}
               </Button>
             </Stack>
           </Grid>
@@ -509,7 +511,7 @@ export const AnimalDetails = () => {
                 mb: 3,
               })}
             >
-              All details
+              {t("allDetails")}
             </Typography>
 
             <Box
@@ -526,37 +528,37 @@ export const AnimalDetails = () => {
             >
               <DetailRow
                 icon={<PetsRoundedIcon sx={{ fontSize: 16 }} />}
-                label="Species"
+                label={t("details.species")}
                 value={data.species ?? "—"}
                 textSize={textSize}
               />
               <DetailRow
                 icon={<PetsRoundedIcon sx={{ fontSize: 16 }} />}
-                label="Breed"
+                label={t("details.breed")}
                 value={data.breed ?? "—"}
                 textSize={textSize}
               />
               <DetailRow
                 icon={<ScaleOutlinedIcon sx={{ fontSize: 16 }} />}
-                label="Weight"
+                label={t("details.weight")}
                 value={formattedWeight}
                 textSize={textSize}
               />
               <DetailRow
                 icon={<CakeOutlinedIcon sx={{ fontSize: 16 }} />}
-                label="Birth date"
+                label={t("details.birthDate")}
                 value={formattedBirthDate}
                 textSize={textSize}
               />
               <DetailRow
                 icon={<TransgenderOutlinedIcon sx={{ fontSize: 16 }} />}
-                label="Sex"
+                label={t("details.sex")}
                 value={data.sex ?? "—"}
                 textSize={textSize}
               />
               <DetailRow
                 icon={<FingerprintOutlinedIcon sx={{ fontSize: 16 }} />}
-                label="Microchip number"
+                label={t("details.microchipNumber")}
                 value={data.microchipNumber ?? "—"}
                 isLast
                 textSize={textSize}

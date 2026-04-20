@@ -22,5 +22,6 @@
   "save": "Save Settings",
   "saving": "Saving...",
   "saved": "Settings updated successfully.",
-  "saveError": "Failed to update settings."
+  "saveError": "Failed to update settings.",
+  "changeLanguage": "Change Language"
 }

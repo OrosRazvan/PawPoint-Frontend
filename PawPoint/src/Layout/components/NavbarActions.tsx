@@ -169,7 +169,7 @@ export const NavbarActions = ({
             }}
             sx={mobileActionButtonSx}
           >
-            Contact Us
+            {t("layout:navbar.contactUs")}
           </Button>
         )}
 
@@ -182,7 +182,7 @@ export const NavbarActions = ({
             }}
             sx={mobileActionButtonSx}
           >
-            My Messages
+            {t("layout:navbar.myMessages")}
           </Button>
         )}
 
@@ -203,7 +203,7 @@ export const NavbarActions = ({
             }}
             sx={mobileActionButtonSx}
           >
-            Admin Messages
+            {t("layout:navbar.adminMessages")}
           </Button>
         )}
 
@@ -270,14 +270,14 @@ export const NavbarActions = ({
           <MenuItem onClick={handleGoToProfile}>
             <Stack direction="row" spacing={1.5} alignItems="center">
               <PersonOutlineOutlinedIcon fontSize="small" />
-              <Typography>Profile</Typography>
+              <Typography>{t("layout:navbar.profile")}</Typography>
             </Stack>
           </MenuItem>
 
           <MenuItem onClick={handleGoToSettings}>
             <Stack direction="row" spacing={1.5} alignItems="center">
               <SettingsOutlinedIcon fontSize="small" />
-              <Typography>Settings</Typography>
+              <Typography>{t("layout:navbar.settings")}</Typography>
             </Stack>
           </MenuItem>
 
@@ -286,7 +286,7 @@ export const NavbarActions = ({
           <MenuItem onClick={handleMenuLogout}>
             <Stack direction="row" spacing={1.5} alignItems="center">
               <LogoutOutlinedIcon fontSize="small" />
-              <Typography>Logout</Typography>
+              <Typography>{t("layout:navbar.logout")}</Typography>
             </Stack>
           </MenuItem>
         </Menu>
@@ -299,7 +299,7 @@ export const NavbarActions = ({
       {!isAdmin && <NotificationsDropdown showCount={showNotificationCount} />}
 
       {!isAdmin && (
-        <Tooltip title="Contact Us">
+        <Tooltip title={t("layout:navbar.contactUs")}>
           <IconButton
             onClick={() => navigate("/contact-us")}
             sx={actionIconButtonSx}
@@ -310,7 +310,7 @@ export const NavbarActions = ({
       )}
 
       {!isAdmin && (
-        <Tooltip title="My Messages">
+        <Tooltip title={t("layout:navbar.myMessages")}>
           <IconButton
             onClick={() => navigate("/my-contact-messages")}
             sx={actionIconButtonSx}
@@ -321,7 +321,7 @@ export const NavbarActions = ({
       )}
 
       {isAdmin && (
-        <Tooltip title="Admin Messages">
+        <Tooltip title={t("layout:navbar.adminMessages")}>
           <IconButton
             onClick={() => navigate("/admin/contact-messages")}
             sx={actionIconButtonSx}
@@ -412,19 +412,17 @@ export const NavbarActions = ({
             }),
           }}
         >
-          {/* păstrezi aici exact restul meniului tău actual */}
-          {/* nu am schimbat logica, doar am adăugat suportul mobile mai sus */}
           <MenuItem onClick={handleGoToProfile}>
             <Stack direction="row" spacing={1.5} alignItems="center">
               <PersonOutlineOutlinedIcon fontSize="small" />
-              <Typography>Profile</Typography>
+              <Typography>{t("layout:navbar.profile")}</Typography>
             </Stack>
           </MenuItem>
 
           <MenuItem onClick={handleGoToSettings}>
             <Stack direction="row" spacing={1.5} alignItems="center">
               <SettingsOutlinedIcon fontSize="small" />
-              <Typography>Settings</Typography>
+              <Typography>{t("layout:navbar.settings")}</Typography>
             </Stack>
           </MenuItem>
 
@@ -433,7 +431,7 @@ export const NavbarActions = ({
           <MenuItem onClick={handleMenuLogout}>
             <Stack direction="row" spacing={1.5} alignItems="center">
               <LogoutOutlinedIcon fontSize="small" />
-              <Typography>Logout</Typography>
+              <Typography>{t("layout:navbar.logout")}</Typography>
             </Stack>
           </MenuItem>
         </Menu>

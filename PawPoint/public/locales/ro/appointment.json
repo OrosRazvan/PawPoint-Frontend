@@ -19,6 +19,7 @@
   "workingHours": "Program",
   "price": "Preț",
   "select": "Selectează",
+  "selected": "Selectat",
   "next": "Continuă",
   "back": "Înapoi",
 
@@ -38,6 +39,7 @@
   "availabilityLoadError": "Disponibilitatea nu a putut fi încărcată.",
   "availableHours": "Ore disponibile",
   "availableHoursFor": "Ore disponibile pentru {{date}}:",
+  "availableSlots": "sloturi disponibile",
   "selectDayPrompt": "Selectează o zi pentru a vedea orele disponibile.",
   "noHoursOnDay": "Nu există ore disponibile în această zi.",
   "noCabinetSelected": "Nu a fost selectat niciun cabinet",
@@ -61,5 +63,39 @@
   "notification24h": "Primește o notificare cu 24h înainte",
   "active": "Activ",
   "confirmAppointment": "Confirmă programarea",
-  "confirming": "Se confirmă..."
+  "confirming": "Se confirmă...",
+
+  "petFallback": "Animal",
+  "clinicFallback": "Cabinet veterinar",
+  "serviceFallback": "Consultație",
+  "dateTimeLabel": "{{date}} la {{time}}",
+
+  "noSlots": "Fără sloturi",
+  "selectDate": "Selectează data",
+
+  "weekSun": "Dum",
+  "weekMon": "Lun",
+  "weekTue": "Mar",
+  "weekWed": "Mie",
+  "weekThu": "Joi",
+  "weekFri": "Vin",
+  "weekSat": "Sâm",
+
+  "monthJanuary": "Ianuarie",
+  "monthFebruary": "Februarie",
+  "monthMarch": "Martie",
+  "monthApril": "Aprilie",
+  "monthMay": "Mai",
+  "monthJune": "Iunie",
+  "monthJuly": "Iulie",
+  "monthAugust": "August",
+  "monthSeptember": "Septembrie",
+  "monthOctober": "Octombrie",
+  "monthNovember": "Noiembrie",
+  "monthDecember": "Decembrie",
+
+  "status": {
+    "completed": "Finalizată",
+    "upcoming": "Urmează"
+  }
 }

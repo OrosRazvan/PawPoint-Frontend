@@ -39,5 +39,24 @@
   "updateSuccess": "Deparazitarea a fost actualizată cu succes.",
   "updateError": "Deparazitarea nu a putut fi actualizată.",
   "deleteSuccess": "Deparazitarea a fost ștearsă cu succes.",
-  "deleteError": "Deparazitarea nu a putut fi ștearsă."
+  "deleteError": "Deparazitarea nu a putut fi ștearsă.",
+
+  "type": "Tip",
+  "selectType": "Selectează tipul",
+  "intervalDays": "Interval (zile)",
+  "typeInternal": "Internă",
+  "typeExternal": "Externă",
+  "typeCombined": "Combinată",
+  "typeControl": "Control",
+  "unknown": "Necunoscut",
+  "petFallback": "Animal",
+  "doneOn": "Efectuat: {{date}}",
+  "scheduledOn": "Programat: {{date}}",
+  "veterinarianLabel": "Veterinar: {{value}}",
+  "nextDueLabel": "Următoarea administrare: {{date}}",
+  "intervalLabel": "Interval: {{days}} zile",
+  "status": {
+    "completed": "Finalizată",
+    "upcoming": "Programată"
+  }
 }

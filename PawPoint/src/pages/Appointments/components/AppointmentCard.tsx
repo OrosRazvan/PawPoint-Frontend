@@ -12,6 +12,7 @@ import { alpha } from "@mui/material/styles";
 import { useSettings } from "../../../hooks/useSettings";
 import { scaleFont } from "../../../utils/fontScale";
 import type { AppointmentCardItem } from "../types/appointment";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   item: AppointmentCardItem;
@@ -44,32 +45,40 @@ const formatDateBySettings = (
   }
 };
 
-const formatTime = (value?: string | null) => {
+const formatTime = (value?: string | null, locale = "en-GB") => {
   if (!value) return "—";
 
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
 
-  return date.toLocaleTimeString("en-US", {
-    hour: "numeric",
+  return date.toLocaleTimeString(locale, {
+    hour: "2-digit",
     minute: "2-digit",
-    hour12: true,
+    hour12: false,
   });
 };
 
 const formatDateTimeBySettings = (
-  value?: string | null,
-  format: AppDateFormat = "DD/MM/YYYY"
+  value: string | null | undefined,
+  format: AppDateFormat,
+  t: (key: string, options?: any) => string,
+  locale: string
 ) => {
   if (!value) return "—";
-  return `${formatDateBySettings(value, format)} at ${formatTime(value)}`;
+
+  return t("appointment:dateTimeLabel", {
+    date: formatDateBySettings(value, format),
+    time: formatTime(value, locale),
+  });
 };
 
 export const AppointmentCard = ({ item, onEdit }: Props) => {
+  const { t, i18n } = useTranslation(["appointment"]);
   const isCompleted = item.status === "completed";
   const { data: settings } = useSettings();
 
   const dateFormat: AppDateFormat = settings?.dateFormat ?? "DD/MM/YYYY";
+  const locale = i18n.language === "ro" ? "ro-RO" : "en-GB";
 
   return (
     <Paper
@@ -116,7 +125,7 @@ export const AppointmentCard = ({ item, onEdit }: Props) => {
           </Box>
 
           <Chip
-            label={item.status}
+            label={t(`appointment:status.${item.status}`)}
             size="small"
             sx={(theme) => ({
               height: 30,
@@ -148,7 +157,7 @@ export const AppointmentCard = ({ item, onEdit }: Props) => {
                 color: theme.palette.text.secondary,
               })}
             >
-              {formatDateTimeBySettings(item.slotStartTimeUtc, dateFormat)}
+              {formatDateTimeBySettings(item.slotStartTimeUtc, dateFormat, t, locale)}
             </Typography>
           </Stack>
 

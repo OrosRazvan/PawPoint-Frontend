@@ -152,7 +152,10 @@ export const Profile = () => {
     const appointmentItems: ActivityItem[] = appointments.map((item: any) => ({
       id: `appointment-${item.id}`,
       type: "appointment",
-      title: `${item.serviceType ?? "Consult"} for ${item.animalName ?? "Pet"}`,
+      title: t("activityForPet", {
+        activity: item.serviceType ?? t("appointmentFallback"),
+        pet: item.animalName ?? t("petFallback"),
+      }),
       dateValue:
         item.slotStartTimeUtc ??
         item.SlotStartTimeUtc ??
@@ -168,13 +171,16 @@ export const Profile = () => {
         item.VeterinarianName ??
         item.clinicName ??
         item.ClinicName ??
-        "Veterinary Clinic",
+        t("clinicFallback"),
     }));
 
     const vaccinationItems: ActivityItem[] = vaccinations.map((item: any) => ({
       id: `vaccination-${item.id}`,
       type: "vaccination",
-      title: `${item.vaccineName ?? "Vaccination"} for ${item.animalName ?? "Pet"}`,
+      title: t("activityForPet", {
+        activity: item.vaccineName ?? t("vaccinationFallback"),
+        pet: item.animalName ?? t("petFallback"),
+      }),
       dateValue:
         item.dateUtc ??
         item.DateUtc ??
@@ -199,15 +205,16 @@ export const Profile = () => {
         item.VeterinarianName ??
         item.clinicName ??
         item.ClinicName ??
-        "Veterinary Clinic",
+        t("clinicFallback"),
     }));
 
     const dewormingItems: ActivityItem[] = dewormings.map((item: any) => ({
       id: `deworming-${item.id}`,
       type: "deworming",
-      title: `${item.productName ?? item.type ?? "Deworming"} for ${
-        item.animalName ?? "Pet"
-      }`,
+      title: t("activityForPet", {
+        activity: item.productName ?? item.type ?? t("dewormingFallback"),
+        pet: item.animalName ?? t("petFallback"),
+      }),
       dateValue:
         item.dateUtc ??
         item.DateUtc ??
@@ -232,7 +239,7 @@ export const Profile = () => {
         item.VeterinarianName ??
         item.clinicName ??
         item.ClinicName ??
-        "Veterinary Clinic",
+        t("clinicFallback"),
     }));
 
     return [...appointmentItems, ...vaccinationItems, ...dewormingItems]
@@ -242,7 +249,7 @@ export const Profile = () => {
         return bTime - aTime;
       })
       .slice(0, 6);
-  }, [appointments, vaccinations, dewormings]);
+  }, [appointments, vaccinations, dewormings, t]);
 
   const handleSaveName = () => {
     updateProfile(
@@ -305,7 +312,7 @@ export const Profile = () => {
           p: 4,
         })}
       >
-        <Typography color="error">Failed to load profile.</Typography>
+        <Typography color="error">{t("loadError")}</Typography>
       </Box>
     );
   }
@@ -770,7 +777,7 @@ export const Profile = () => {
                     color: theme.palette.text.primary,
                   })}
                 >
-                  My Pets
+                  {t("myPets")}
                 </Typography>
 
                 {pets.length > 0 ? (
@@ -930,7 +937,7 @@ export const Profile = () => {
                               },
                             }}
                           >
-                            View
+                            {t("view")}
                           </Button>
                         </Paper>
                       </Grid>
@@ -943,7 +950,7 @@ export const Profile = () => {
                       fontSize: scaleFont(16, settings?.textSize),
                     })}
                   >
-                    No pets yet.
+                    {t("noPets")}
                   </Typography>
                 )}
               </Stack>

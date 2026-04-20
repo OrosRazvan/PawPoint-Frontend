@@ -69,7 +69,7 @@ export const Dashboard = () => {
         onClick: () => setIsAddPetOpen(true),
       },
     ],
-    [navigate, setIsAddPetOpen]
+    [navigate]
   );
 
   const upcomingEvents = useMemo(() => {
@@ -89,9 +89,14 @@ export const Dashboard = () => {
 
       return {
         id: `appointment-${item.id}`,
-        petName: item.animalName ?? item.petName ?? "Pet",
-        typeLabel: item.serviceType ?? "Appointment",
-        statusLabel: "Upcoming",
+        petName:
+          item.animalName ??
+          item.petName ??
+          t("dashboard:petFallback"),
+        typeLabel:
+          item.serviceType ??
+          t("dashboard:appointmentFallback"),
+        statusLabel: t("dashboard:upcomingStatus"),
         rawDate,
       };
     });
@@ -116,9 +121,14 @@ export const Dashboard = () => {
 
       return {
         id: `vaccination-${item.id}`,
-        petName: item.animalName ?? item.petName ?? "Pet",
-        typeLabel: item.vaccineName ?? "Vaccination",
-        statusLabel: "Upcoming",
+        petName:
+          item.animalName ??
+          item.petName ??
+          t("dashboard:petFallback"),
+        typeLabel:
+          item.vaccineName ??
+          t("dashboard:vaccinationFallback"),
+        statusLabel: t("dashboard:upcomingStatus"),
         rawDate,
       };
     });
@@ -143,9 +153,15 @@ export const Dashboard = () => {
 
       return {
         id: `deworming-${item.id}`,
-        petName: item.animalName ?? item.petName ?? "Pet",
-        typeLabel: item.productName ?? item.type ?? "Deworming",
-        statusLabel: "Upcoming",
+        petName:
+          item.animalName ??
+          item.petName ??
+          t("dashboard:petFallback"),
+        typeLabel:
+          item.productName ??
+          item.type ??
+          t("dashboard:dewormingFallback"),
+        statusLabel: t("dashboard:upcomingStatus"),
         rawDate,
       };
     });
@@ -167,7 +183,7 @@ export const Dashboard = () => {
         ...item,
         dateValue: item.rawDate,
       }));
-  }, [appointments, vaccinations, dewormings]);
+  }, [appointments, vaccinations, dewormings, t]);
 
   const handleViewPet = (pet: DashboardPet) => {
     navigate(`/animals/${pet.id}`);

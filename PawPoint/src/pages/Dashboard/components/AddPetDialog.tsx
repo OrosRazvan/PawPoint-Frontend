@@ -406,9 +406,7 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
             </Grid>
 
             <Grid size={{ xs: 7 }}>
-              <Typography sx={labelSx}>
-                {t("dashboard:birthDate") ?? "Birth date"}
-              </Typography>
+              <Typography sx={labelSx}>{t("dashboard:birthDate")}</Typography>
               <Controller
                 name="birthDate"
                 control={control}

@@ -5,7 +5,8 @@
     "password": "Parolă",
     "loginSubtitle": "Introdu datele de autentificare pentru a accesa contul",
     "noAccount": "Nu ai cont?",
-    "register": "Înregistrează-te"
+    "register": "Înregistrează-te",
+    "forgotPasswordLink": "Ai uitat parola?"
   },
   "hero": {
     "welcome": "Bine ai venit la PawPoint!",
@@ -26,6 +27,6 @@
   },
   "errors": {
     "emailInvalid": "Introduceți un email valid.",
-    "passwordMin8": "Introduceți o parolă de minim 8 caractere."
+    "passwordRequired": "Parola este incorectă"
   }
 }

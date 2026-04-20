@@ -1,22 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Container,
-  IconButton,
-  Stack,
-  Typography,
-} from "@mui/material";
-import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
-import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
-import ShieldOutlinedIcon from "@mui/icons-material/ShieldOutlined";
-import PhoneIphoneRoundedIcon from "@mui/icons-material/PhoneIphoneRounded";
-import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
-import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded";
-import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
+import { useEffect, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
+import type { CSSProperties } from "react";
 
 const ORANGE = "#f7ae1a";
 const ORANGE_DARK = "#e39100";
@@ -26,578 +10,651 @@ const PAGE_BG = "#f7f5f0";
 const CARD_BG = "#ffffff";
 const BORDER = "#ead9b0";
 
-const heroImages = [
-  "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=1600&q=80",
-  "https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?auto=format&fit=crop&w=1600&q=80",
-  "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=1600&q=80",
-  "https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?auto=format&fit=crop&w=1600&q=80",
+type HeroSlide = {
+  url: string;
+  label: string;
+};
+
+type Feature = {
+  icon: string;
+  title: string;
+  description: string;
+};
+
+type Step = {
+  number: string;
+  title: string;
+  description: string;
+};
+
+const heroSlides: HeroSlide[] = [
+  {
+    url: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=2000&q=90",
+    label: "Golden Retriever Dog",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=2000&q=90",
+    label: "British Shorthair Cat",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?auto=format&fit=crop&w=2000&q=90",
+    label: "Domestic Rabbit",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1552728089-57bdde30beb3?auto=format&fit=crop&w=2000&q=90",
+    label: "Macaw Parrot",
+  },
 ];
 
-const features = [
+const features: Feature[] = [
   {
-    icon: <CalendarMonthRoundedIcon sx={{ fontSize: 30 }} />,
-    title: "Appointment Scheduling",
+    icon: "📅",
+    title: "Vet Appointments",
     description:
       "Book and manage vet appointments with ease. Never miss an important checkup.",
   },
   {
-    icon: <FavoriteBorderRoundedIcon sx={{ fontSize: 30 }} />,
+    icon: "❤️",
     title: "Health Tracking",
     description:
-      "Keep detailed records of vaccinations, deworming, and medical history.",
+      "Keep detailed records of vaccinations, deworming, and complete medical history.",
   },
   {
-    icon: <ShieldOutlinedIcon sx={{ fontSize: 30 }} />,
+    icon: "🔒",
     title: "Secure & Private",
     description:
-      "Your pet's data is stored securely and kept private at all times.",
+      "Your pet’s data is stored safely and remains private at all times.",
   },
   {
-    icon: <PhoneIphoneRoundedIcon sx={{ fontSize: 30 }} />,
+    icon: "📱",
     title: "Always Accessible",
     description:
-      "Access your pet's information anytime, anywhere, on any device.",
+      "Access your pet’s information anytime, anywhere, on any device.",
   },
 ];
 
-const steps = [
+const steps: Step[] = [
   {
     number: "1",
     title: "Create Account",
-    description: "Sign up for free and set up your profile in seconds.",
+    description: "Sign up for free and set up your profile in just a few seconds.",
   },
   {
     number: "2",
     title: "Add Your Pets",
-    description: "Add your furry friends and their important information.",
+    description: "Add your furry friends and their important health information.",
   },
   {
     number: "3",
-    title: "Start Managing",
-    description: "Track health records, book appointments, and set reminders.",
+    title: "Manage Everything",
+    description: "Track medical records, make appointments, and set automatic reminders.",
   },
 ];
 
-export const PublicHome = () => {
-  const [activeIndex, setActiveIndex] = useState(0);
+const styles = {
+  page: {
+    minHeight: "100vh",
+    backgroundColor: PAGE_BG,
+    fontFamily: "'DM Sans', sans-serif",
+    overflowX: "hidden",
+  } as CSSProperties,
 
-  const slides = useMemo(() => heroImages, []);
+  hero: {
+    position: "relative",
+    height: "100vh",
+    minHeight: 640,
+    overflow: "hidden",
+  } as CSSProperties,
+
+  slide: (active: boolean): CSSProperties => ({
+    position: "absolute",
+    inset: 0,
+    opacity: active ? 1 : 0,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    transform: active ? "scale(1)" : "scale(1.04)",
+    transitionProperty: "opacity, transform",
+    transitionDuration: "1.2s, 7s",
+    transitionTimingFunction: "ease",
+  }),
+
+  heroOverlay: {
+    position: "absolute",
+    inset: 0,
+    background:
+      "linear-gradient(160deg, rgba(7,28,66,0.55) 0%, rgba(7,28,66,0.28) 60%, rgba(247,174,26,0.08) 100%)",
+    zIndex: 1,
+  } as CSSProperties,
+
+  heroContent: {
+    position: "relative",
+    zIndex: 2,
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "2rem",
+    textAlign: "center",
+  } as CSSProperties,
+
+  heroBadge: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 8,
+    background: "rgba(247,174,26,0.18)",
+    border: "1px solid rgba(247,174,26,0.5)",
+    borderRadius: 999,
+    padding: "6px 18px",
+    fontSize: "0.8rem",
+    fontWeight: 600,
+    color: ORANGE,
+    letterSpacing: "0.12em",
+    textTransform: "uppercase",
+    marginBottom: "1.6rem",
+    backdropFilter: "blur(8px)",
+  } as CSSProperties,
+
+  heroTitle: {
+    fontFamily: "'Playfair Display', serif",
+    fontSize: "clamp(2.8rem, 7vw, 6rem)",
+    fontWeight: 900,
+    lineHeight: 1,
+    color: "#fff",
+    letterSpacing: "-0.02em",
+    marginBottom: "1.4rem",
+  } as CSSProperties,
+
+  heroTitleSpan: {
+    color: ORANGE,
+    fontStyle: "italic",
+    display: "block",
+  } as CSSProperties,
+
+  heroDesc: {
+    fontSize: "clamp(1rem, 2vw, 1.25rem)",
+    color: "rgba(255,255,255,0.88)",
+    maxWidth: 640,
+    lineHeight: 1.8,
+    marginBottom: "2.4rem",
+    fontWeight: 300,
+  } as CSSProperties,
+
+  heroBtns: {
+    display: "flex",
+    gap: 12,
+    flexWrap: "wrap",
+    justifyContent: "center",
+    marginBottom: "3rem",
+  } as CSSProperties,
+
+  btnPrimary: {
+    padding: "14px 36px",
+    borderRadius: 14,
+    background: ORANGE,
+    color: TEXT,
+    fontFamily: "'DM Sans', sans-serif",
+    fontSize: "1rem",
+    fontWeight: 700,
+    border: "none",
+    cursor: "pointer",
+    boxShadow: "0 8px 28px rgba(247,174,26,0.42)",
+    transition: "all 0.2s",
+    textDecoration: "none",
+  } as CSSProperties,
+
+  btnOutline: {
+    padding: "14px 36px",
+    borderRadius: 14,
+    background: "rgba(255,255,255,0.08)",
+    color: "#fff",
+    fontFamily: "'DM Sans', sans-serif",
+    fontSize: "1rem",
+    fontWeight: 600,
+    border: "1px solid rgba(255,255,255,0.4)",
+    cursor: "pointer",
+    backdropFilter: "blur(8px)",
+    transition: "all 0.2s",
+    textDecoration: "none",
+  } as CSSProperties,
+
+  dots: {
+    display: "flex",
+    gap: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  } as CSSProperties,
+
+  dot: (active: boolean): CSSProperties => ({
+    width: active ? 28 : 8,
+    height: 8,
+    borderRadius: 999,
+    background: active ? ORANGE : "rgba(255,255,255,0.45)",
+    cursor: "pointer",
+    transition: "all 0.3s",
+    border: "none",
+    padding: 0,
+  }),
+
+  slideLabel: (visible: boolean): CSSProperties => ({
+    position: "absolute",
+    bottom: "2.2rem",
+    left: "50%",
+    transform: "translateX(-50%)",
+    zIndex: 3,
+    background: "rgba(7,28,66,0.52)",
+    backdropFilter: "blur(12px)",
+    border: "1px solid rgba(255,255,255,0.18)",
+    borderRadius: 12,
+    padding: "10px 22px",
+    color: "rgba(255,255,255,0.9)",
+    fontSize: "0.85rem",
+    fontWeight: 500,
+    letterSpacing: "0.05em",
+    opacity: visible ? 1 : 0,
+    transition: "opacity 0.5s",
+    pointerEvents: "none",
+    whiteSpace: "nowrap",
+  }),
+
+  featuresSection: {
+    padding: "90px 5vw",
+    backgroundColor: PAGE_BG,
+  } as CSSProperties,
+
+  featuresHeader: {
+    textAlign: "center",
+    marginBottom: "3.5rem",
+  } as CSSProperties,
+
+  featuresGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+    gap: "1.5rem",
+  } as CSSProperties,
+
+  featureCard: {
+    background: CARD_BG,
+    border: `1px solid ${BORDER}`,
+    borderRadius: 24,
+    padding: "2.2rem",
+    transition: "transform 0.25s, box-shadow 0.25s",
+    cursor: "default",
+  } as CSSProperties,
+
+  featureIcon: {
+    width: 58,
+    height: 58,
+    borderRadius: 16,
+    background: `linear-gradient(135deg, ${ORANGE} 0%, #eb8500 100%)`,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: "1.4rem",
+    fontSize: "1.5rem",
+  } as CSSProperties,
+
+  featureTitle: {
+    fontFamily: "'Playfair Display', serif",
+    fontSize: "1.4rem",
+    fontWeight: 700,
+    color: TEXT,
+    marginBottom: "0.7rem",
+  } as CSSProperties,
+
+  featureDesc: {
+    fontSize: "0.97rem",
+    color: SUBTEXT,
+    lineHeight: 1.75,
+  } as CSSProperties,
+
+  statsSection: {
+    padding: "90px 5vw",
+    background: "linear-gradient(110deg, #071c42 0%, #0e2d5e 60%, #1a3a6e 100%)",
+    position: "relative",
+    overflow: "hidden",
+  } as CSSProperties,
+
+  statsGrid: {
+    position: "relative",
+    zIndex: 1,
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+    gap: "2rem",
+    textAlign: "center",
+  } as CSSProperties,
+
+  statNum: {
+    fontFamily: "'Playfair Display', serif",
+    fontSize: "clamp(2.4rem, 5vw, 4rem)",
+    fontWeight: 900,
+    color: ORANGE,
+    lineHeight: 1,
+    marginBottom: "0.5rem",
+  } as CSSProperties,
+
+  statLabel: {
+    fontSize: "1rem",
+    color: "rgba(255,255,255,0.72)",
+    fontWeight: 300,
+  } as CSSProperties,
+
+  howSection: {
+    padding: "90px 5vw",
+    backgroundColor: PAGE_BG,
+  } as CSSProperties,
+
+  howHeader: {
+    textAlign: "center",
+    marginBottom: "3.5rem",
+  } as CSSProperties,
+
+  stepsGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+    gap: "2rem",
+    position: "relative",
+  } as CSSProperties,
+
+  stepCircle: {
+    width: 88,
+    height: 88,
+    borderRadius: "50%",
+    background: `linear-gradient(135deg, ${ORANGE} 0%, #eb8500 100%)`,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    margin: "0 auto 1.4rem",
+    boxShadow: "0 16px 36px rgba(247,174,26,0.28)",
+  } as CSSProperties,
+
+  stepNum: {
+    fontFamily: "'Playfair Display', serif",
+    fontSize: "2.2rem",
+    fontWeight: 900,
+    color: "#fff",
+  } as CSSProperties,
+
+  stepTitle: {
+    fontFamily: "'Playfair Display', serif",
+    fontSize: "1.35rem",
+    fontWeight: 700,
+    color: TEXT,
+    marginBottom: "0.6rem",
+  } as CSSProperties,
+
+  stepDesc: {
+    fontSize: "0.95rem",
+    color: SUBTEXT,
+    lineHeight: 1.75,
+    maxWidth: 280,
+    margin: "0 auto",
+  } as CSSProperties,
+
+  ctaSection: {
+    padding: "90px 5vw",
+    background: `linear-gradient(135deg, ${ORANGE} 0%, #eb8500 100%)`,
+    textAlign: "center",
+    position: "relative",
+    overflow: "hidden",
+  } as CSSProperties,
+
+  ctaTitle: {
+    fontFamily: "'Playfair Display', serif",
+    fontSize: "clamp(2.2rem, 5vw, 3.8rem)",
+    fontWeight: 900,
+    color: "#fff",
+    marginBottom: "1rem",
+    lineHeight: 1.1,
+  } as CSSProperties,
+
+  ctaSub: {
+    fontSize: "1.1rem",
+    color: "rgba(255,255,255,0.9)",
+    maxWidth: 560,
+    margin: "0 auto 2.4rem",
+    lineHeight: 1.75,
+  } as CSSProperties,
+
+  btnCta: {
+    display: "inline-block",
+    padding: "16px 48px",
+    borderRadius: 16,
+    background: "#fff",
+    color: TEXT,
+    fontFamily: "'DM Sans', sans-serif",
+    fontSize: "1.08rem",
+    fontWeight: 700,
+    border: "none",
+    cursor: "pointer",
+    boxShadow: "0 12px 36px rgba(7,28,66,0.18)",
+    transition: "all 0.2s",
+    textDecoration: "none",
+  } as CSSProperties,
+
+  eyebrow: {
+    fontSize: "0.75rem",
+    fontWeight: 700,
+    letterSpacing: "0.18em",
+    textTransform: "uppercase",
+    color: ORANGE_DARK,
+    marginBottom: "1rem",
+  } as CSSProperties,
+
+  sectionTitle: {
+    fontFamily: "'Playfair Display', serif",
+    fontSize: "clamp(2rem, 4.5vw, 3.5rem)",
+    fontWeight: 900,
+    color: TEXT,
+    lineHeight: 1.1,
+    marginBottom: "1rem",
+  } as CSSProperties,
+
+  sectionSub: {
+    fontSize: "1.05rem",
+    color: SUBTEXT,
+    lineHeight: 1.8,
+    maxWidth: 620,
+    fontWeight: 300,
+    margin: "0 auto",
+  } as CSSProperties,
+};
+
+export const PublicHome = () => {
+  const [activeIndex, setActiveIndex] = useState<number>(0);
+  const [showLabel, setShowLabel] = useState<boolean>(false);
+  const [paused, setPaused] = useState<boolean>(false);
 
   useEffect(() => {
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href =
+      "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap";
+    document.head.appendChild(link);
+
+    return () => {
+      document.head.removeChild(link);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (paused) return;
+
     const interval = window.setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % slides.length);
-    }, 5000);
+      setActiveIndex((prev) => (prev + 1) % heroSlides.length);
+      setShowLabel(true);
+
+      window.setTimeout(() => {
+        setShowLabel(false);
+      }, 2000);
+    }, 2000);
 
     return () => window.clearInterval(interval);
-  }, [slides.length]);
+  }, [paused]);
 
-  const goPrev = () => {
-    setActiveIndex((prev) => (prev - 1 + slides.length) % slides.length);
-  };
+  const goTo = (index: number) => {
+    setActiveIndex(index);
+    setShowLabel(true);
 
-  const goNext = () => {
-    setActiveIndex((prev) => (prev + 1) % slides.length);
+    window.setTimeout(() => {
+      setShowLabel(false);
+    }, 1900);
   };
 
   return (
-    <Box sx={{ minHeight: "100vh", backgroundColor: PAGE_BG }}>
-      <Container maxWidth="xl" sx={{ py: { xs: 2, md: 3 } }}>
-        <Stack spacing={{ xs: 8, md: 12 }}>
-          <Box
-            sx={{
-              position: "relative",
-              minHeight: { xs: 620, sm: 700, md: 760 },
-              borderRadius: { xs: "24px", md: "34px" },
-              overflow: "hidden",
-              boxShadow: "0 24px 60px rgba(7, 28, 66, 0.10)",
+    <div style={styles.page}>
+      <div
+        style={styles.hero}
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+      >
+        {heroSlides.map((slide, i) => (
+          <div
+            key={i}
+            style={{
+              ...styles.slide(activeIndex === i),
+              backgroundImage: `url(${slide.url})`,
             }}
-          >
-            {slides.map((image, index) => (
-              <Box
-                key={image}
-                sx={{
-                  position: "absolute",
-                  inset: 0,
-                  opacity: activeIndex === index ? 1 : 0,
-                  transition: "opacity 0.9s ease",
-                  backgroundImage: `url(${image})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  transform: activeIndex === index ? "scale(1)" : "scale(1.03)",
-                }}
-              />
-            ))}
+          />
+        ))}
 
-            <Box
-              sx={{
-                position: "absolute",
-                inset: 0,
-                background:
-                  "linear-gradient(180deg, rgba(7,28,66,0.26) 0%, rgba(7,28,66,0.42) 100%)",
+        <div style={styles.heroOverlay} />
+
+        <div style={styles.heroContent}>
+          <div style={styles.heroBadge}>
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                background: ORANGE,
+                display: "inline-block",
               }}
             />
+            The #1 platform for pet health
+          </div>
 
-            <IconButton
-              onClick={goPrev}
-              sx={{
-                position: "absolute",
-                left: { xs: 10, md: 18 },
-                top: "50%",
-                transform: "translateY(-50%)",
-                width: 48,
-                height: 48,
-                color: "#fff",
-                backgroundColor: "rgba(255,255,255,0.16)",
-                backdropFilter: "blur(10px)",
-                "&:hover": {
-                  backgroundColor: "rgba(255,255,255,0.26)",
-                },
-              }}
+          <h1 style={styles.heroTitle}>
+            Your pet’s health,
+            <span style={styles.heroTitleSpan}>All in one place</span>
+          </h1>
+
+          <p style={styles.heroDesc}>
+            PawPoint is the complete pet management platform — track medical
+            records, schedule vet appointments, and never miss an important date.
+          </p>
+
+          <div style={styles.heroBtns}>
+            <RouterLink to="/register" style={styles.btnPrimary}>
+              Create free account →
+            </RouterLink>
+
+            <RouterLink to="/login" style={styles.btnOutline}>
+              Sign in
+            </RouterLink>
+          </div>
+
+          <div style={styles.dots}>
+            {heroSlides.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                style={styles.dot(activeIndex === i)}
+                onClick={() => goTo(i)}
+              />
+            ))}
+          </div>
+        </div>
+
+        <div style={styles.slideLabel(showLabel)}>
+          {heroSlides[activeIndex].label}
+        </div>
+      </div>
+
+      <section style={styles.featuresSection}>
+        <div style={styles.featuresHeader}>
+          <div style={styles.eyebrow}>Features</div>
+          <div style={styles.sectionTitle}>
+            Everything you need for pet care
+          </div>
+          <p style={styles.sectionSub}>
+            Complete tools to manage your pet’s health and well-being
+          </p>
+        </div>
+
+        <div style={styles.featuresGrid}>
+          {features.map((feature) => (
+            <div key={feature.title} style={styles.featureCard}>
+              <div style={styles.featureIcon}>{feature.icon}</div>
+              <div style={styles.featureTitle}>{feature.title}</div>
+              <p style={styles.featureDesc}>{feature.description}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section style={styles.statsSection}>
+        <div style={styles.statsGrid}>
+          <div>
+            <div style={styles.statNum}>10,000+</div>
+            <div style={styles.statLabel}>Happy pet owners</div>
+          </div>
+          <div>
+            <div style={styles.statNum}>25,000+</div>
+            <div style={styles.statLabel}>Pets managed</div>
+          </div>
+          <div>
+            <div style={styles.statNum}>50,000+</div>
+            <div style={styles.statLabel}>Appointments scheduled</div>
+          </div>
+        </div>
+      </section>
+
+      <section style={styles.howSection}>
+        <div style={styles.howHeader}>
+          <div style={styles.eyebrow}>How it works</div>
+          <div style={{ ...styles.sectionTitle, textAlign: "center" }}>
+            Three simple steps to get started
+          </div>
+        </div>
+
+        <div style={styles.stepsGrid}>
+          {steps.map((step) => (
+            <div
+              key={step.number}
+              style={{ textAlign: "center", position: "relative", zIndex: 1 }}
             >
-              <ChevronLeftRoundedIcon />
-            </IconButton>
+              <div style={styles.stepCircle}>
+                <span style={styles.stepNum}>{step.number}</span>
+              </div>
+              <div style={styles.stepTitle}>{step.title}</div>
+              <p style={styles.stepDesc}>{step.description}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
-            <IconButton
-              onClick={goNext}
-              sx={{
-                position: "absolute",
-                right: { xs: 10, md: 18 },
-                top: "50%",
-                transform: "translateY(-50%)",
-                width: 48,
-                height: 48,
-                color: "#fff",
-                backgroundColor: "rgba(255,255,255,0.16)",
-                backdropFilter: "blur(10px)",
-                "&:hover": {
-                  backgroundColor: "rgba(255,255,255,0.26)",
-                },
-              }}
-            >
-              <ChevronRightRoundedIcon />
-            </IconButton>
+      <section style={styles.ctaSection}>
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <div style={{ ...styles.eyebrow, color: "rgba(255,255,255,0.7)" }}>
+            Ready to get started?
+          </div>
 
-            <Box
-              sx={{
-                position: "relative",
-                zIndex: 2,
-                minHeight: { xs: 620, sm: 700, md: 760 },
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                px: { xs: 2, sm: 4, md: 6 },
-                py: { xs: 6, md: 8 },
-              }}
-            >
-              <Box
-                sx={{
-                  width: "100%",
-                  maxWidth: 980,
-                  borderRadius: { xs: "22px", md: "28px" },
-                  px: { xs: 2.5, sm: 4, md: 6 },
-                  py: { xs: 3.5, sm: 4.5, md: 5.5 },
-                  textAlign: "center",
-                  background: "rgba(255,255,255,0.16)",
-                  border: "1px solid rgba(255,255,255,0.28)",
-                  backdropFilter: "blur(14px)",
-                  boxShadow: "0 20px 45px rgba(0,0,0,0.14)",
-                }}
-              >
-                <Typography
-                  sx={{
-                    fontSize: { xs: "2.7rem", sm: "4rem", md: "5.2rem" },
-                    lineHeight: 1.02,
-                    fontWeight: 900,
-                    color: "#fff",
-                    letterSpacing: "-0.03em",
-                  }}
-                >
-                  Your Pet&apos;s Health,
-                  <br />
-                  <Box component="span" sx={{ color: ORANGE }}>
-                    All in One Place
-                  </Box>
-                </Typography>
+          <div style={styles.ctaTitle}>
+            Join thousands of owners
+            <br />
+            who chose PawPoint
+          </div>
 
-                <Typography
-                  sx={{
-                    mt: 3,
-                    mx: "auto",
-                    maxWidth: 900,
-                    fontSize: { xs: "1.05rem", sm: "1.2rem", md: "1.55rem" },
-                    lineHeight: 1.8,
-                    color: "rgba(255,255,255,0.92)",
-                  }}
-                >
-                  PawPoint is the complete pet management platform that helps you
-                  track health records, schedule appointments, and never miss
-                  important care dates.
-                </Typography>
+          <p style={styles.ctaSub}>
+            The complete platform for managing your pet’s health — free forever.
+          </p>
 
-                <Stack
-                  direction={{ xs: "column", sm: "row" }}
-                  spacing={2}
-                  justifyContent="center"
-                  sx={{ mt: 4 }}
-                >
-                  <Button
-                    component={RouterLink}
-                    to="/register"
-                    variant="contained"
-                    endIcon={<ArrowForwardRoundedIcon />}
-                    sx={{
-                      px: 4.5,
-                      py: 1.7,
-                      borderRadius: "16px",
-                      fontSize: "1.08rem",
-                      fontWeight: 800,
-                      textTransform: "none",
-                      color: TEXT,
-                      backgroundColor: ORANGE,
-                      boxShadow: "0 12px 30px rgba(247, 174, 26, 0.35)",
-                      "&:hover": {
-                        backgroundColor: ORANGE_DARK,
-                      },
-                    }}
-                  >
-                    Create Free Account
-                  </Button>
-
-                  <Button
-                    component={RouterLink}
-                    to="/login"
-                    variant="outlined"
-                    sx={{
-                      px: 4.5,
-                      py: 1.7,
-                      borderRadius: "16px",
-                      fontSize: "1.08rem",
-                      fontWeight: 800,
-                      textTransform: "none",
-                      color: "#fff",
-                      borderColor: "rgba(255,255,255,0.55)",
-                      backgroundColor: "rgba(255,255,255,0.08)",
-                      "&:hover": {
-                        borderColor: "#fff",
-                        backgroundColor: "rgba(255,255,255,0.14)",
-                      },
-                    }}
-                  >
-                    Sign In
-                  </Button>
-                </Stack>
-
-                <Stack
-                  direction="row"
-                  spacing={1}
-                  justifyContent="center"
-                  sx={{ mt: 3.5 }}
-                >
-                  {slides.map((_, index) => (
-                    <Box
-                      key={index}
-                      onClick={() => setActiveIndex(index)}
-                      sx={{
-                        width: activeIndex === index ? 26 : 10,
-                        height: 10,
-                        borderRadius: "999px",
-                        cursor: "pointer",
-                        transition: "all 0.25s ease",
-                        backgroundColor:
-                          activeIndex === index
-                            ? ORANGE
-                            : "rgba(255,255,255,0.55)",
-                      }}
-                    />
-                  ))}
-                </Stack>
-              </Box>
-            </Box>
-          </Box>
-
-          <Stack spacing={2} alignItems="center" textAlign="center">
-            <Typography
-              sx={{
-                fontSize: { xs: "2.2rem", md: "4rem" },
-                fontWeight: 900,
-                color: TEXT,
-                lineHeight: 1.08,
-              }}
-            >
-              Everything You Need for Pet Care
-            </Typography>
-
-            <Typography
-              sx={{
-                fontSize: { xs: "1rem", md: "1.25rem" },
-                color: SUBTEXT,
-                maxWidth: 900,
-                lineHeight: 1.8,
-              }}
-            >
-              Comprehensive tools to manage your pet&apos;s health and wellness
-              journey
-            </Typography>
-
-            <Box
-              sx={{
-                mt: 2,
-                width: "100%",
-                display: "grid",
-                gridTemplateColumns: {
-                  xs: "1fr",
-                  sm: "repeat(2, 1fr)",
-                  xl: "repeat(4, 1fr)",
-                },
-                gap: 3,
-              }}
-            >
-              {features.map((feature) => (
-                <Card
-                  key={feature.title}
-                  elevation={0}
-                  sx={{
-                    minHeight: 290,
-                    borderRadius: "24px",
-                    backgroundColor: CARD_BG,
-                    border: `1px solid ${BORDER}`,
-                    boxShadow: "0 10px 24px rgba(7,28,66,0.04)",
-                  }}
-                >
-                  <CardContent sx={{ p: 4 }}>
-                    <Box
-                      sx={{
-                        width: 64,
-                        height: 64,
-                        borderRadius: "18px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        mb: 3,
-                        color: "#fff",
-                        background:
-                          "linear-gradient(135deg, #f7ae1a 0%, #f39a0a 100%)",
-                      }}
-                    >
-                      {feature.icon}
-                    </Box>
-
-                    <Typography
-                      sx={{
-                        fontSize: "1.9rem",
-                        fontWeight: 800,
-                        color: TEXT,
-                        lineHeight: 1.2,
-                        mb: 2,
-                      }}
-                    >
-                      {feature.title}
-                    </Typography>
-
-                    <Typography
-                      sx={{
-                        fontSize: "1.08rem",
-                        lineHeight: 1.8,
-                        color: SUBTEXT,
-                      }}
-                    >
-                      {feature.description}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              ))}
-            </Box>
-          </Stack>
-
-          <Box
-            sx={{
-              borderRadius: "28px",
-              px: { xs: 3, md: 6 },
-              py: { xs: 5, md: 7 },
-              background:
-                "linear-gradient(90deg, #f7ae1a 0%, #f39a0a 50%, #eb8500 100%)",
-              boxShadow: "0 20px 40px rgba(247, 174, 26, 0.18)",
-            }}
-          >
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" },
-                gap: 4,
-                textAlign: "center",
-              }}
-            >
-              <Box>
-                <Typography
-                  sx={{
-                    fontSize: { xs: "2.6rem", md: "3.6rem" },
-                    fontWeight: 900,
-                    color: "#fff",
-                  }}
-                >
-                  10,000+
-                </Typography>
-                <Typography sx={{ fontSize: "1.2rem", color: "#fffaf0" }}>
-                  Happy Pet Owners
-                </Typography>
-              </Box>
-
-              <Box>
-                <Typography
-                  sx={{
-                    fontSize: { xs: "2.6rem", md: "3.6rem" },
-                    fontWeight: 900,
-                    color: "#fff",
-                  }}
-                >
-                  25,000+
-                </Typography>
-                <Typography sx={{ fontSize: "1.2rem", color: "#fffaf0" }}>
-                  Pets Managed
-                </Typography>
-              </Box>
-
-              <Box>
-                <Typography
-                  sx={{
-                    fontSize: { xs: "2.6rem", md: "3.6rem" },
-                    fontWeight: 900,
-                    color: "#fff",
-                  }}
-                >
-                  50,000+
-                </Typography>
-                <Typography sx={{ fontSize: "1.2rem", color: "#fffaf0" }}>
-                  Appointments Scheduled
-                </Typography>
-              </Box>
-            </Box>
-          </Box>
-
-          <Stack spacing={2} alignItems="center" textAlign="center">
-            <Typography
-              sx={{
-                fontSize: { xs: "2.2rem", md: "4rem" },
-                fontWeight: 900,
-                color: TEXT,
-              }}
-            >
-              How It Works
-            </Typography>
-
-            <Typography
-              sx={{
-                fontSize: { xs: "1rem", md: "1.2rem" },
-                color: SUBTEXT,
-                lineHeight: 1.7,
-              }}
-            >
-              Get started with PawPoint in three simple steps
-            </Typography>
-
-            <Box
-              sx={{
-                mt: 2,
-                width: "100%",
-                display: "grid",
-                gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" },
-                gap: 5,
-              }}
-            >
-              {steps.map((step) => (
-                <Stack key={step.number} spacing={2} alignItems="center">
-                  <Box
-                    sx={{
-                      width: 84,
-                      height: 84,
-                      borderRadius: "50%",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      background:
-                        "linear-gradient(135deg, #f7ae1a 0%, #eb8500 100%)",
-                      color: "#fff",
-                      fontSize: "2rem",
-                      fontWeight: 900,
-                      boxShadow: "0 14px 28px rgba(247, 174, 26, 0.22)",
-                    }}
-                  >
-                    {step.number}
-                  </Box>
-
-                  <Typography
-                    sx={{
-                      fontSize: "2rem",
-                      fontWeight: 800,
-                      color: TEXT,
-                    }}
-                  >
-                    {step.title}
-                  </Typography>
-
-                  <Typography
-                    sx={{
-                      maxWidth: 360,
-                      fontSize: "1.08rem",
-                      lineHeight: 1.8,
-                      color: SUBTEXT,
-                    }}
-                  >
-                    {step.description}
-                  </Typography>
-                </Stack>
-              ))}
-            </Box>
-          </Stack>
-
-          <Stack spacing={2.5} alignItems="center" textAlign="center" sx={{ pb: 4 }}>
-            <Typography
-              sx={{
-                fontSize: { xs: "2.4rem", md: "4rem" },
-                fontWeight: 900,
-                color: TEXT,
-              }}
-            >
-              Ready to Get Started?
-            </Typography>
-
-            <Typography
-              sx={{
-                fontSize: { xs: "1rem", md: "1.2rem" },
-                color: SUBTEXT,
-                maxWidth: 900,
-                lineHeight: 1.8,
-              }}
-            >
-              Join thousands of pet owners who trust PawPoint for their pet care
-              management
-            </Typography>
-
-            <Button
-              component={RouterLink}
-              to="/register"
-              variant="contained"
-              endIcon={<ArrowForwardRoundedIcon />}
-              sx={{
-                px: 5,
-                py: 1.7,
-                borderRadius: "16px",
-                fontSize: "1.08rem",
-                fontWeight: 800,
-                textTransform: "none",
-                color: TEXT,
-                backgroundColor: ORANGE,
-                boxShadow: "0 12px 30px rgba(247, 174, 26, 0.32)",
-                "&:hover": {
-                  backgroundColor: ORANGE_DARK,
-                },
-              }}
-            >
-              Create Free Account
-            </Button>
-          </Stack>
-        </Stack>
-      </Container>
-    </Box>
+          <RouterLink to="/register" style={styles.btnCta}>
+            Create free account →
+          </RouterLink>
+        </div>
+      </section>
+    </div>
   );
 };

@@ -33,7 +33,7 @@ const formatDate = (value: string) => {
 
 export const Notifications = () => {
   const token = getAccessToken();
-  const { t } = useTranslation(["notifications"]);
+  const { t } = useTranslation("notifications");
   const { data: settings } = useSettings();
 
   if (token) {
@@ -70,7 +70,7 @@ export const Notifications = () => {
             color: theme.palette.text.primary,
           })}
         >
-          {t("notifications:title")}
+          {t("title")}
         </Typography>
 
         {isLoading ? (
@@ -78,7 +78,7 @@ export const Notifications = () => {
             <CircularProgress />
           </Box>
         ) : isError ? (
-          <Typography color="error">{t("notifications:loadError")}</Typography>
+          <Typography color="error">{t("loadError")}</Typography>
         ) : notifications.length === 0 ? (
           <Typography
             sx={(theme) => ({
@@ -86,7 +86,7 @@ export const Notifications = () => {
               fontSize: scaleFont(16, settings?.textSize),
             })}
           >
-            {t("notifications:empty")}
+            {t("empty")}
           </Typography>
         ) : (
           <Stack spacing={2.2}>
@@ -188,7 +188,7 @@ export const Notifications = () => {
                           },
                         })}
                       >
-                        {t("notifications:markAsRead")}
+                        {t("markAsRead")}
                       </Button>
                     )}
 
@@ -213,7 +213,7 @@ export const Notifications = () => {
                         },
                       })}
                     >
-                      {t("notifications:delete")}
+                      {t("delete")}
                     </Button>
                   </Stack>
                 </Stack>

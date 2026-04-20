@@ -27,8 +27,24 @@ type Props = {
   isLoading?: boolean;
 };
 
-const formatDewormingType = (value: number) => {
-  return DewormingTypeLabels[value] ?? "Unknown";
+const formatDewormingType = (
+  value: number,
+  t: (key: string) => string
+) => {
+  const label = DewormingTypeLabels[value];
+
+  switch (label) {
+    case "Internal":
+      return t("deworming:typeInternal");
+    case "External":
+      return t("deworming:typeExternal");
+    case "Combined":
+      return t("deworming:typeCombined");
+    case "Control":
+      return t("deworming:typeControl");
+    default:
+      return t("deworming:unknown");
+  }
 };
 
 export const DeleteDewormingDialog = ({
@@ -242,7 +258,7 @@ export const DeleteDewormingDialog = ({
                     mt: 0.2,
                   })}
                 >
-                  {formatDewormingType(item.type)}
+                  {formatDewormingType(item.type, t)}
                 </Typography>
               </Box>
             </Box>
