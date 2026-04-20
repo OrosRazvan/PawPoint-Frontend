@@ -87,13 +87,11 @@ const shouldShowNotificationInNavbar = (
     return !!settings.dewormingNotifications;
   }
 
-  // toate celelalte notificări rămân vizibile:
-  // AnimalCreated, ProfileUpdated, ContactMessageReplyReceived etc.
   return true;
 };
 
 export const NotificationsDropdown = ({ showCount = true }: Props) => {
-  const { t } = useTranslation(["notifications"]);
+  const { t } = useTranslation("notifications");
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -214,7 +212,7 @@ export const NotificationsDropdown = ({ showCount = true }: Props) => {
                 color: theme.palette.text.primary,
               })}
             >
-              {t("notifications:title")}
+              {t("title")}
             </Typography>
 
             {unreadEnabledCount > 0 && (
@@ -246,7 +244,7 @@ export const NotificationsDropdown = ({ showCount = true }: Props) => {
                   fontSize: scaleFont(15, settings?.textSize),
                 })}
               >
-                {t("notifications:loading")}
+                {t("loading")}
               </Typography>
             </Box>
           ) : notifications.length === 0 ? (
@@ -257,7 +255,7 @@ export const NotificationsDropdown = ({ showCount = true }: Props) => {
                   fontSize: scaleFont(15, settings?.textSize),
                 })}
               >
-                {t("notifications:empty")}
+                {t("empty")}
               </Typography>
             </Box>
           ) : (
@@ -342,7 +340,7 @@ export const NotificationsDropdown = ({ showCount = true }: Props) => {
                             borderRadius: 2,
                           }}
                         >
-                          {t("notifications:markAsRead")}
+                          {t("markAsRead")}
                         </Button>
                       )}
                     </Stack>
@@ -370,7 +368,7 @@ export const NotificationsDropdown = ({ showCount = true }: Props) => {
               py: 1.3,
             }}
           >
-            {t("notifications:seeAll")}
+            {t("seeAll")}
           </Button>
         </Box>
       </Menu>

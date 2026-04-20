@@ -5,7 +5,8 @@
     "password": "Password",
     "loginSubtitle": "Enter your credentials to access your account",
     "noAccount": "Don't have an account?",
-    "register": "Register"
+    "register": "Register",
+    "forgotPasswordLink": "Forgot password?"
   },
   "hero": {
     "welcome": "Welcome to PawPoint!",
@@ -25,7 +26,7 @@
     "loginFailed": "Login failed."
   },
   "errors": {
-    "emailInvalid": "Enter a valid email address.",
-    "passwordMin8": "Enter a password with at least 8 characters."
+    "emailInvalid": "Enter a valid email address",
+    "passwordRequired": "Password is incorrect"
   }
 }

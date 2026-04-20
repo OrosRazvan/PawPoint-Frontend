@@ -1,5 +1,4 @@
 import { Box, CircularProgress, Grid, Stack, Typography, Button } from "@mui/material";
-// import { alpha } from "@mui/material/styles";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -48,7 +47,10 @@ const resolveStatus = (item: VaccinationDto): "completed" | "upcoming" => {
   return slotDate <= Date.now() ? "completed" : "upcoming";
 };
 
-const mapVaccinations = (items: VaccinationDto[]): VaccinationCardItem[] => {
+const mapVaccinations = (
+  items: VaccinationDto[],
+  t: (key: string) => string
+): VaccinationCardItem[] => {
   return items.map((item) => {
     const raw = item as Record<string, unknown>;
 
@@ -58,7 +60,7 @@ const mapVaccinations = (items: VaccinationDto[]): VaccinationCardItem[] => {
         raw.AnimalName as string | undefined,
         raw.petName as string | undefined,
         raw.PetName as string | undefined
-      ) ?? "Pet";
+      ) ?? t("vaccination:petFallback");
 
     const vaccineName =
       pickFirst(
@@ -66,7 +68,7 @@ const mapVaccinations = (items: VaccinationDto[]): VaccinationCardItem[] => {
         raw.VaccineName as string | undefined,
         raw.name as string | undefined,
         raw.Name as string | undefined
-      ) ?? "Vaccination";
+      ) ?? t("vaccination:vaccinationFallback");
 
     const lastDate = pickFirst(
       item.lastDate,
@@ -84,40 +86,37 @@ const mapVaccinations = (items: VaccinationDto[]): VaccinationCardItem[] => {
       raw.StartTimeUtc as string | undefined
     );
 
-   const slotStartTimeUtc =
-    pickFirst(
-      item.slotStartTimeUtc,
-      raw.SlotStartTimeUtc as string | undefined,
-      item.startTimeUtc,
-      raw.StartTimeUtc as string | undefined,
-      item.nextDate,
-      raw.NextDate as string | undefined,
-      item.lastDate,
-      raw.LastDate as string | undefined
-    ) ?? "";
+    const slotStartTimeUtc =
+      pickFirst(
+        item.slotStartTimeUtc,
+        raw.SlotStartTimeUtc as string | undefined,
+        item.startTimeUtc,
+        raw.StartTimeUtc as string | undefined,
+        item.nextDate,
+        raw.NextDate as string | undefined,
+        item.lastDate,
+        raw.LastDate as string | undefined
+      ) ?? "";
 
-  const slotEndTimeUtc =
-    pickFirst(
-      item.slotEndTimeUtc,
-      raw.SlotEndTimeUtc as string | undefined,
-      item.endTimeUtc,
-      raw.EndTimeUtc as string | undefined
-    ) ?? "";
+    const slotEndTimeUtc =
+      pickFirst(
+        item.slotEndTimeUtc,
+        raw.SlotEndTimeUtc as string | undefined,
+        item.endTimeUtc,
+        raw.EndTimeUtc as string | undefined
+      ) ?? "";
 
-   const vetCabinetName =
-    pickFirst(
-      item.vetCabinetName,
-      raw.VetCabinetName as string | undefined,
-      raw.veterinarianName as string | undefined,
-      raw.VeterinarianName as string | undefined,
-      raw.clinicName as string | undefined,
-      raw.ClinicName as string | undefined
-    ) ?? "";
+    const vetCabinetName =
+      pickFirst(
+        item.vetCabinetName,
+        raw.VetCabinetName as string | undefined,
+        raw.veterinarianName as string | undefined,
+        raw.VeterinarianName as string | undefined,
+        raw.clinicName as string | undefined,
+        raw.ClinicName as string | undefined
+      ) ?? "";
 
-    const notes = pickFirst(
-      item.notes,
-      raw.Notes as string | undefined
-    );
+    const notes = pickFirst(item.notes, raw.Notes as string | undefined);
 
     return {
       id: item.id,
@@ -153,7 +152,7 @@ export const Vaccinations = () => {
   const [editItem, setEditItem] = useState<VaccinationCardItem | null>(null);
   const [deleteItem, setDeleteItem] = useState<VaccinationCardItem | null>(null);
 
-  const items = useMemo(() => mapVaccinations(data), [data]);
+  const items = useMemo(() => mapVaccinations(data, t), [data, t]);
 
   const completedItems = items.filter((item) => item.status === "completed");
   const upcomingItems = items.filter((item) => item.status === "upcoming");
@@ -235,11 +234,11 @@ export const Vaccinations = () => {
               letterSpacing: "-0.1px",
               background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
               boxShadow:
-              theme.palette.mode === "dark"
-                ? `0 6px 18px ${alpha(theme.palette.primary.main, 0.28)}`
-                : `0 4px 12px ${alpha(theme.palette.primary.main, 0.35)}`,
-                "&:hover": {
-              background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.main} 100%)`,
+                theme.palette.mode === "dark"
+                  ? `0 6px 18px ${alpha(theme.palette.primary.main, 0.28)}`
+                  : `0 4px 12px ${alpha(theme.palette.primary.main, 0.35)}`,
+              "&:hover": {
+                background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.main} 100%)`,
               },
             })}
           >
@@ -259,18 +258,18 @@ export const Vaccinations = () => {
               <Box>
                 <Typography
                   sx={(theme) => ({
-                    fontSize: scaleFont(24, settings?.textSize),
-                    fontWeight: 700,
+                    mb: 2,
+                    fontSize: scaleFont(22, settings?.textSize),
+                    fontWeight: 800,
                     color: theme.palette.text.primary,
-                    mb: 3,
                   })}
                 >
                   {t("vaccination:completed")}
                 </Typography>
 
-                <Grid container spacing={3}>
+                <Grid container spacing={2.5}>
                   {completedItems.map((item) => (
-                    <Grid key={item.id} size={{ xs: 12, md: 4 }}>
+                    <Grid key={item.id} size={{ xs: 12, md: 6, xl: 4 }}>
                       <VaccinationCard item={item} />
                     </Grid>
                   ))}
@@ -282,18 +281,18 @@ export const Vaccinations = () => {
               <Box>
                 <Typography
                   sx={(theme) => ({
-                    fontSize: scaleFont(24, settings?.textSize),
-                    fontWeight: 700,
+                    mb: 2,
+                    fontSize: scaleFont(22, settings?.textSize),
+                    fontWeight: 800,
                     color: theme.palette.text.primary,
-                    mb: 3,
                   })}
                 >
                   {t("vaccination:upcoming")}
                 </Typography>
 
-                <Grid container spacing={3}>
+                <Grid container spacing={2.5}>
                   {upcomingItems.map((item) => (
-                    <Grid key={item.id} size={{ xs: 12, md: 4 }}>
+                    <Grid key={item.id} size={{ xs: 12, md: 6, xl: 4 }}>
                       <VaccinationCard
                         item={item}
                         onEdit={() => setEditItem(item)}
@@ -305,38 +304,33 @@ export const Vaccinations = () => {
               </Box>
             )}
 
-            {completedItems.length === 0 && upcomingItems.length === 0 && (
-              <Typography
-                sx={(theme) => ({
-                  color: theme.palette.text.secondary,
-                  fontSize: scaleFont(16, settings?.textSize),
-                })}
-              >
+            {items.length === 0 && (
+              <Typography color="text.secondary">
                 {t("vaccination:empty")}
               </Typography>
             )}
           </Stack>
         )}
-
-        <AddVaccinationDialog
-          open={isAddOpen}
-          onClose={() => setIsAddOpen(false)}
-        />
-
-        <EditVaccinationDialog
-          open={!!editItem}
-          item={editItem}
-          onClose={() => setEditItem(null)}
-        />
-
-        <DeleteVaccinationDialog
-          open={!!deleteItem}
-          item={deleteItem}
-          onClose={() => setDeleteItem(null)}
-          onConfirm={handleDeleteConfirm}
-          isLoading={deleteVaccinationMutation.isPending}
-        />
       </Stack>
+
+      <AddVaccinationDialog
+        open={isAddOpen}
+        onClose={() => setIsAddOpen(false)}
+      />
+
+      <EditVaccinationDialog
+        open={!!editItem}
+        item={editItem}
+        onClose={() => setEditItem(null)}
+      />
+
+      <DeleteVaccinationDialog
+        open={!!deleteItem}
+        item={deleteItem}
+        onClose={() => setDeleteItem(null)}
+        onConfirm={handleDeleteConfirm}
+        isLoading={deleteVaccinationMutation.isPending}
+      />
     </Box>
   );
 };

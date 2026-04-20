@@ -22,7 +22,7 @@ export const PasswordField = () => {
           type="password"
           autoComplete="current-password"
           error={!!errors.password}
-          helperText={errors.password?.message}
+          helperText={errors.password?.message ? t(`errors.${errors.password.message}`) : ""}
         />
       )}
     />

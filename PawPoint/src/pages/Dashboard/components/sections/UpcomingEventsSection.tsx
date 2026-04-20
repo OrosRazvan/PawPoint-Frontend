@@ -37,27 +37,31 @@ type Props = {
   events: RawUpcomingEvent[];
 };
 
-const formatDate = (value?: string) => {
-  if (!value) return "—";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "—";
-
-  return date.toLocaleDateString("ro-RO");
-};
-
-const formatTime = (value?: string) => {
-  if (!value) return "—";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "—";
-
-  return date.toLocaleTimeString("ro-RO", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-};
-
 export const UpcomingEventsSection = ({ events }: Props) => {
-  const { t } = useTranslation("dashboard");
+  const { t, i18n } = useTranslation("dashboard");
+
+  const locale = i18n.language === "ro" ? "ro-RO" : "en-GB";
+
+  const formatDate = (value?: string) => {
+    if (!value) return "—";
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "—";
+
+    return date.toLocaleDateString(locale);
+  };
+
+  const formatTime = (value?: string) => {
+    if (!value) return "—";
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "—";
+
+    return date.toLocaleTimeString(locale, {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   const normalizedEvents = useMemo(() => {
     return (events ?? [])
@@ -78,35 +82,68 @@ export const UpcomingEventsSection = ({ events }: Props) => {
 
         const parsedTime = new Date(rawDate).getTime();
 
+        const typeLabel =
+          item.typeLabel ??
+          item.title ??
+          item.eventType ??
+          item.type ??
+          t("eventFallback");
+
+        const normalizedType = typeLabel.toLowerCase();
+
+        let eventKind: "appointment" | "vaccination" | "deworming" = "deworming";
+
+        if (
+          normalizedType.includes("appointment") ||
+          normalizedType.includes("consult") ||
+          normalizedType.includes("program") ||
+          normalizedType.includes("consulta")
+        ) {
+          eventKind = "appointment";
+        } else if (
+          normalizedType.includes("vacc") ||
+          normalizedType.includes("vaccine") ||
+          normalizedType.includes("vaccin")
+        ) {
+          eventKind = "vaccination";
+        }
+
         return {
           id: String(item.id ?? index),
-          petName: item.petName ?? item.animalName ?? item.name ?? "Pet",
-          typeLabel: item.typeLabel ?? item.title ?? item.eventType ?? item.type ?? "Event",
-          statusLabel: item.statusLabel ?? item.status ?? "Upcoming",
+          petName:
+            item.petName ??
+            item.animalName ??
+            item.name ??
+            t("petFallback"),
+          typeLabel,
+          statusLabel:
+            item.statusLabel ??
+            item.status ??
+            t("upcomingStatus"),
           rawDate,
           dateLabel: item.dateLabel ?? formatDate(rawDate),
           timeLabel: item.timeLabel ?? formatTime(rawDate),
-          sortValue: Number.isNaN(parsedTime) ? Number.MAX_SAFE_INTEGER : parsedTime,
+          sortValue:
+            Number.isNaN(parsedTime) ? Number.MAX_SAFE_INTEGER : parsedTime,
+          eventKind,
         };
       })
       .filter((item) => item.sortValue !== Number.MAX_SAFE_INTEGER)
       .sort((a, b) => a.sortValue - b.sortValue)
       .slice(0, 3);
-  }, [events]);
+  }, [events, t, locale]);
 
   return (
-    <SectionCard title={t("upcomingEvents", "Upcoming Events")}>
+    <SectionCard title={t("upcomingEvents")}>
       {normalizedEvents.length > 0 ? (
         <Stack spacing={2}>
           {normalizedEvents.map((item) => {
-            const normalizedType = item.typeLabel.toLowerCase();
-
             const icon =
-              normalizedType.includes("appointment") ? (
+              item.eventKind === "appointment" ? (
                 <CalendarMonthRoundedIcon
                   sx={(theme) => ({ color: theme.palette.secondary.main })}
                 />
-              ) : normalizedType.includes("vacc") ? (
+              ) : item.eventKind === "vaccination" ? (
                 <VaccinesRoundedIcon
                   sx={(theme) => ({ color: theme.palette.info.main })}
                 />
@@ -146,9 +183,9 @@ export const UpcomingEventsSection = ({ events }: Props) => {
                         alignItems: "center",
                         justifyContent: "center",
                         backgroundColor:
-                          normalizedType.includes("appointment")
+                          item.eventKind === "appointment"
                             ? alpha(theme.palette.secondary.main, 0.16)
-                            : normalizedType.includes("vacc")
+                            : item.eventKind === "vaccination"
                             ? alpha(theme.palette.info.main, 0.14)
                             : alpha(theme.palette.success.main, 0.14),
                         flexShrink: 0,
@@ -166,7 +203,10 @@ export const UpcomingEventsSection = ({ events }: Props) => {
                           wordBreak: "break-word",
                         })}
                       >
-                        {item.typeLabel} for {item.petName}
+                        {t("eventForPet", {
+                          type: item.typeLabel,
+                          pet: item.petName,
+                        })}
                       </Typography>
 
                       <Typography
@@ -177,7 +217,9 @@ export const UpcomingEventsSection = ({ events }: Props) => {
                         })}
                       >
                         {item.dateLabel}
-                        {item.timeLabel && item.timeLabel !== "—" ? ` • ${item.timeLabel}` : ""}
+                        {item.timeLabel && item.timeLabel !== "—"
+                          ? ` • ${item.timeLabel}`
+                          : ""}
                       </Typography>
                     </Box>
                   </Stack>
@@ -206,7 +248,7 @@ export const UpcomingEventsSection = ({ events }: Props) => {
             fontSize: 15,
           })}
         >
-          {t("noUpcomingEvents", "No upcoming events.")}
+          {t("noUpcomingEvents")}
         </Typography>
       )}
     </SectionCard>

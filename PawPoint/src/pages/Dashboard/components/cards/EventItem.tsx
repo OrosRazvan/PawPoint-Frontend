@@ -5,6 +5,7 @@ import VaccinesRoundedIcon from "@mui/icons-material/VaccinesRounded";
 import BugReportRoundedIcon from "@mui/icons-material/BugReportRounded";
 import { useSettings } from "../../../../hooks/useSettings";
 import { scaleFont } from "../../../../utils/fontScale";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   petName: string;
@@ -22,6 +23,7 @@ export const EventItem = ({
   timeLabel,
 }: Props) => {
   const { data: settings } = useSettings();
+  const { t } = useTranslation("dashboard");
 
   const normalizedType = typeLabel.toLowerCase();
 
@@ -89,7 +91,7 @@ export const EventItem = ({
                 wordBreak: "break-word",
               })}
             >
-              {typeLabel} for {petName}
+              {t("eventForPet", { type: typeLabel, pet: petName })}
             </Typography>
 
             <Typography

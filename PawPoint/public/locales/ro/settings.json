@@ -22,5 +22,6 @@
   "save": "Salvează setările",
   "saving": "Se salvează...",
   "saved": "Setările au fost actualizate.",
-  "saveError": "Setările nu au putut fi actualizate."
+  "saveError": "Setările nu au putut fi actualizate.",
+  "changeLanguage": "Schimbă limba"
 }

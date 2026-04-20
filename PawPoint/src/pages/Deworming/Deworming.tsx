@@ -56,7 +56,10 @@ const resolveStatus = (item: DewormingDto): "completed" | "upcoming" => {
   return slotDate <= Date.now() ? "completed" : "upcoming";
 };
 
-const mapDewormings = (items: DewormingDto[]): DewormingCardItem[] => {
+const mapDewormings = (
+  items: DewormingDto[],
+  t: (key: string) => string
+): DewormingCardItem[] => {
   return items.map((item) => {
     const raw = item as Record<string, unknown>;
 
@@ -66,7 +69,7 @@ const mapDewormings = (items: DewormingDto[]): DewormingCardItem[] => {
         raw.AnimalName as string | undefined,
         raw.petName as string | undefined,
         raw.PetName as string | undefined
-      ) ?? "Pet";
+      ) ?? t("deworming:petFallback");
 
     const rawType = pickFirst(
       item.type,
@@ -216,7 +219,7 @@ export const Deworming = () => {
   const [editItem, setEditItem] = useState<DewormingCardItem | null>(null);
   const [deleteItem, setDeleteItem] = useState<DewormingCardItem | null>(null);
 
-  const items = useMemo(() => mapDewormings(data), [data]);
+  const items = useMemo(() => mapDewormings(data, t), [data, t]);
 
   const completedItems = items.filter((item) => item.status === "completed");
   const upcomingItems = items.filter((item) => item.status === "upcoming");

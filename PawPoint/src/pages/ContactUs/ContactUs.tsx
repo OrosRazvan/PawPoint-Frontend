@@ -118,11 +118,29 @@ const EnvelopeIllustration = ({ isDark }: { isDark: boolean }) => (
 );
 
 /* ─── sidebar info items ──────────────────────────────── */
-const InfoCard = ({ isDark }: { isDark: boolean }) => {
+const InfoCard = ({
+  isDark,
+  t,
+}: {
+  isDark: boolean;
+  t: (key: string) => string;
+}) => {
   const items = [
-    { icon: "⚡", label: "Fast response", sub: "Usually within 24 hours" },
-    { icon: "🔒", label: "Secure & private", sub: "Only admins can see this" },
-    { icon: "💬", label: "Full thread", sub: "Track replies in one place" },
+    {
+      icon: "⚡",
+      label: t("contact:info.fastResponseTitle"),
+      sub: t("contact:info.fastResponseSubtitle"),
+    },
+    {
+      icon: "🔒",
+      label: t("contact:info.securePrivateTitle"),
+      sub: t("contact:info.securePrivateSubtitle"),
+    },
+    {
+      icon: "💬",
+      label: t("contact:info.fullThreadTitle"),
+      sub: t("contact:info.fullThreadSubtitle"),
+    },
   ];
 
   return (
@@ -482,7 +500,7 @@ export const ContactUs = () => {
                       letterSpacing: "-0.1px",
                     }}
                   >
-                    New Message
+                    {t("contact:newMessage")}
                   </Typography>
                   <Typography
                     sx={{
@@ -490,7 +508,7 @@ export const ContactUs = () => {
                       color: isDark ? alpha("#fff", 0.3) : "#94a3b8",
                     }}
                   >
-                    Fill in the details below
+                    {t("contact:fillDetails")}
                   </Typography>
                 </Box>
               </Stack>
@@ -570,7 +588,7 @@ export const ContactUs = () => {
                         lineHeight: 1.4,
                       }}
                     >
-                      Usually responds within 24h
+                      {t("contact:responseTime")}
                     </Typography>
                   </Stack>
 
@@ -625,7 +643,7 @@ export const ContactUs = () => {
                             animation: `${spin} 0.7s linear infinite`,
                           }}
                         />
-                        <span>Sending…</span>
+                        <span>{t("contact:sending")}</span>
                       </Stack>
                     ) : (
                       t("contact:send")
@@ -674,9 +692,9 @@ export const ContactUs = () => {
                     mb: 2,
                   }}
                 >
-                  What to expect
+                  {t("contact:whatToExpect")}
                 </Typography>
-                <InfoCard isDark={isDark} />
+                <InfoCard isDark={isDark} t={t} />
               </CardContent>
             </Card>
           </Box>

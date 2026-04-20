@@ -1,0 +1,27 @@
+{
+  "backToDashboard": "Back to dashboard",
+  "allDetails": "All details",
+  "unknown": "Unknown",
+  "actions": {
+    "editPet": "Edit pet",
+    "deletePet": "Delete pet"
+  },
+  "labels": {
+    "weight": "Weight",
+    "born": "Born",
+    "species": "Species"
+  },
+  "details": {
+    "species": "Species",
+    "breed": "Breed",
+    "weight": "Weight",
+    "birthDate": "Birth date",
+    "sex": "Sex",
+    "microchipNumber": "Microchip number"
+  },
+  "messages": {
+    "loadError": "Failed to load pet details.",
+    "deleteSuccess": "Pet deleted successfully.",
+    "deleteError": "An error occurred while deleting the pet."
+  }
+}

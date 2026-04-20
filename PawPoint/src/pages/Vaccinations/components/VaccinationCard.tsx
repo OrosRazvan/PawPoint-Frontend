@@ -11,6 +11,7 @@ import { alpha } from "@mui/material/styles";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import { useTranslation } from "react-i18next";
 import { useSettings } from "../../../hooks/useSettings";
 import { scaleFont } from "../../../utils/fontScale";
 import type { VaccinationCardItem } from "../types/vaccination";
@@ -47,6 +48,7 @@ const formatDateBySettings = (
 };
 
 export const VaccinationCard = ({ item, onEdit, onDelete }: Props) => {
+  const { t } = useTranslation(["vaccination"]);
   const isCompleted = item.status === "completed";
   const { data: settings } = useSettings();
 
@@ -98,14 +100,13 @@ export const VaccinationCard = ({ item, onEdit, onDelete }: Props) => {
           </Box>
 
           <Chip
-            label={item.status}
+            label={t(`vaccination:status.${item.status}`)}
             size="small"
             sx={(theme) => ({
               height: 30,
               borderRadius: 999,
               fontWeight: 700,
               fontSize: scaleFont(12, settings?.textSize),
-              textTransform: "lowercase",
               backgroundColor: isCompleted
                 ? theme.palette.mode === "dark"
                   ? alpha(theme.palette.success.main, 0.18)
@@ -135,14 +136,18 @@ export const VaccinationCard = ({ item, onEdit, onDelete }: Props) => {
               })}
             >
               {isCompleted
-                ? `Given: ${formatDateBySettings(
-                    item.lastDate ?? item.slotStartTimeUtc,
-                    dateFormat
-                  )}`
-                : `Scheduled: ${formatDateBySettings(
-                    item.slotStartTimeUtc,
-                    dateFormat
-                  )}`}
+                ? t("vaccination:givenOn", {
+                    date: formatDateBySettings(
+                      item.lastDate ?? item.slotStartTimeUtc,
+                      dateFormat
+                    ),
+                  })
+                : t("vaccination:scheduledOn", {
+                    date: formatDateBySettings(
+                      item.slotStartTimeUtc,
+                      dateFormat
+                    ),
+                  })}
             </Typography>
           </Stack>
 
@@ -152,7 +157,9 @@ export const VaccinationCard = ({ item, onEdit, onDelete }: Props) => {
               color: theme.palette.text.secondary,
             })}
           >
-            Veterinarian: {item.vetCabinetName || "—"}
+            {t("vaccination:veterinarianLabel", {
+              value: item.vetCabinetName || "—",
+            })}
           </Typography>
         </Stack>
 

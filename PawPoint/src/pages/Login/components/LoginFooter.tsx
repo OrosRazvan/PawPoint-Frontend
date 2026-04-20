@@ -18,7 +18,7 @@ export const LoginFooter = () => {
       </Typography>
 
       <Typography
-        onClick={() => navigate("/")}
+        onClick={() => navigate("/register")}
         sx={{
           fontSize: 14,
           fontWeight: 700,

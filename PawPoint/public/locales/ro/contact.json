@@ -5,9 +5,39 @@
   "messageTitle": "Titlu",
   "description": "Descriere",
   "send": "Trimite mesajul",
+  "sending": "Se trimite...",
+  "responseTime": "De obicei răspundem în 24h",
+  "newMessage": "Mesaj nou",
+  "fillDetails": "Completează detaliile de mai jos",
+  "whatToExpect": "La ce să te aștepți",
   "myMessages": "Mesajele mele",
   "myMessagesSubtitle": "Vezi cererile tale și răspunsurile adminului.",
   "replies": "Răspunsuri",
   "noReplies": "Nu există încă răspunsuri.",
-  "loadFailed": "Nu am putut încărca mesajele tale."
+  "loadFailed": "Nu am putut încărca mesajele tale.",
+  "emptyTitle": "Nu există încă mesaje",
+  "emptySubtitle": "Mesajele tale de contact vor apărea aici",
+  "admin": "Admin",
+  "user": "Utilizator",
+  "repliesCount_one": "{{count}} răspuns",
+  "repliesCount_few": "{{count}} răspunsuri",
+  "repliesCount_other": "{{count}} de răspunsuri",
+  "totalCount": "{{count}} total",
+  "stats": {
+    "total": "Total",
+    "open": "Deschise"
+  },
+  "status": {
+    "open": "Deschis",
+    "closed": "Închis",
+    "pending": "În așteptare"
+  },
+  "info": {
+    "fastResponseTitle": "Răspuns rapid",
+    "fastResponseSubtitle": "De obicei în 24 de ore",
+    "securePrivateTitle": "Sigur și privat",
+    "securePrivateSubtitle": "Doar administratorii pot vedea mesajul",
+    "fullThreadTitle": "Istoric complet",
+    "fullThreadSubtitle": "Urmărești toate răspunsurile într-un singur loc"
+  }
 }

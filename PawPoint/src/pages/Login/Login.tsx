@@ -157,7 +157,7 @@ export const Login = () => {
                 },
               }}
             >
-              {t("auth:forgotPasswordLink")}
+              {t("auth.forgotPasswordLink")}
             </Typography>
           </Stack>
 

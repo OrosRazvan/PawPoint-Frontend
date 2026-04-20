@@ -29,5 +29,22 @@
   "updateSuccess": "Vaccination updated successfully.",
   "updateError": "Failed to update vaccination.",
   "deleteSuccess": "Vaccination deleted successfully.",
-  "deleteError": "Failed to delete vaccination."
+  "deleteError": "Failed to delete vaccination.",
+
+  "lastDate": "Last date",
+  "nextDate": "Next date",
+  "notes": "Notes",
+  "vetCabinet": "Vet cabinet",
+  "selectVetCabinet": "Select vet cabinet",
+  "timeSlot": "Time slot",
+  "selectTimeSlot": "Select time slot",
+  "petFallback": "Pet",
+  "vaccinationFallback": "Vaccination",
+  "givenOn": "Given: {{date}}",
+  "scheduledOn": "Scheduled: {{date}}",
+  "veterinarianLabel": "Veterinarian: {{value}}",
+  "status": {
+    "completed": "Completed",
+    "upcoming": "Upcoming"
+  }
 }

@@ -120,7 +120,7 @@ export const NavbarNav = ({
             },
           })}
         >
-          Admin
+          {t("layout:navbar.admin")}
         </Button>
       </Stack>
     );

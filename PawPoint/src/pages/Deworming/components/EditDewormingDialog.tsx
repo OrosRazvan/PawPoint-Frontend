@@ -38,33 +38,40 @@ type FormValues = {
   notes: string;
 };
 
-const dewormingTypes = [
-  { value: 1, label: "Internal" },
-  { value: 2, label: "External" },
-  { value: 3, label: "Combined" },
-  { value: 4, label: "Control" },
-];
-
-const normalizeType = (value: DewormingCardItem["type"]): DewormingTypeEnum | "" => {
-  if (typeof value === "string") {
-    if (dewormingTypes.some((type) => type.label === value)) {
-      return value as DewormingTypeEnum;
+const normalizeType = (
+  value: string | number
+): DewormingTypeEnum | "" => {
+  if (typeof value === "number") {
+    switch (value) {
+      case 1:
+        return DewormingTypeEnum.Internal;
+      case 2:
+        return DewormingTypeEnum.External;
+      case 3:
+        return DewormingTypeEnum.Combined;
+      case 4:
+        return DewormingTypeEnum.Control;
+      default:
+        return "";
     }
-    return "";
   }
 
-  switch (value) {
-    case 1:
-      return DewormingTypeEnum.Internal;
-    case 2:
-      return DewormingTypeEnum.External;
-    case 3:
-      return DewormingTypeEnum.Combined;
-    case 4:
-      return DewormingTypeEnum.Control;
-    default:
-      return "";
+  if (typeof value === "string") {
+    switch (value.toLowerCase()) {
+      case "internal":
+        return DewormingTypeEnum.Internal;
+      case "external":
+        return DewormingTypeEnum.External;
+      case "combined":
+        return DewormingTypeEnum.Combined;
+      case "control":
+        return DewormingTypeEnum.Control;
+      default:
+        return "";
+    }
   }
+
+  return "";
 };
 
 export const EditDewormingDialog = ({ open, item, onClose }: Props) => {
@@ -73,6 +80,13 @@ export const EditDewormingDialog = ({ open, item, onClose }: Props) => {
   const queryClient = useQueryClient();
   const updateDewormingMutation = useUpdateDeworming();
   const { data: settings } = useSettings();
+
+  const dewormingTypes = [
+    { value: 1, label: t("deworming:typeInternal") },
+    { value: 2, label: t("deworming:typeExternal") },
+    { value: 3, label: t("deworming:typeCombined") },
+    { value: 4, label: t("deworming:typeControl") },
+  ];
 
   const fieldSx = (theme: any) => ({
     "& .MuiOutlinedInput-root": {

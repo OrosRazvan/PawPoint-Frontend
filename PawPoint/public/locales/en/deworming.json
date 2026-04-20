@@ -39,5 +39,24 @@
   "updateSuccess": "Deworming updated successfully.",
   "updateError": "Failed to update deworming.",
   "deleteSuccess": "Deworming deleted successfully.",
-  "deleteError": "Failed to delete deworming."
+  "deleteError": "Failed to delete deworming.",
+
+  "type": "Type",
+  "selectType": "Select type",
+  "intervalDays": "Interval (days)",
+  "typeInternal": "Internal",
+  "typeExternal": "External",
+  "typeCombined": "Combined",
+  "typeControl": "Control",
+  "unknown": "Unknown",
+  "petFallback": "Pet",
+  "doneOn": "Done: {{date}}",
+  "scheduledOn": "Scheduled: {{date}}",
+  "veterinarianLabel": "Veterinarian: {{value}}",
+  "nextDueLabel": "Next due: {{date}}",
+  "intervalLabel": "Interval: {{days}} days",
+  "status": {
+    "completed": "Completed",
+    "upcoming": "Upcoming"
+  }
 }

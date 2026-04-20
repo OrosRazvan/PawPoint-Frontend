@@ -11,6 +11,7 @@ import { alpha } from "@mui/material/styles";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import { useTranslation } from "react-i18next";
 import { useSettings } from "../../../hooks/useSettings";
 import { scaleFont } from "../../../utils/fontScale";
 import type { DewormingCardItem } from "../types/deworming";
@@ -47,11 +48,28 @@ const formatDateBySettings = (
   }
 };
 
-const formatDewormingType = (value: number) => {
-  return DewormingTypeLabels[value] ?? "Unknown";
+const formatDewormingType = (
+  value: number,
+  t: (key: string) => string
+) => {
+  const label = DewormingTypeLabels[value];
+
+  switch (label) {
+    case "Internal":
+      return t("deworming:typeInternal");
+    case "External":
+      return t("deworming:typeExternal");
+    case "Combined":
+      return t("deworming:typeCombined");
+    case "Control":
+      return t("deworming:typeControl");
+    default:
+      return t("deworming:unknown");
+  }
 };
 
 export const DewormingCard = ({ item, onEdit, onDelete }: Props) => {
+  const { t } = useTranslation(["deworming"]);
   const isCompleted = item.status === "completed";
   const { data: settings } = useSettings();
 
@@ -98,19 +116,18 @@ export const DewormingCard = ({ item, onEdit, onDelete }: Props) => {
                 fontWeight: 500,
               })}
             >
-              {formatDewormingType(item.type)}
+              {formatDewormingType(item.type, t)}
             </Typography>
           </Box>
 
           <Chip
-            label={item.status}
+            label={t(`deworming:status.${item.status}`)}
             size="small"
             sx={(theme) => ({
               height: 30,
               borderRadius: 999,
               fontWeight: 700,
               fontSize: scaleFont(12, settings?.textSize),
-              textTransform: "lowercase",
               backgroundColor: isCompleted
                 ? theme.palette.mode === "dark"
                   ? alpha(theme.palette.success.main, 0.18)
@@ -140,14 +157,18 @@ export const DewormingCard = ({ item, onEdit, onDelete }: Props) => {
               })}
             >
               {isCompleted
-                ? `Done: ${formatDateBySettings(
-                    item.date ?? item.slotStartTimeUtc ?? item.nextDate,
-                    dateFormat
-                  )}`
-                : `Scheduled: ${formatDateBySettings(
-                    item.slotStartTimeUtc ?? item.date ?? item.nextDate,
-                    dateFormat
-                  )}`}
+                ? t("deworming:doneOn", {
+                    date: formatDateBySettings(
+                      item.date ?? item.slotStartTimeUtc ?? item.nextDate,
+                      dateFormat
+                    ),
+                  })
+                : t("deworming:scheduledOn", {
+                    date: formatDateBySettings(
+                      item.slotStartTimeUtc ?? item.date ?? item.nextDate,
+                      dateFormat
+                    ),
+                  })}
             </Typography>
           </Stack>
 
@@ -157,7 +178,9 @@ export const DewormingCard = ({ item, onEdit, onDelete }: Props) => {
               color: theme.palette.text.secondary,
             })}
           >
-            Veterinarian: {item.vetCabinetName || "—"}
+            {t("deworming:veterinarianLabel", {
+              value: item.vetCabinetName || "—",
+            })}
           </Typography>
 
           <Typography
@@ -166,7 +189,12 @@ export const DewormingCard = ({ item, onEdit, onDelete }: Props) => {
               color: theme.palette.text.secondary,
             })}
           >
-            Next due: {formatDateBySettings(item.nextDate ?? item.date ?? item.slotStartTimeUtc, dateFormat)}
+            {t("deworming:nextDueLabel", {
+              date: formatDateBySettings(
+                item.nextDate ?? item.date ?? item.slotStartTimeUtc,
+                dateFormat
+              ),
+            })}
           </Typography>
 
           <Typography
@@ -175,7 +203,9 @@ export const DewormingCard = ({ item, onEdit, onDelete }: Props) => {
               color: theme.palette.text.secondary,
             })}
           >
-            Interval: {item.intervalDays} days
+            {t("deworming:intervalLabel", {
+              days: item.intervalDays,
+            })}
           </Typography>
         </Stack>
 

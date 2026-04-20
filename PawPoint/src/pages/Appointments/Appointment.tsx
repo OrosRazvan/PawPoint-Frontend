@@ -28,27 +28,30 @@ const resolveStatus = (item: AppointmentDto): "completed" | "upcoming" => {
   return slotDate <= Date.now() ? "completed" : "upcoming";
 };
 
-const mapAppointments = (items: AppointmentDto[]): AppointmentCardItem[] => {
-  return items.map((item) => ({
-    id: item.id,
-    animalId: item.animalId,
-    animalName: item.animalName ?? "Pet",
-    serviceType: item.serviceType ?? "Consult",
-    vetCabinetId: item.vetCabinetId,
-    vetCabinetName: item.vetCabinetName ?? "Veterinary Clinic",
-    vetCabinetAddress: item.vetCabinetAddress ?? null,
-    vetTimeSlotId: item.vetTimeSlotId,
-    slotStartTimeUtc: item.slotStartTimeUtc ?? item.startTimeUtc ?? "",
-    slotEndTimeUtc: item.slotEndTimeUtc ?? item.endTimeUtc ?? "",
-    vetDoctorName: item.vetDoctorName ?? null,
-    priceRon: item.priceRon ?? null,
-    notes: item.notes ?? null,
-    status: resolveStatus({
-      ...item,
+const mapAppointments = (
+  items: AppointmentDto[],
+  t: (key: string) => string
+  ): AppointmentCardItem[] => {
+    return items.map((item) => ({
+      id: item.id,
+      animalId: item.animalId,
+      animalName: item.animalName ?? t("appointment:petFallback"),
+      serviceType: item.serviceType ?? t("appointment:serviceFallback"),
+      vetCabinetId: item.vetCabinetId,
+      vetCabinetName: item.vetCabinetName ?? t("appointment:clinicFallback"),
+      vetCabinetAddress: item.vetCabinetAddress ?? null,
+      vetTimeSlotId: item.vetTimeSlotId,
       slotStartTimeUtc: item.slotStartTimeUtc ?? item.startTimeUtc ?? "",
-    } as AppointmentDto),
-  }));
-};
+      slotEndTimeUtc: item.slotEndTimeUtc ?? item.endTimeUtc ?? "",
+      vetDoctorName: item.vetDoctorName ?? null,
+      priceRon: item.priceRon ?? null,
+      notes: item.notes ?? null,
+      status: resolveStatus({
+        ...item,
+        slotStartTimeUtc: item.slotStartTimeUtc ?? item.startTimeUtc ?? "",
+      } as AppointmentDto),
+    }));
+  };
 
 export const Appointments = () => {
   const { t } = useTranslation(["appointment"]);
@@ -57,7 +60,7 @@ export const Appointments = () => {
 
   const { data = [], isLoading, isError } = useAppointments();
 
-  const items = useMemo(() => mapAppointments(data), [data]);
+  const items = useMemo(() => mapAppointments(data, t), [data, t]);
 
   const completedItems = items.filter((item) => item.status === "completed");
   const upcomingItems = items.filter((item) => item.status === "upcoming");

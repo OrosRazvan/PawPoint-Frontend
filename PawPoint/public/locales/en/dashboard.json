@@ -42,5 +42,14 @@
   "editPetDialogSubtitle": "Update your pet's information to keep everything organized.",
   "saveChanges": "Save changes",
   "updatePetSuccess": "Pet updated successfully.",
-  "updatePetError": "Failed to update pet."
+  "updatePetError": "Failed to update pet.",
+  "view": "View",
+  "eventForPet": "{{type}} for {{pet}}",
+  "petFallback": "Pet",
+  "eventFallback": "Event",
+  "upcomingStatus": "Upcoming",
+  "appointmentFallback": "Appointment",
+  "vaccinationFallback": "Vaccination",
+  "dewormingFallback": "Deworming",
+  "noUpcomingEvents": "No upcoming events."
 }

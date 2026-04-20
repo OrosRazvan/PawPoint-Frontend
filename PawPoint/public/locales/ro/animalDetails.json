@@ -1,0 +1,27 @@
+{
+  "backToDashboard": "Înapoi la dashboard",
+  "allDetails": "Toate detaliile",
+  "unknown": "Necunoscut",
+  "actions": {
+    "editPet": "Editează animalul",
+    "deletePet": "Șterge animalul"
+  },
+  "labels": {
+    "weight": "Greutate",
+    "born": "Născut",
+    "species": "Specie"
+  },
+  "details": {
+    "species": "Specie",
+    "breed": "Rasă",
+    "weight": "Greutate",
+    "birthDate": "Data nașterii",
+    "sex": "Sex",
+    "microchipNumber": "Număr microcip"
+  },
+  "messages": {
+    "loadError": "Detaliile animalului nu au putut fi încărcate.",
+    "deleteSuccess": "Animalul a fost șters cu succes.",
+    "deleteError": "A apărut o eroare la ștergerea animalului."
+  }
+}

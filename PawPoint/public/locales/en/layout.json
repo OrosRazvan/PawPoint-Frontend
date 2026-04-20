@@ -1,19 +1,22 @@
 {
+  "dashboard": "Dashboard",
+  "management": "Management",
+  "vaccinations": "Vaccinations",
+  "appointments": "Appointments",
+  "deworming": "Deworming",
+  "assistant": "Assistant",
   "navbar": {
-    "home": "Home",
-    "dashboard": "Dashboard",
-    "management": "Management",
-    "vaccinations": "Vaccinations",
-    "appointments": "Appointments",
-    "deworming": "Deworming",
-    "assistant": "Assistant",
-    "logout": "Logout",
     "profile": "Profile",
-    "settings": "Settings"
+    "settings": "Settings",
+    "logout": "Logout",
+    "contactUs": "Contact Us",
+    "myMessages": "My Messages",
+    "adminMessages": "Admin Messages",
+    "admin": "Admin"
   },
   "footer": {
-    "aboutTitle": "About PawPoint",
-    "aboutText": "Your complete pet management platform for tracking health, appointments, and care.",
+    "aboutTitle": "PawPoint",
+    "aboutText": "A simple place to manage your pets, appointments, vaccinations, and deworming records.",
     "quickLinks": "Quick Links",
     "dashboard": "Dashboard",
     "vaccinations": "Vaccinations",
@@ -25,7 +28,6 @@
     "legal": "Legal",
     "privacyPolicy": "Privacy Policy",
     "termsOfService": "Terms of Service",
-    "copyright": "© 2026 PawPoint. All rights reserved.",
-    "myMessages": "My Messages"
+    "copyright": "© 2026 PawPoint. All rights reserved."
   }
 }
