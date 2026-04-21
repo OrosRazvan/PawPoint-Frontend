@@ -46,18 +46,22 @@ export const EditVaccinationDialog = ({ open, item, onClose }: Props) => {
 
   const fieldSx = (theme: any) => ({
     "& .MuiOutlinedInput-root": {
-      borderRadius: 2,
+      borderRadius: 2.5,
       backgroundColor:
         theme.palette.mode === "dark"
           ? alpha("#ffffff", 0.03)
           : theme.palette.background.paper,
       color: theme.palette.text.primary,
       fontSize: scaleFont(14, settings?.textSize),
+      transition: "box-shadow 0.15s ease",
       "& fieldset": {
         borderColor: theme.palette.divider,
       },
       "&:hover fieldset": {
         borderColor: theme.palette.primary.main,
+      },
+      "&.Mui-focused": {
+        boxShadow: `0 0 0 3px ${alpha(theme.palette.primary.main, 0.12)}`,
       },
       "&.Mui-focused fieldset": {
         borderColor: theme.palette.primary.main,
@@ -70,12 +74,12 @@ export const EditVaccinationDialog = ({ open, item, onClose }: Props) => {
   });
 
   const labelSx = (theme: any) => ({
-    fontSize: scaleFont(12, settings?.textSize),
-    fontWeight: 600,
+    fontSize: scaleFont(11.5, settings?.textSize),
+    fontWeight: 700,
     color: theme.palette.text.secondary,
-    letterSpacing: "0.04em",
+    letterSpacing: "0.06em",
     textTransform: "uppercase" as const,
-    mb: 0.6,
+    mb: 0.75,
   });
 
   const { control, handleSubmit, reset } = useForm<FormValues>({
@@ -144,37 +148,34 @@ export const EditVaccinationDialog = ({ open, item, onClose }: Props) => {
           boxShadow:
             theme.palette.mode === "dark"
               ? "0 24px 64px rgba(0,0,0,0.38), 0 4px 12px rgba(0,0,0,0.24)"
-              : undefined,
+              : "0 20px 60px rgba(7,28,66,0.14), 0 4px 12px rgba(7,28,66,0.06)",
         }),
       }}
     >
+      {/* Amber accent strip */}
+      <Box
+        sx={{
+          height: 4,
+          background: "linear-gradient(90deg, #f5a623, #f8c471)",
+        }}
+      />
+
       <DialogTitle sx={{ p: 0 }}>
-        <Box
-          sx={(theme) => ({
-            px: 3.5,
-            pt: 3,
-            pb: 2.5,
-            background:
-              theme.palette.mode === "dark"
-                ? `linear-gradient(135deg, ${alpha(
-                    theme.palette.primary.main,
-                    0.12
-                  )} 0%, ${alpha(theme.palette.background.paper, 0.9)} 100%)`
-                : "linear-gradient(135deg, #fbf2ea 0%, #fdf7ef 100%)",
-          })}
-        >
-          <Stack direction="row" justifyContent="space-between">
+        <Box sx={{ px: 3, pt: 2.75, pb: 2.5 }}>
+          <Stack direction="row" justifyContent="space-between" alignItems="center">
             <Stack direction="row" spacing={2} alignItems="center">
               <Box
                 sx={{
-                  width: 48,
-                  height: 48,
+                  width: 46,
+                  height: 46,
                   borderRadius: 2.5,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   background: "linear-gradient(135deg, #f5a623 0%, #f0911a 100%)",
                   color: "#fff",
+                  boxShadow: "0 4px 14px rgba(245,166,35,0.36)",
+                  flexShrink: 0,
                 }}
               >
                 <VaccinesRoundedIcon sx={{ fontSize: 22 }} />
@@ -183,18 +184,20 @@ export const EditVaccinationDialog = ({ open, item, onClose }: Props) => {
               <Box>
                 <Typography
                   sx={(theme) => ({
-                    fontSize: scaleFont(19, settings?.textSize),
+                    fontSize: scaleFont(18, settings?.textSize),
                     fontWeight: 800,
                     color: theme.palette.text.primary,
+                    lineHeight: 1.2,
+                    letterSpacing: "-0.3px",
                   })}
                 >
                   {t("vaccination:editDialogTitle")}
                 </Typography>
                 <Typography
                   sx={(theme) => ({
-                    fontSize: scaleFont(13, settings?.textSize),
+                    fontSize: scaleFont(12.5, settings?.textSize),
                     color: theme.palette.text.secondary,
-                    mt: 0.4,
+                    mt: 0.35,
                   })}
                 >
                   {t("vaccination:editDialogSubtitle")}
@@ -212,11 +215,18 @@ export const EditVaccinationDialog = ({ open, item, onClose }: Props) => {
                     ? alpha("#ffffff", 0.06)
                     : "rgba(0,0,0,0.04)",
                 borderRadius: 2,
-                width: 32,
-                height: 32,
+                width: 30,
+                height: 30,
+                "&:hover": {
+                  backgroundColor:
+                    theme.palette.mode === "dark"
+                      ? alpha("#ffffff", 0.1)
+                      : "rgba(0,0,0,0.08)",
+                  color: theme.palette.text.primary,
+                },
               })}
             >
-              <CloseRoundedIcon sx={{ fontSize: 18 }} />
+              <CloseRoundedIcon sx={{ fontSize: 17 }} />
             </IconButton>
           </Stack>
         </Box>
@@ -224,8 +234,8 @@ export const EditVaccinationDialog = ({ open, item, onClose }: Props) => {
         <Divider />
       </DialogTitle>
 
-      <DialogContent sx={{ px: 3.5, pt: 3, pb: 3.5 }}>
-        <Stack component="form" spacing={2} onSubmit={handleSubmit(onSubmit)}>
+      <DialogContent sx={{ px: 3, pt: "24px !important", pb: 3 }}>
+        <Stack component="form" spacing={2.25} onSubmit={handleSubmit(onSubmit)}>
           <Box>
             <Typography sx={labelSx}>{t("vaccination:vaccineName")}</Typography>
             <Controller
@@ -235,27 +245,29 @@ export const EditVaccinationDialog = ({ open, item, onClose }: Props) => {
             />
           </Box>
 
-          <Box>
-            <Typography sx={labelSx}>{t("vaccination:lastDate")}</Typography>
-            <Controller
-              name="lastDate"
-              control={control}
-              render={({ field }) => (
-                <TextField {...field} type="date" fullWidth sx={fieldSx} />
-              )}
-            />
-          </Box>
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+            <Box sx={{ flex: 1 }}>
+              <Typography sx={labelSx}>{t("vaccination:lastDate")}</Typography>
+              <Controller
+                name="lastDate"
+                control={control}
+                render={({ field }) => (
+                  <TextField {...field} type="date" fullWidth sx={fieldSx} />
+                )}
+              />
+            </Box>
 
-          <Box>
-            <Typography sx={labelSx}>{t("vaccination:nextDate")}</Typography>
-            <Controller
-              name="nextDate"
-              control={control}
-              render={({ field }) => (
-                <TextField {...field} type="date" fullWidth sx={fieldSx} />
-              )}
-            />
-          </Box>
+            <Box sx={{ flex: 1 }}>
+              <Typography sx={labelSx}>{t("vaccination:nextDate")}</Typography>
+              <Controller
+                name="nextDate"
+                control={control}
+                render={({ field }) => (
+                  <TextField {...field} type="date" fullWidth sx={fieldSx} />
+                )}
+              />
+            </Box>
+          </Stack>
 
           <Box>
             <Typography sx={labelSx}>{t("vaccination:notes")}</Typography>
@@ -268,7 +280,7 @@ export const EditVaccinationDialog = ({ open, item, onClose }: Props) => {
             />
           </Box>
 
-          <Divider sx={{ mt: 1, mb: 1 }} />
+          <Divider sx={{ my: 0.5 }} />
 
           <Stack direction="row" spacing={1.5}>
             <Button
@@ -276,16 +288,23 @@ export const EditVaccinationDialog = ({ open, item, onClose }: Props) => {
               fullWidth
               onClick={onClose}
               sx={(theme) => ({
-                py: 1.5,
+                py: 1.35,
                 borderRadius: 2.5,
                 textTransform: "none",
-                fontWeight: 700,
-                fontSize: scaleFont(15, settings?.textSize),
+                fontWeight: 600,
+                fontSize: scaleFont(14, settings?.textSize),
                 color: theme.palette.text.secondary,
                 backgroundColor:
                   theme.palette.mode === "dark"
                     ? alpha("#ffffff", 0.06)
                     : "#f0f2f7",
+                border: `1px solid ${theme.palette.divider}`,
+                "&:hover": {
+                  backgroundColor:
+                    theme.palette.mode === "dark"
+                      ? alpha("#ffffff", 0.1)
+                      : "#e8ecf3",
+                },
               })}
             >
               {t("vaccination:cancel")}
@@ -297,13 +316,18 @@ export const EditVaccinationDialog = ({ open, item, onClose }: Props) => {
               variant="contained"
               fullWidth
               sx={{
-                py: 1.5,
+                py: 1.35,
                 borderRadius: 2.5,
                 textTransform: "none",
                 fontWeight: 700,
-                fontSize: scaleFont(15, settings?.textSize),
+                fontSize: scaleFont(14, settings?.textSize),
                 background: "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
                 color: "#fff",
+                boxShadow: "0 6px 16px rgba(245,166,35,0.28)",
+                "&:hover": {
+                  background: "linear-gradient(135deg, #f0a020 0%, #e08510 100%)",
+                  boxShadow: "0 8px 20px rgba(245,166,35,0.36)",
+                },
               }}
             >
               {t("vaccination:saveChanges")}

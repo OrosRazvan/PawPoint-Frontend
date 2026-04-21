@@ -1,0 +1,68 @@
+{
+  "assistant": {
+    "pageTitle": "Assistant",
+    "pageSubtitle": "Ask about pets, appointments, vaccinations, and deworming.",
+    "inputPlaceholder": "Write a message...",
+    "send": "Send",
+    "loading": "Generating response...",
+    "errors": {
+      "generic": "Something went wrong. Please try again."
+    },
+    "greeting": "Hi! I can help you with your pets, appointments, vaccinations, deworming records, and recommendations based on your account data.",
+    "help": "I can tell you what pets you have, what appointments are coming up, what vaccinations or dewormings are due, and I can give simple recommendations based on your existing data.",
+    "unknown": "I did not fully understand the request. Try something like: “What pets do I have?”, “What’s next for Rex?” or “Which vaccinations are due?”",
+    "noPets": "I could not find any pets in your account.",
+    "listPets": "You have the following pets: {{petNames}}",
+    "noAppointments": "You have no appointments in the next {{days}} days.",
+    "upcomingAppointments": "The upcoming appointments are: {{appointments}}",
+    "petNotFound": "I could not find a pet named {{petName}}.",
+    "noVaccinations": "I could not find any vaccinations for {{petName}}.",
+    "noDewormings": "I could not find any deworming records for {{petName}}.",
+    "healthOverview": "You have {{petCount}} pets, {{appointmentCount}} upcoming appointments, {{dueVaccinations}} vaccinations due soon, and {{dueDewormings}} dewormings due soon.",
+    "noDueItems": "I could not find any vaccinations or dewormings due in the next 14 days.",
+    "dueItems": {
+      "summary": "Due vaccinations: {{vaccinations}}. Due dewormings: {{dewormings}}."
+    },
+    "petOverview": {
+      "composed": "__COMPOSED__",
+      "base": "{{petName}} is registered as a {{species}}.",
+      "withBreed": "{{petName}} is registered as a {{species}} ({{breed}}).",
+      "nextAppointment": "The next appointment is on {{date}} for {{type}}.",
+      "nextVaccination": "The next vaccination is due on {{date}}.",
+      "nextDeworming": "The next deworming is due on {{date}}."
+    },
+    "petVaccinations": {
+      "noDueDate": "I found {{count}} vaccinations for {{petName}}, but none has a calculated next due date.",
+      "nextDue": "For {{petName}}, the next vaccination is due on {{date}}."
+    },
+    "petDewormings": {
+      "noDueDate": "I found {{count}} deworming records for {{petName}}, but none has a calculated next due date.",
+      "nextDue": "For {{petName}}, the next deworming is due on {{date}}."
+    },
+    "alerts": {
+      "dueVaccinations": "You have {{count}} vaccinations due in the next 7 days.",
+      "dueDewormings": "You have {{count}} dewormings due in the next 7 days.",
+      "appointments": "You have {{count}} appointments in the next 30 days."
+    },
+    "recommendations": {
+      "summary": "__COMPOSED__",
+      "overdueVaccinations": "You have {{count}} overdue vaccinations. It would be good to schedule a consultation or vaccination as soon as possible.",
+      "overdueDewormings": "You have {{count}} overdue dewormings. Check the affected pets and plan administration.",
+      "noAppointments": "You have no upcoming appointments. It would be useful to check whether any vaccinations or checkups should be scheduled.",
+      "checkPet": "You can separately check the history for {{petName}} to see exactly what is coming next.",
+      "allGood": "Things look good for now. Keep tracking appointments and recurring treatments."
+    },
+    "suggestions": {
+      "listPets": "What pets do I have?",
+      "upcomingAppointments": "What appointments are coming up?",
+      "healthOverview": "Give me a general summary",
+      "recommendations": "What do you recommend?",
+      "dueVaccinations": "Which vaccinations are due?",
+      "dueDewormings": "Which dewormings are due?",
+      "petOverview": "What’s next for {{petName}}?",
+      "petVaccinations": "Vaccinations for {{petName}}",
+      "petDewormings": "Dewormings for {{petName}}",
+      "petRecommendations": "What do you recommend for {{petName}}?"
+    }
+  }
+}

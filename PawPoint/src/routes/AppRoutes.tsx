@@ -28,6 +28,7 @@ import { MyContactMessages } from "../pages/ContactUs/MyContactMessages";
 import { AdminContactMessages } from "../pages/Admin/AdminContactMessages";
 import { AdminContactMessageDetails } from "../pages/Admin/AdminContactMessageDetails";
 import { PublicHome } from "../pages/PublicHome/PublicHome";
+import { Assistant } from "../pages/Assistant/Assistant";
 
 export const AppRoutes = () => {
   return (
@@ -69,7 +70,9 @@ export const AppRoutes = () => {
         <Route path="/contact-us" element={<PrivateRoute><ContactUs /></PrivateRoute>}/>
         <Route path="/my-contact-messages" element={<PrivateRoute><MyContactMessages /></PrivateRoute>}/>
         <Route path="/admin/contact-messages" element={<AdminRoute><AdminContactMessages /></AdminRoute>}/>
-        <Route path="/admin/contact-messages/:id" element={<AdminRoute><AdminContactMessageDetails /></AdminRoute>}/></Route>
+        <Route path="/admin/contact-messages/:id" element={<AdminRoute><AdminContactMessageDetails /></AdminRoute>}/>
+        <Route path="/assistant" element={<PrivateRoute><Assistant /></PrivateRoute>} />
+        </Route>
     </Routes>
   );
 };

@@ -1,4 +1,4 @@
-import { Paper, Typography, Stack } from "@mui/material";
+import { Paper, Typography, Stack, Box } from "@mui/material";
 import { useSettings } from "../../../../hooks/useSettings";
 import { scaleFont } from "../../../../utils/fontScale";
 
@@ -15,14 +15,15 @@ export const SectionCard = ({ title, children, rightSlot }: Props) => {
     <Paper
       elevation={0}
       sx={(theme) => ({
-        p: 3,
-        borderRadius: 4,
+        p: { xs: 2.5, sm: 3 },
+        borderRadius: 5,
         border: `1px solid ${theme.palette.divider}`,
         backgroundColor: theme.palette.background.paper,
         boxShadow:
           theme.palette.mode === "dark"
-            ? "0 10px 24px rgba(0,0,0,0.24)"
-            : "0 10px 24px rgba(0,0,0,0.05)",
+            ? "0 1px 3px rgba(0,0,0,0.3), 0 8px 32px rgba(0,0,0,0.2)"
+            : "0 1px 3px rgba(0,0,0,0.04), 0 8px 32px rgba(7,28,66,0.06)",
+        height: "100%",
       })}
     >
       <Stack
@@ -31,15 +32,27 @@ export const SectionCard = ({ title, children, rightSlot }: Props) => {
         justifyContent="space-between"
         sx={{ mb: 3 }}
       >
-        <Typography
-          sx={(theme) => ({
-            fontSize: scaleFont(22, settings?.textSize),
-            fontWeight: 700,
-            color: theme.palette.text.primary,
-          })}
-        >
-          {title}
-        </Typography>
+        <Stack direction="row" alignItems="center" spacing={1.5}>
+          <Box
+            sx={(theme) => ({
+              width: 4,
+              height: 22,
+              borderRadius: 99,
+              background: "linear-gradient(180deg, #1657ff 0%, #4f83ff 100%)",
+              opacity: theme.palette.mode === "dark" ? 0.85 : 1,
+            })}
+          />
+          <Typography
+            sx={(theme) => ({
+              fontSize: scaleFont(20, settings?.textSize),
+              fontWeight: 700,
+              letterSpacing: "-0.4px",
+              color: theme.palette.text.primary,
+            })}
+          >
+            {title}
+          </Typography>
+        </Stack>
 
         {rightSlot}
       </Stack>

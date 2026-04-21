@@ -8,6 +8,8 @@ export const useCreateAnimal = () => {
     mutationFn: createAnimal,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      await queryClient.invalidateQueries({ queryKey: ["dashboardData"] });
+      await queryClient.invalidateQueries({ queryKey: ["animals"] });
     },
   });
 };

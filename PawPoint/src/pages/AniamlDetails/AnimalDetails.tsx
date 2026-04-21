@@ -122,7 +122,7 @@ export const AnimalDetails = () => {
       breed: data.breed ?? data.species ?? t("unknown"),
       weight: formatWeightByUnit(petWeightValue, weightUnit),
       imageLetter: getInitial(data.name),
-      imageUrl: data.profilePictureUrl ?? null,
+      imageUrl: data.imageUrl ?? null,
       species: data.species ?? "",
       weightKg: petWeightValue,
       birthDate: data.birthDate ?? null,
@@ -305,10 +305,10 @@ export const AnimalDetails = () => {
                   mb: 3,
                 })}
               >
-                {data.profilePictureUrl ? (
+                {data.imageUrl ? (
                   <Box
                     component="img"
-                    src={data.profilePictureUrl}
+                    src={data.imageUrl}
                     alt={data.name}
                     sx={{ width: "100%", height: "100%", objectFit: "cover" }}
                   />

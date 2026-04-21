@@ -1,126 +1,63 @@
-import { Box, Chip, Stack, Typography } from "@mui/material";
-import { alpha } from "@mui/material/styles";
-import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
-import VaccinesRoundedIcon from "@mui/icons-material/VaccinesRounded";
-import BugReportRoundedIcon from "@mui/icons-material/BugReportRounded";
+import { Paper, Typography, Stack, Box } from "@mui/material";
 import { useSettings } from "../../../../hooks/useSettings";
 import { scaleFont } from "../../../../utils/fontScale";
-import { useTranslation } from "react-i18next";
 
 type Props = {
-  petName: string;
-  typeLabel: string;
-  statusLabel: string;
-  dateLabel: string;
-  timeLabel: string;
+  title: string;
+  children: React.ReactNode;
+  rightSlot?: React.ReactNode;
 };
 
-export const EventItem = ({
-  petName,
-  typeLabel,
-  statusLabel,
-  dateLabel,
-  timeLabel,
-}: Props) => {
+export const SectionCard = ({ title, children, rightSlot }: Props) => {
   const { data: settings } = useSettings();
-  const { t } = useTranslation("dashboard");
-
-  const normalizedType = typeLabel.toLowerCase();
-
-  const icon =
-    normalizedType.includes("appointment") ? (
-      <CalendarMonthRoundedIcon
-        sx={(theme) => ({ color: theme.palette.secondary.main })}
-      />
-    ) : normalizedType.includes("vacc") ? (
-      <VaccinesRoundedIcon
-        sx={(theme) => ({ color: theme.palette.info.main })}
-      />
-    ) : (
-      <BugReportRoundedIcon
-        sx={(theme) => ({ color: theme.palette.success.main })}
-      />
-    );
 
   return (
-    <Box
+    <Paper
+      elevation={0}
       sx={(theme) => ({
+        p: { xs: 2.5, sm: 3 },
+        borderRadius: 5,
         border: `1px solid ${theme.palette.divider}`,
-        borderRadius: 3,
-        backgroundColor:
+        backgroundColor: theme.palette.background.paper,
+        boxShadow:
           theme.palette.mode === "dark"
-            ? alpha("#ffffff", 0.03)
-            : "#fff",
-        px: { xs: 1.75, sm: 2.25, md: 2.5 },
-        py: { xs: 1.75, sm: 2.25, md: 2.5 },
+            ? "0 1px 3px rgba(0,0,0,0.3), 0 8px 32px rgba(0,0,0,0.2)"
+            : "0 1px 3px rgba(0,0,0,0.04), 0 8px 32px rgba(7,28,66,0.06)",
+        height: "100%",
       })}
     >
       <Stack
-        direction={{ xs: "column", sm: "row" }}
+        direction="row"
+        alignItems="center"
         justifyContent="space-between"
-        alignItems={{ xs: "flex-start", sm: "flex-start" }}
-        spacing={2}
+        sx={{ mb: 3 }}
       >
-        <Stack direction="row" spacing={2} alignItems="flex-start">
+        <Stack direction="row" alignItems="center" spacing={1.5}>
           <Box
             sx={(theme) => ({
-              width: { xs: 46, sm: 54 },
-              height: { xs: 46, sm: 54 },
-              borderRadius: 2.5,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor:
-                normalizedType.includes("appointment")
-                  ? alpha(theme.palette.secondary.main, 0.16)
-                  : normalizedType.includes("vacc")
-                  ? alpha(theme.palette.info.main, 0.14)
-                  : alpha(theme.palette.success.main, 0.14),
-              flexShrink: 0,
+              width: 4,
+              height: 22,
+              borderRadius: 99,
+              background: "linear-gradient(180deg, #1657ff 0%, #4f83ff 100%)",
+              opacity: theme.palette.mode === "dark" ? 0.85 : 1,
+            })}
+          />
+          <Typography
+            sx={(theme) => ({
+              fontSize: scaleFont(20, settings?.textSize),
+              fontWeight: 700,
+              letterSpacing: "-0.4px",
+              color: theme.palette.text.primary,
             })}
           >
-            {icon}
-          </Box>
-
-          <Box sx={{ minWidth: 0 }}>
-            <Typography
-              sx={(theme) => ({
-                fontSize: scaleFont(18, settings?.textSize),
-                fontWeight: 800,
-                color: theme.palette.text.primary,
-                wordBreak: "break-word",
-              })}
-            >
-              {t("eventForPet", { type: typeLabel, pet: petName })}
-            </Typography>
-
-            <Typography
-              sx={(theme) => ({
-                mt: 1,
-                fontSize: scaleFont(15, settings?.textSize),
-                color: theme.palette.text.secondary,
-              })}
-            >
-              {dateLabel}
-              {timeLabel && timeLabel !== "—" ? ` • ${timeLabel}` : ""}
-            </Typography>
-          </Box>
+            {title}
+          </Typography>
         </Stack>
 
-        <Chip
-          label={statusLabel}
-          sx={(theme) => ({
-            borderRadius: 999,
-            backgroundColor:
-              theme.palette.mode === "dark"
-                ? alpha("#ffffff", 0.06)
-                : "#f2f4f7",
-            color: theme.palette.text.secondary,
-            fontSize: scaleFont(13, settings?.textSize),
-            alignSelf: { xs: "flex-start", sm: "flex-start" },
-          })}
-        />
+        {rightSlot}
       </Stack>
-    </Box>
+
+      {children}
+    </Paper>
   );
 };

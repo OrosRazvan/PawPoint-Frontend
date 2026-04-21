@@ -45,28 +45,28 @@ export const MyPetsSection = ({
         title={title}
         rightSlot={
           <Button
-            startIcon={<AddOutlinedIcon />}
+            startIcon={<AddOutlinedIcon sx={{ fontSize: "17px !important" }} />}
             onClick={onAddPet}
             sx={{
               px: 2.5,
-              py: 1.2,
-              borderRadius: 2.5,
+              py: 1.1,
+              borderRadius: 3,
               color: "#fff",
               textTransform: "none",
               fontSize: scaleFont(14, settings?.textSize),
               fontWeight: 700,
               letterSpacing: "-0.1px",
               background: "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
-              boxShadow: "0 4px 12px rgba(245,166,35,0.35)",
-              transition: "all 0.2s ease",
+              boxShadow: "0 4px 14px rgba(245,166,35,0.3)",
+              transition: "all 0.18s ease",
               "&:hover": {
                 background: "linear-gradient(135deg, #f0981a 0%, #e88510 100%)",
-                boxShadow: "0 6px 16px rgba(245,166,35,0.45)",
+                boxShadow: "0 6px 20px rgba(245,166,35,0.4)",
                 transform: "translateY(-1px)",
               },
               "&:active": {
                 transform: "translateY(0)",
-                boxShadow: "0 2px 6px rgba(245,166,35,0.3)",
+                boxShadow: "0 2px 8px rgba(245,166,35,0.25)",
               },
             }}
           >
@@ -74,7 +74,7 @@ export const MyPetsSection = ({
           </Button>
         }
       >
-        <Grid container spacing={3}>
+        <Grid container spacing={2.5}>
           {pets.map((pet) => (
             <Grid key={pet.id} size={{ xs: 12, sm: 6, md: 4 }}>
               <PetCard
@@ -83,6 +83,7 @@ export const MyPetsSection = ({
                 weight={pet.weight}
                 imageLetter={pet.imageLetter}
                 imageUrl={pet.imageUrl}
+                imagePositionY={pet.imagePositionY}
                 onView={() => onViewPet(pet)}
                 onEdit={() => onEditPet(pet)}
                 onDelete={() => setPetToDelete(pet)}

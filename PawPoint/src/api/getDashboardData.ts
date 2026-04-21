@@ -47,7 +47,8 @@ const mapAnimalsToPets = (animals: AnimalDto[]): DashboardPet[] => {
         ? `${animal.weight} kg`
         : "—",
     imageLetter: getInitial(animal.name),
-    imageUrl: animal.profilePictureUrl ?? null,
+    imageUrl: animal.imageUrl ?? null,
+    imagePositionY: animal.imagePositionY ?? 50,
 
     species: animal.species ?? "",
     weightKg:

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import {
   Dialog,
@@ -13,10 +13,14 @@ import {
   Divider,
   Grid,
   Button,
+  Checkbox,
+  FormControlLabel,
+  Slider,
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import PetsRoundedIcon from "@mui/icons-material/PetsRounded";
+import PhotoCameraOutlinedIcon from "@mui/icons-material/PhotoCameraOutlined";
 import {
   useForm,
   Controller,
@@ -42,12 +46,21 @@ type Props = {
   pet: DashboardPet | null;
 };
 
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const MAX_IMAGE_SIZE_MB = 5;
+const MAX_IMAGE_SIZE_BYTES = MAX_IMAGE_SIZE_MB * 1024 * 1024;
+
 export const EditPetDialog = ({ open, onClose, pet }: Props) => {
   const { t } = useTranslation(["dashboard"]);
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
   const updateAnimalMutation = useUpdateAnimal();
   const { data: settings } = useSettings();
+
+  const [imagePositionY, setImagePositionY] = useState(50);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState("");
+  const [removeImage, setRemoveImage] = useState(false);
 
   const fieldSx = (theme: any) => ({
     "& .MuiOutlinedInput-root": {
@@ -129,7 +142,58 @@ export const EditPetDialog = ({ open, onClose, pet }: Props) => {
       sex: pet.sex ?? "",
       microchipNumber: pet.microchipNumber ?? "",
     });
+
+    setSelectedImage(null);
+    setRemoveImage(false);
+    setImagePositionY(pet.imagePositionY ?? 50);
+
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      setPreviewUrl("");
+    }
   }, [pet, open, reset]);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+      enqueueSnackbar("Poți încărca doar JPG, PNG sau WEBP.", {
+        variant: "error",
+      });
+      event.target.value = "";
+      return;
+    }
+
+    if (file.size > MAX_IMAGE_SIZE_BYTES) {
+      enqueueSnackbar(`Imaginea trebuie să aibă maxim ${MAX_IMAGE_SIZE_MB} MB.`, {
+        variant: "error",
+      });
+      event.target.value = "";
+      return;
+    }
+
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+
+    const localPreviewUrl = URL.createObjectURL(file);
+    setSelectedImage(file);
+    setPreviewUrl(localPreviewUrl);
+    setRemoveImage(false);
+    event.target.value = "";
+  };
+
+  const displayedImage = previewUrl || (!removeImage ? pet?.imageUrl : "") || "";
 
   const onSubmit: SubmitHandler<CreateAnimalFormValues> = (values) => {
     if (!pet) return;
@@ -147,15 +211,21 @@ export const EditPetDialog = ({ open, onClose, pet }: Props) => {
             : undefined,
           sex: values.sex || undefined,
           microchipNumber: values.microchipNumber?.trim() || undefined,
+          image: selectedImage,
+          removeImage,
+          imagePositionY,
         },
       },
       {
-        onSuccess: () => {
+        onSuccess: async () => {
           enqueueSnackbar(t("dashboard:updatePetSuccess"), {
             variant: "success",
           });
 
-          queryClient.invalidateQueries({ queryKey: ["dashboardData"] });
+          await queryClient.invalidateQueries({ queryKey: ["dashboardData"] });
+          await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+          await queryClient.invalidateQueries({ queryKey: ["animals"] });
+
           onClose();
         },
         onError: () => {
@@ -200,20 +270,6 @@ export const EditPetDialog = ({ open, onClose, pet }: Props) => {
                 : "linear-gradient(135deg, #fbf2ea 0%, #fdf7ef 100%)",
             position: "relative",
             overflow: "hidden",
-            "&::after": {
-              content: '""',
-              position: "absolute",
-              bottom: 0,
-              right: -20,
-              width: 120,
-              height: 120,
-              borderRadius: "50%",
-              background:
-                theme.palette.mode === "dark"
-                  ? alpha(theme.palette.primary.main, 0.1)
-                  : "rgba(245,166,35,0.08)",
-              pointerEvents: "none",
-            },
           })}
         >
           <Stack
@@ -247,7 +303,6 @@ export const EditPetDialog = ({ open, onClose, pet }: Props) => {
                     fontWeight: 800,
                     color: theme.palette.text.primary,
                     lineHeight: 1.2,
-                    letterSpacing: "-0.3px",
                   })}
                 >
                   {t("dashboard:editPetDialogTitle")}
@@ -257,7 +312,6 @@ export const EditPetDialog = ({ open, onClose, pet }: Props) => {
                     fontSize: scaleFont(13, settings?.textSize),
                     color: theme.palette.text.secondary,
                     mt: 0.4,
-                    fontWeight: 400,
                   })}
                 >
                   {t("dashboard:editPetDialogSubtitle")}
@@ -265,28 +319,7 @@ export const EditPetDialog = ({ open, onClose, pet }: Props) => {
               </Box>
             </Stack>
 
-            <IconButton
-              onClick={onClose}
-              size="small"
-              sx={(theme) => ({
-                color: theme.palette.text.secondary,
-                backgroundColor:
-                  theme.palette.mode === "dark"
-                    ? alpha("#ffffff", 0.06)
-                    : "rgba(0,0,0,0.04)",
-                borderRadius: 2,
-                width: 32,
-                height: 32,
-                mt: 0.5,
-                "&:hover": {
-                  backgroundColor:
-                    theme.palette.mode === "dark"
-                      ? alpha("#ffffff", 0.1)
-                      : "rgba(0,0,0,0.08)",
-                  color: theme.palette.text.primary,
-                },
-              })}
-            >
+            <IconButton onClick={onClose} size="small">
               <CloseRoundedIcon sx={{ fontSize: 18 }} />
             </IconButton>
           </Stack>
@@ -297,6 +330,103 @@ export const EditPetDialog = ({ open, onClose, pet }: Props) => {
 
       <DialogContent sx={{ px: 3.5, pt: 3, pb: 3.5 }}>
         <Stack component="form" spacing={0} onSubmit={handleSubmit(onSubmit)}>
+          <Box sx={{ mb: 2 }}>
+            <Typography sx={labelSx}>Poză animal</Typography>
+
+            <Stack spacing={1.5} alignItems="center">
+              <Box
+                sx={(theme) => ({
+                  width: "100%",
+                  height: 180,
+                  borderRadius: 3,
+                  border: `1px dashed ${theme.palette.divider}`,
+                  overflow: "hidden",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background:
+                    theme.palette.mode === "dark"
+                      ? alpha("#ffffff", 0.03)
+                      : "#faf7f2",
+                })}
+              >
+                {displayedImage ? (
+                  <Box
+                    component="img"
+                    src={displayedImage}
+                    alt={pet?.name ?? "Pet"}
+                    sx={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      objectPosition: `center ${imagePositionY}%`,
+                    }}
+                  />
+                ) : (
+                  <Typography
+                    sx={(theme) => ({
+                      color: theme.palette.text.secondary,
+                      fontSize: scaleFont(14, settings?.textSize),
+                    })}
+                  >
+                    Nu există imagine pentru acest animal
+                  </Typography>
+                )}
+              </Box>
+
+              <Stack direction="row" spacing={1.5}>
+                <Button
+                  component="label"
+                  startIcon={<PhotoCameraOutlinedIcon />}
+                  variant="outlined"
+                  sx={{
+                    borderRadius: 2.5,
+                    textTransform: "none",
+                    fontWeight: 700,
+                  }}
+                >
+                  Schimbă poza
+                  <input
+                    hidden
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    onChange={handleImageChange}
+                  />
+                </Button>
+
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={removeImage}
+                      onChange={(e) => {
+                        setRemoveImage(e.target.checked);
+                        if (e.target.checked) {
+                          setSelectedImage(null);
+                          if (previewUrl) {
+                            URL.revokeObjectURL(previewUrl);
+                            setPreviewUrl("");
+                          }
+                        }
+                      }}
+                    />
+                  }
+                  label="Șterge poza"
+                />
+              </Stack>
+
+              <Box sx={{ width: "100%", mt: 1 }}>
+                <Typography sx={labelSx}>Poziție imagine</Typography>
+                <Slider
+                  value={imagePositionY}
+                  min={0}
+                  max={100}
+                  step={1}
+                  onChange={(_, value) => setImagePositionY(value as number)}
+                />
+              </Box>
+            </Stack>
+          </Box>
+
           <Box sx={{ mb: 2, pt: 0.4 }}>
             <Typography sx={labelSx}>{t("dashboard:petName")}</Typography>
             <Controller
@@ -339,14 +469,7 @@ export const EditPetDialog = ({ open, onClose, pet }: Props) => {
                     SelectProps={{ displayEmpty: true }}
                     sx={fieldSx}
                   >
-                    <MenuItem
-                      value=""
-                      disabled
-                      sx={(theme) => ({
-                        fontSize: scaleFont(14, settings?.textSize),
-                        color: theme.palette.text.secondary,
-                      })}
-                    >
+                    <MenuItem value="" disabled>
                       {t("dashboard:species")}
                     </MenuItem>
                     <MenuItem value="Dog">{t("dashboard:dog")}</MenuItem>
@@ -372,14 +495,7 @@ export const EditPetDialog = ({ open, onClose, pet }: Props) => {
                     SelectProps={{ displayEmpty: true }}
                     sx={fieldSx}
                   >
-                    <MenuItem
-                      value=""
-                      disabled
-                      sx={(theme) => ({
-                        fontSize: scaleFont(14, settings?.textSize),
-                        color: theme.palette.text.secondary,
-                      })}
-                    >
+                    <MenuItem value="" disabled>
                       {t("dashboard:sex")}
                     </MenuItem>
                     <MenuItem value="Male">{t("dashboard:male")}</MenuItem>
@@ -463,29 +579,7 @@ export const EditPetDialog = ({ open, onClose, pet }: Props) => {
           <Divider sx={{ mb: 2.5 }} />
 
           <Stack direction="row" spacing={1.5}>
-            <Button
-              type="button"
-              fullWidth
-              onClick={onClose}
-              sx={(theme) => ({
-                py: 1.5,
-                borderRadius: 2.5,
-                textTransform: "none",
-                fontWeight: 700,
-                fontSize: scaleFont(15, settings?.textSize),
-                color: theme.palette.text.secondary,
-                backgroundColor:
-                  theme.palette.mode === "dark"
-                    ? alpha("#ffffff", 0.06)
-                    : "#f0f2f7",
-                "&:hover": {
-                  backgroundColor:
-                    theme.palette.mode === "dark"
-                      ? alpha("#ffffff", 0.12)
-                      : "#e4e8f0",
-                },
-              })}
-            >
+            <Button type="button" fullWidth onClick={onClose}>
               {t("dashboard:cancel")}
             </Button>
 
@@ -494,28 +588,6 @@ export const EditPetDialog = ({ open, onClose, pet }: Props) => {
               loading={isSubmitting || updateAnimalMutation.isPending}
               variant="contained"
               fullWidth
-              sx={{
-                py: 1.5,
-                borderRadius: 2.5,
-                textTransform: "none",
-                fontWeight: 700,
-                fontSize: scaleFont(15, settings?.textSize),
-                letterSpacing: "-0.1px",
-                background: "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
-                color: "#fff",
-                boxShadow: "0 4px 14px rgba(245,166,35,0.4)",
-                transition: "all 0.2s ease",
-                "&:hover": {
-                  background:
-                    "linear-gradient(135deg, #f0981a 0%, #e88510 100%)",
-                  boxShadow: "0 6px 18px rgba(245,166,35,0.45)",
-                  transform: "translateY(-1px)",
-                },
-                "&:active": {
-                  transform: "translateY(0)",
-                  boxShadow: "0 2px 8px rgba(245,166,35,0.3)",
-                },
-              }}
             >
               {t("dashboard:saveChanges")}
             </LoadingButton>

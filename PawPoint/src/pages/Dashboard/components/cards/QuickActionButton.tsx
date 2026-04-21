@@ -1,4 +1,4 @@
-import { Button, Stack, Typography } from "@mui/material";
+import { Button, Stack, Typography, Box } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import type { ReactNode } from "react";
 import { useSettings } from "../../../../hooks/useSettings";
@@ -28,34 +28,50 @@ export const QuickActionButton = ({
       variant="text"
       sx={(theme) => ({
         justifyContent: "flex-start",
-        px: 2,
-        py: 2,
-        borderRadius: 3,
+        px: 2.5,
+        py: 1.75,
+        borderRadius: 3.5,
         backgroundColor:
           theme.palette.mode === "dark"
-            ? alpha(textColor, 0.14)
+            ? alpha(textColor, 0.1)
             : backgroundColor,
         textTransform: "none",
         border:
           theme.palette.mode === "dark"
-            ? `1px solid ${alpha(textColor, 0.2)}`
-            : "none",
+            ? `1px solid ${alpha(textColor, 0.18)}`
+            : `1px solid ${alpha(textColor, 0.1)}`,
+        transition: "all 0.18s ease",
         "&:hover": {
           backgroundColor:
             theme.palette.mode === "dark"
-              ? alpha(textColor, 0.2)
-              : backgroundColor,
-          opacity: 0.95,
+              ? alpha(textColor, 0.18)
+              : alpha(textColor, 0.12),
+          transform: "translateX(3px)",
+          boxShadow: `0 4px 16px ${alpha(textColor, 0.18)}`,
         },
       })}
     >
-      <Stack direction="row" spacing={1.5} alignItems="center">
-        {icon}
+      <Stack direction="row" spacing={2} alignItems="center">
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 36,
+            height: 36,
+            borderRadius: 2,
+            backgroundColor: alpha(textColor, 0.12),
+            flexShrink: 0,
+          }}
+        >
+          {icon}
+        </Box>
         <Typography
           sx={{
-            fontSize: scaleFont(18, settings?.textSize),
+            fontSize: scaleFont(15, settings?.textSize),
             fontWeight: 600,
             color: textColor,
+            letterSpacing: "-0.1px",
           }}
         >
           {label}
