@@ -8,8 +8,10 @@ export const DashboardContainer = ({ children }: Props) => {
   return (
     <Box
       sx={{
-        px: { xs: 2, sm: 3, md: 5 },
-        py: { xs: 3, md: 5 },
+        maxWidth: 1400,
+        mx: "auto",
+        px: { xs: 2, sm: 4, md: 6, lg: 8 },
+        py: { xs: 4, md: 6 },
       }}
     >
       {children}

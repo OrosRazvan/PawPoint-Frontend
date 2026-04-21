@@ -17,6 +17,8 @@ import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
 import VaccinesRoundedIcon from "@mui/icons-material/VaccinesRounded";
 import BugReportRoundedIcon from "@mui/icons-material/BugReportRounded";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import PhotoCameraOutlinedIcon from "@mui/icons-material/PhotoCameraOutlined";
+import SaveRoundedIcon from "@mui/icons-material/SaveRounded";
 import { useEffect, useMemo, useState } from "react";
 import { useSnackbar } from "notistack";
 import { useNavigate } from "react-router-dom";
@@ -70,11 +72,18 @@ const getInitial = (name?: string | null) => {
   return name.trim().charAt(0).toUpperCase();
 };
 
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const MAX_IMAGE_SIZE_MB = 5;
+const MAX_IMAGE_SIZE_BYTES = MAX_IMAGE_SIZE_MB * 1024 * 1024;
+
 export const Profile = () => {
   const { enqueueSnackbar } = useSnackbar();
 
-  const { data: profile, isLoading: isProfileLoading, isError: isProfileError } =
-    useUserProfile();
+  const {
+    data: profile,
+    isLoading: isProfileLoading,
+    isError: isProfileError,
+  } = useUserProfile();
 
   const { data: appointments = [] } = useAppointments();
   const { data: vaccinations = [] } = useVaccinations();
@@ -90,6 +99,10 @@ export const Profile = () => {
 
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+
+  const [selectedProfilePicture, setSelectedProfilePicture] =
+    useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState("");
 
   const safeProfile = profile ?? {
     fullName: "",
@@ -147,6 +160,14 @@ export const Profile = () => {
     setFullName(safeProfile.fullName ?? "");
     setPhoneNumber(safeProfile.phoneNumber ?? "");
   }, [safeProfile.fullName, safeProfile.phoneNumber]);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
 
   const activityItems = useMemo<ActivityItem[]>(() => {
     const appointmentItems: ActivityItem[] = appointments.map((item: any) => ({
@@ -287,6 +308,74 @@ export const Profile = () => {
     );
   };
 
+  const handleProfilePictureChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+      enqueueSnackbar("Poți încărca doar JPG, PNG sau WEBP.", {
+        variant: "error",
+      });
+      event.target.value = "";
+      return;
+    }
+
+    if (file.size > MAX_IMAGE_SIZE_BYTES) {
+      enqueueSnackbar(`Imaginea trebuie să aibă maxim ${MAX_IMAGE_SIZE_MB} MB.`, {
+        variant: "error",
+      });
+      event.target.value = "";
+      return;
+    }
+
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+
+    const localPreviewUrl = URL.createObjectURL(file);
+    setSelectedProfilePicture(file);
+    setPreviewUrl(localPreviewUrl);
+    event.target.value = "";
+  };
+
+  const handleSaveProfilePicture = () => {
+    if (!selectedProfilePicture) {
+      return;
+    }
+
+    updateProfile(
+      {
+        fullName: safeProfile.fullName ?? "",
+        phoneNumber: safeProfile.phoneNumber ?? "",
+        profilePicture: selectedProfilePicture,
+      },
+      {
+        onSuccess: () => {
+          enqueueSnackbar("Poza de profil a fost actualizată.", {
+            variant: "success",
+          });
+          setSelectedProfilePicture(null);
+          if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+          }
+          setPreviewUrl("");
+        },
+        onError: () => {
+          enqueueSnackbar("Nu s-a putut actualiza poza de profil.", {
+            variant: "error",
+          });
+        },
+      }
+    );
+  };
+
+  const displayedProfilePicture = previewUrl || safeProfile.profilePictureUrl || "";
+
   if (isProfileLoading) {
     return (
       <Box
@@ -353,9 +442,9 @@ export const Profile = () => {
             >
               <Stack spacing={3}>
                 <Stack alignItems="center" spacing={2}>
-                  {safeProfile.profilePictureUrl ? (
+                  {displayedProfilePicture ? (
                     <Avatar
-                      src={safeProfile.profilePictureUrl}
+                      src={displayedProfilePicture}
                       sx={{
                         width: { xs: 96, sm: 110, md: 120 },
                         height: { xs: 96, sm: 110, md: 120 },
@@ -376,6 +465,48 @@ export const Profile = () => {
                       {getInitial(safeProfile.fullName)}
                     </Avatar>
                   )}
+
+                  <Stack
+                    direction={{ xs: "column", sm: "row" }}
+                    spacing={1.5}
+                    alignItems="center"
+                    justifyContent="center"
+                    flexWrap="wrap"
+                  >
+                    <Button
+                      component="label"
+                      startIcon={<PhotoCameraOutlinedIcon />}
+                      disabled={isUpdatingProfile}
+                      sx={{
+                        borderRadius: 2.5,
+                        textTransform: "none",
+                        fontWeight: 700,
+                      }}
+                      variant="outlined"
+                    >
+                      Alege poză
+                      <input
+                        hidden
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp"
+                        onChange={handleProfilePictureChange}
+                      />
+                    </Button>
+
+                    <Button
+                      variant="contained"
+                      startIcon={<SaveRoundedIcon />}
+                      onClick={handleSaveProfilePicture}
+                      disabled={!selectedProfilePicture || isUpdatingProfile}
+                      sx={{
+                        borderRadius: 2.5,
+                        textTransform: "none",
+                        fontWeight: 700,
+                      }}
+                    >
+                      Salvează poza
+                    </Button>
+                  </Stack>
 
                   <Box sx={{ textAlign: "center", maxWidth: "100%" }}>
                     <Typography

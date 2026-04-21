@@ -51,3 +51,5 @@ export const UPDATE_SETTINGS_ENDPOINT = "/settings";
 
 export const CONTACT_MESSAGES_ENDPOINT = "/contact-messages";
 export const ADMIN_CONTACT_MESSAGES_ENDPOINT = "/admin/contact-messages";
+
+export const ASSISTANT_MESSAGE_ENDPOINT = "/Assistant/message";

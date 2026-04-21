@@ -1,4 +1,4 @@
-import { Stack, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import { useSettings } from "../../../hooks/useSettings";
 import { scaleFont } from "../../../utils/fontScale";
 
@@ -11,25 +11,37 @@ export const DashboardHeader = ({ title, subtitle }: Props) => {
   const { data: settings } = useSettings();
 
   return (
-    <Stack spacing={1} sx={{ mb: 4 }}>
-      <Typography
-        sx={(theme) => ({
-          fontSize: {
-            xs: scaleFont(34, settings?.textSize),
-            md: scaleFont(42, settings?.textSize),
-          },
-          fontWeight: 800,
-          lineHeight: 1.1,
-          color: theme.palette.text.primary,
-        })}
-      >
-        {title}
-      </Typography>
+    <Stack spacing={1.5} sx={{ mb: 5 }}>
+      <Box sx={{ position: "relative", display: "inline-block" }}>
+        <Typography
+          sx={(theme) => ({
+            fontSize: {
+              xs: scaleFont(36, settings?.textSize),
+              md: scaleFont(48, settings?.textSize),
+            },
+            fontWeight: 900,
+            lineHeight: 1.05,
+            letterSpacing: "-1.5px",
+            color: theme.palette.text.primary,
+            "& span": {
+              background: "linear-gradient(135deg, #f59e0b 0%, #4f83ff 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            },
+          })}
+        >
+          {title}
+        </Typography>
+      </Box>
 
       <Typography
         sx={(theme) => ({
-          fontSize: scaleFont(18, settings?.textSize),
+          fontSize: scaleFont(16, settings?.textSize),
           color: theme.palette.text.secondary,
+          fontWeight: 400,
+          letterSpacing: "0.1px",
+          maxWidth: 480,
         })}
       >
         {subtitle}

@@ -60,6 +60,7 @@ export const NavbarNav = ({
 
   const isDashboard = location.pathname.startsWith("/dashboard");
   const isAdminPage = location.pathname.startsWith("/admin");
+  const isAssistantPage = location.pathname.startsWith("/assistant");
 
   const managementActive = useMemo(
     () =>
@@ -274,7 +275,23 @@ export const NavbarNav = ({
 
       <Button
         startIcon={<AssistantOutlinedIcon />}
-        sx={navButtonSx}
+        onClick={() => handleGo("/assistant")}
+        sx={(theme) => ({
+          ...navButtonSx(theme),
+          backgroundColor: isAssistantPage
+            ? alpha(theme.palette.primary.main, 0.22)
+            : "transparent",
+          color: isAssistantPage
+            ? theme.palette.text.primary
+            : theme.palette.text.secondary,
+          "&:hover": {
+            backgroundColor: isAssistantPage
+              ? alpha(theme.palette.primary.main, 0.22)
+              : theme.palette.mode === "dark"
+              ? alpha("#ffffff", 0.06)
+              : "#f5f5f5",
+          },
+        })}
       >
         {t("layout:assistant")}
       </Button>

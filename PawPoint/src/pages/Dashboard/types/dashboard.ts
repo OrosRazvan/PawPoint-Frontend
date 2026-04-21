@@ -8,7 +8,8 @@ export type AnimalDto = {
   birthDate?: string | null;
   sex?: string | null;
   microchipNumber?: string | null;
-  profilePictureUrl?: string | null;
+  imageUrl?: string | null;
+  imagePositionY?: number | null;
 };
 
 export type AppointmentDto = {
@@ -55,6 +56,7 @@ export type DashboardPet = {
   weight: string;
   imageLetter: string;
   imageUrl?: string | null;
+  imagePositionY?: number | null;
 
   species?: string;
   weightKg?: number;

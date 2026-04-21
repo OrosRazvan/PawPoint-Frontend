@@ -13,10 +13,10 @@ type Props = {
 };
 
 const iconMap: Record<QuickActionItem["icon"], React.ReactNode> = {
-  vaccination: <VaccinesOutlinedIcon sx={{ color: "#1657ff" }} />,
-  appointment: <EventAvailableOutlinedIcon sx={{ color: "#f59e0b" }} />,
-  deworming: <BugReportOutlinedIcon sx={{ color: "#05a533" }} />,
-  pet: <AddOutlinedIcon sx={{ color: "#ff5a1f" }} />,
+  vaccination: <VaccinesOutlinedIcon sx={{ color: "#1657ff", fontSize: 20 }} />,
+  appointment: <EventAvailableOutlinedIcon sx={{ color: "#f59e0b", fontSize: 20 }} />,
+  deworming: <BugReportOutlinedIcon sx={{ color: "#05a533", fontSize: 20 }} />,
+  pet: <AddOutlinedIcon sx={{ color: "#ff5a1f", fontSize: 20 }} />,
 };
 
 export const QuickActionsSection = ({ actions }: Props) => {
@@ -24,7 +24,7 @@ export const QuickActionsSection = ({ actions }: Props) => {
 
   return (
     <SectionCard title={t("dashboard:quickActions")}>
-      <Stack spacing={3.5}>
+      <Stack spacing={1.5}>
         {actions.map((action) => (
           <QuickActionButton
             key={action.id}

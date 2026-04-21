@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import {
   Dialog,
@@ -11,10 +12,12 @@ import {
   Box,
   Divider,
   Grid,
+  Button,
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import PetsRoundedIcon from "@mui/icons-material/PetsRounded";
+import PhotoCameraOutlinedIcon from "@mui/icons-material/PhotoCameraOutlined";
 import {
   useForm,
   Controller,
@@ -38,12 +41,19 @@ type Props = {
   onClose: () => void;
 };
 
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const MAX_IMAGE_SIZE_MB = 5;
+const MAX_IMAGE_SIZE_BYTES = MAX_IMAGE_SIZE_MB * 1024 * 1024;
+
 export const AddPetDialog = ({ open, onClose }: Props) => {
   const { t } = useTranslation(["dashboard"]);
   const { enqueueSnackbar } = useSnackbar();
   const createAnimalMutation = useCreateAnimal();
   const queryClient = useQueryClient();
   const { data: settings } = useSettings();
+
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState("");
 
   const fieldSx = (theme: any) => ({
     "& .MuiOutlinedInput-root": {
@@ -113,6 +123,47 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
     },
   });
 
+  useEffect(() => {
+    if (!open) {
+      setSelectedImage(null);
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+      setPreviewUrl("");
+    }
+  }, [open, previewUrl]);
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+      enqueueSnackbar("Poți încărca doar JPG, PNG sau WEBP.", {
+        variant: "error",
+      });
+      event.target.value = "";
+      return;
+    }
+
+    if (file.size > MAX_IMAGE_SIZE_BYTES) {
+      enqueueSnackbar(`Imaginea trebuie să aibă maxim ${MAX_IMAGE_SIZE_MB} MB.`, {
+        variant: "error",
+      });
+      event.target.value = "";
+      return;
+    }
+
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+
+    const localPreviewUrl = URL.createObjectURL(file);
+    setSelectedImage(file);
+    setPreviewUrl(localPreviewUrl);
+    event.target.value = "";
+  };
+
   const onSubmit: SubmitHandler<CreateAnimalFormValues> = (values) => {
     createAnimalMutation.mutate(
       {
@@ -125,16 +176,24 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
           : undefined,
         sex: values.sex || undefined,
         microchipNumber: values.microchipNumber?.trim() || undefined,
+        image: selectedImage,
       },
       {
-        onSuccess: () => {
+        onSuccess: async () => {
           enqueueSnackbar(t("dashboard:addPetSuccess"), {
             variant: "success",
           });
 
-          queryClient.invalidateQueries({ queryKey: ["dashboardData"] });
+          await queryClient.invalidateQueries({ queryKey: ["dashboardData"] });
+          await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+          await queryClient.invalidateQueries({ queryKey: ["animals"] });
 
           reset();
+          setSelectedImage(null);
+          if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+          }
+          setPreviewUrl("");
           onClose();
         },
         onError: () => {
@@ -276,6 +335,70 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
 
       <DialogContent sx={{ px: 3.5, pt: 3, pb: 3.5 }}>
         <Stack component="form" spacing={0} onSubmit={handleSubmit(onSubmit)}>
+          <Box sx={{ mb: 2 }}>
+            <Typography sx={labelSx}>Poză animal</Typography>
+
+            <Stack spacing={1.5} alignItems="center">
+              <Box
+                sx={(theme) => ({
+                  width: "100%",
+                  height: 180,
+                  borderRadius: 3,
+                  border: `1px dashed ${theme.palette.divider}`,
+                  overflow: "hidden",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background:
+                    theme.palette.mode === "dark"
+                      ? alpha("#ffffff", 0.03)
+                      : "#faf7f2",
+                })}
+              >
+                {previewUrl ? (
+                  <Box
+                    component="img"
+                    src={previewUrl}
+                    alt="Preview"
+                    sx={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                ) : (
+                  <Typography
+                    sx={(theme) => ({
+                      color: theme.palette.text.secondary,
+                      fontSize: scaleFont(14, settings?.textSize),
+                    })}
+                  >
+                    Nu ai selectat nicio imagine
+                  </Typography>
+                )}
+              </Box>
+
+              <Button
+                component="label"
+                startIcon={<PhotoCameraOutlinedIcon />}
+                variant="outlined"
+                sx={{
+                  borderRadius: 2.5,
+                  textTransform: "none",
+                  fontWeight: 700,
+                }}
+              >
+                Alege poză
+                <input
+                  hidden
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  onChange={handleImageChange}
+                />
+              </Button>
+            </Stack>
+          </Box>
+
           <Box sx={{ mb: 2, pt: 0.4 }}>
             <Typography sx={labelSx}>{t("dashboard:petName")}</Typography>
             <Controller
@@ -318,14 +441,7 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
                     SelectProps={{ displayEmpty: true }}
                     sx={fieldSx}
                   >
-                    <MenuItem
-                      value=""
-                      disabled
-                      sx={(theme) => ({
-                        fontSize: scaleFont(14, settings?.textSize),
-                        color: theme.palette.text.secondary,
-                      })}
-                    >
+                    <MenuItem value="" disabled>
                       {t("dashboard:species")}
                     </MenuItem>
                     <MenuItem value="Dog">{t("dashboard:dog")}</MenuItem>
@@ -351,14 +467,7 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
                     SelectProps={{ displayEmpty: true }}
                     sx={fieldSx}
                   >
-                    <MenuItem
-                      value=""
-                      disabled
-                      sx={(theme) => ({
-                        fontSize: scaleFont(14, settings?.textSize),
-                        color: theme.palette.text.secondary,
-                      })}
-                    >
+                    <MenuItem value="" disabled>
                       {t("dashboard:sex")}
                     </MenuItem>
                     <MenuItem value="Male">{t("dashboard:male")}</MenuItem>
@@ -456,16 +565,9 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
               background: "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
               color: "#fff",
               boxShadow: "0 4px 14px rgba(245,166,35,0.4)",
-              transition: "all 0.2s ease",
               "&:hover": {
                 background:
                   "linear-gradient(135deg, #f0981a 0%, #e88510 100%)",
-                boxShadow: "0 6px 18px rgba(245,166,35,0.45)",
-                transform: "translateY(-1px)",
-              },
-              "&:active": {
-                transform: "translateY(0)",
-                boxShadow: "0 2px 8px rgba(245,166,35,0.3)",
               },
             }}
           >

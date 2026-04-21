@@ -44,19 +44,15 @@ export const UpcomingEventsSection = ({ events }: Props) => {
 
   const formatDate = (value?: string) => {
     if (!value) return "—";
-
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return "—";
-
     return date.toLocaleDateString(locale);
   };
 
   const formatTime = (value?: string) => {
     if (!value) return "—";
-
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return "—";
-
     return date.toLocaleTimeString(locale, {
       hour: "2-digit",
       minute: "2-digit",
@@ -111,15 +107,9 @@ export const UpcomingEventsSection = ({ events }: Props) => {
         return {
           id: String(item.id ?? index),
           petName:
-            item.petName ??
-            item.animalName ??
-            item.name ??
-            t("petFallback"),
+            item.petName ?? item.animalName ?? item.name ?? t("petFallback"),
           typeLabel,
-          statusLabel:
-            item.statusLabel ??
-            item.status ??
-            t("upcomingStatus"),
+          statusLabel: item.statusLabel ?? item.status ?? t("upcomingStatus"),
           rawDate,
           dateLabel: item.dateLabel ?? formatDate(rawDate),
           timeLabel: item.timeLabel ?? formatTime(rawDate),
@@ -136,58 +126,83 @@ export const UpcomingEventsSection = ({ events }: Props) => {
   return (
     <SectionCard title={t("upcomingEvents")}>
       {normalizedEvents.length > 0 ? (
-        <Stack spacing={2}>
+        <Stack spacing={1.75}>
           {normalizedEvents.map((item) => {
-            const icon =
-              item.eventKind === "appointment" ? (
-                <CalendarMonthRoundedIcon
-                  sx={(theme) => ({ color: theme.palette.secondary.main })}
-                />
-              ) : item.eventKind === "vaccination" ? (
-                <VaccinesRoundedIcon
-                  sx={(theme) => ({ color: theme.palette.info.main })}
-                />
-              ) : (
-                <BugReportRoundedIcon
-                  sx={(theme) => ({ color: theme.palette.success.main })}
-                />
-              );
+            const isAppointment = item.eventKind === "appointment";
+            const isVaccination = item.eventKind === "vaccination";
+            const accentColor = isAppointment
+              ? "secondary"
+              : isVaccination
+              ? "info"
+              : "success";
+
+            const icon = isAppointment ? (
+              <CalendarMonthRoundedIcon
+                sx={(theme) => ({ color: theme.palette.secondary.main, fontSize: 20 })}
+              />
+            ) : isVaccination ? (
+              <VaccinesRoundedIcon
+                sx={(theme) => ({ color: theme.palette.info.main, fontSize: 20 })}
+              />
+            ) : (
+              <BugReportRoundedIcon
+                sx={(theme) => ({ color: theme.palette.success.main, fontSize: 20 })}
+              />
+            );
 
             return (
               <Box
                 key={item.id}
                 sx={(theme) => ({
-                  border: `1px solid ${theme.palette.divider}`,
-                  borderRadius: 3,
+                  borderRadius: 3.5,
                   backgroundColor:
                     theme.palette.mode === "dark"
                       ? alpha("#ffffff", 0.03)
                       : "#fff",
-                  px: { xs: 1.75, sm: 2.25, md: 2.5 },
-                  py: { xs: 1.75, sm: 2.25, md: 2.5 },
+                  border: `1px solid ${theme.palette.divider}`,
+                  px: { xs: 2, sm: 2.5 },
+                  py: { xs: 2, sm: 2.25 },
+                  transition: "all 0.16s ease",
+                  "&:hover": {
+                    borderColor:
+                      theme.palette.mode === "dark"
+                        ? alpha(theme.palette[accentColor].main, 0.4)
+                        : alpha(theme.palette[accentColor].main, 0.3),
+                    boxShadow:
+                      theme.palette.mode === "dark"
+                        ? "0 4px 20px rgba(0,0,0,0.2)"
+                        : `0 4px 20px ${alpha(theme.palette[accentColor].main, 0.08)}`,
+                    transform: "translateY(-1px)",
+                  },
                 })}
               >
                 <Stack
                   direction={{ xs: "column", sm: "row" }}
                   justifyContent="space-between"
-                  alignItems={{ xs: "flex-start", sm: "flex-start" }}
-                  spacing={2}
+                  alignItems={{ xs: "flex-start", sm: "center" }}
+                  spacing={1.5}
                 >
-                  <Stack direction="row" spacing={2} alignItems="flex-start">
+                  <Stack direction="row" spacing={2} alignItems="center">
                     <Box
                       sx={(theme) => ({
-                        width: { xs: 46, sm: 54 },
-                        height: { xs: 46, sm: 54 },
+                        width: { xs: 44, sm: 48 },
+                        height: { xs: 44, sm: 48 },
                         borderRadius: 2.5,
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        backgroundColor:
-                          item.eventKind === "appointment"
-                            ? alpha(theme.palette.secondary.main, 0.16)
-                            : item.eventKind === "vaccination"
-                            ? alpha(theme.palette.info.main, 0.14)
-                            : alpha(theme.palette.success.main, 0.14),
+                        backgroundColor: isAppointment
+                          ? alpha(theme.palette.secondary.main, 0.12)
+                          : isVaccination
+                          ? alpha(theme.palette.info.main, 0.12)
+                          : alpha(theme.palette.success.main, 0.12),
+                        border: `1px solid ${
+                          isAppointment
+                            ? alpha(theme.palette.secondary.main, 0.2)
+                            : isVaccination
+                            ? alpha(theme.palette.info.main, 0.2)
+                            : alpha(theme.palette.success.main, 0.2)
+                        }`,
                         flexShrink: 0,
                       })}
                     >
@@ -197,8 +212,10 @@ export const UpcomingEventsSection = ({ events }: Props) => {
                     <Box sx={{ minWidth: 0 }}>
                       <Typography
                         sx={(theme) => ({
-                          fontSize: 18,
-                          fontWeight: 800,
+                          fontSize: 15,
+                          fontWeight: 700,
+                          letterSpacing: "-0.2px",
+                          lineHeight: 1.3,
                           color: theme.palette.text.primary,
                           wordBreak: "break-word",
                         })}
@@ -211,14 +228,15 @@ export const UpcomingEventsSection = ({ events }: Props) => {
 
                       <Typography
                         sx={(theme) => ({
-                          mt: 1,
-                          fontSize: 15,
+                          mt: 0.4,
+                          fontSize: 13,
                           color: theme.palette.text.secondary,
+                          fontWeight: 400,
                         })}
                       >
                         {item.dateLabel}
                         {item.timeLabel && item.timeLabel !== "—"
-                          ? ` • ${item.timeLabel}`
+                          ? ` · ${item.timeLabel}`
                           : ""}
                       </Typography>
                     </Box>
@@ -226,14 +244,26 @@ export const UpcomingEventsSection = ({ events }: Props) => {
 
                   <Chip
                     label={item.statusLabel}
+                    size="small"
                     sx={(theme) => ({
                       borderRadius: 999,
                       backgroundColor:
                         theme.palette.mode === "dark"
                           ? alpha("#ffffff", 0.06)
-                          : "#f2f4f7",
-                      color: theme.palette.text.secondary,
-                      fontSize: 13,
+                          : alpha(theme.palette[accentColor].main, 0.08),
+                      color:
+                        theme.palette.mode === "dark"
+                          ? theme.palette.text.secondary
+                          : theme.palette[accentColor].main,
+                      fontWeight: 600,
+                      fontSize: 12,
+                      border: `1px solid ${
+                        theme.palette.mode === "dark"
+                          ? alpha("#ffffff", 0.08)
+                          : alpha(theme.palette[accentColor].main, 0.18)
+                      }`,
+                      alignSelf: { xs: "flex-start", sm: "center" },
+                      flexShrink: 0,
                     })}
                   />
                 </Stack>

@@ -1,0 +1,68 @@
+{
+  "assistant": {
+    "pageTitle": "Asistent",
+    "pageSubtitle": "Întreabă despre animale, programări, vaccinări și deparazitări.",
+    "inputPlaceholder": "Scrie un mesaj...",
+    "send": "Trimite",
+    "loading": "Se generează răspunsul...",
+    "errors": {
+      "generic": "A apărut o eroare. Încearcă din nou."
+    },
+    "greeting": "Salut! Te pot ajuta cu animalele tale, programările, vaccinările, deparazitările și recomandări bazate pe datele din cont.",
+    "help": "Pot să-ți spun ce animale ai, ce programări urmează, ce vaccinări sau deparazitări sunt due și îți pot da recomandări simple bazate pe datele existente.",
+    "unknown": "Nu am înțeles complet cererea. Încearcă ceva de genul: „Ce animale am?”, „Ce urmează pentru Rex?” sau „Ce vaccinări sunt due?”",
+    "noPets": "Nu am găsit niciun animal în contul tău.",
+    "listPets": "Ai următoarele animale: {{petNames}}",
+    "noAppointments": "Nu ai programări în următoarele {{days}} zile.",
+    "upcomingAppointments": "Programările care urmează sunt: {{appointments}}",
+    "petNotFound": "Nu am găsit un animal cu numele {{petName}}.",
+    "noVaccinations": "Nu am găsit vaccinări pentru {{petName}}.",
+    "noDewormings": "Nu am găsit deparazitări pentru {{petName}}.",
+    "healthOverview": "Ai {{petCount}} animale, {{appointmentCount}} programări viitoare, {{dueVaccinations}} vaccinări due curând și {{dueDewormings}} deparazitări due curând.",
+    "noDueItems": "Nu am găsit vaccinări sau deparazitări due în următoarele 14 zile.",
+    "dueItems": {
+      "summary": "Vaccinări due: {{vaccinations}}. Deparazitări due: {{dewormings}}."
+    },
+    "petOverview": {
+      "composed": "__COMPOSED__",
+      "base": "{{petName}} este înregistrat ca {{species}}.",
+      "withBreed": "{{petName}} este înregistrat ca {{species}} ({{breed}}).",
+      "nextAppointment": "Următoarea programare este pe {{date}} pentru {{type}}.",
+      "nextVaccination": "Următorul vaccin este due pe {{date}}.",
+      "nextDeworming": "Următoarea deparazitare este due pe {{date}}."
+    },
+    "petVaccinations": {
+      "noDueDate": "Am găsit {{count}} vaccinări pentru {{petName}}, dar fără o dată viitoare calculată.",
+      "nextDue": "Pentru {{petName}}, următorul vaccin este due pe {{date}}."
+    },
+    "petDewormings": {
+      "noDueDate": "Am găsit {{count}} înregistrări de deparazitare pentru {{petName}}, dar fără următoarea dată calculată.",
+      "nextDue": "Pentru {{petName}}, următoarea deparazitare este due pe {{date}}."
+    },
+    "alerts": {
+      "dueVaccinations": "Ai {{count}} vaccinări care sunt due în următoarele 7 zile.",
+      "dueDewormings": "Ai {{count}} deparazitări care sunt due în următoarele 7 zile.",
+      "appointments": "Ai {{count}} programări în următoarele 30 de zile."
+    },
+    "recommendations": {
+      "summary": "__COMPOSED__",
+      "overdueVaccinations": "Ai {{count}} vaccinări întârziate. Ar fi bine să programezi un consult sau vaccin cât mai curând.",
+      "overdueDewormings": "Ai {{count}} deparazitări întârziate. Verifică animalele afectate și planifică administrarea.",
+      "noAppointments": "Nu ai programări viitoare. Ar fi util să verifici dacă există vaccinări sau controale care trebuie planificate.",
+      "checkPet": "Poți verifica separat istoricul pentru {{petName}} ca să vezi ce urmează exact.",
+      "allGood": "Situația pare bună momentan. Continuă să urmărești programările și tratamentele recurente."
+    },
+    "suggestions": {
+      "listPets": "Ce animale am?",
+      "upcomingAppointments": "Ce programări urmează?",
+      "healthOverview": "Dă-mi un rezumat general",
+      "recommendations": "Ce îmi recomanzi?",
+      "dueVaccinations": "Ce vaccinări sunt due?",
+      "dueDewormings": "Ce deparazitări sunt due?",
+      "petOverview": "Ce urmează pentru {{petName}}?",
+      "petVaccinations": "Vaccinări pentru {{petName}}",
+      "petDewormings": "Deparazitări pentru {{petName}}",
+      "petRecommendations": "Ce îmi recomanzi pentru {{petName}}?"
+    }
+  }
+}
