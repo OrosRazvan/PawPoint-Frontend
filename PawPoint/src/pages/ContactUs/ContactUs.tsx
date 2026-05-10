@@ -52,8 +52,8 @@ const EnvelopeIllustration = ({ isDark }: { isDark: boolean }) => (
     }}
   >
     <svg
-      width="110"
-      height="110"
+      width="150"
+      height="150"
       viewBox="0 0 110 110"
       fill="none"
       style={{ maxWidth: "100%", height: "auto" }}
@@ -144,7 +144,7 @@ const InfoCard = ({
   ];
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={3}>
       {items.map((item) => (
         <Stack
           key={item.label}
@@ -154,9 +154,9 @@ const InfoCard = ({
         >
           <Box
             sx={{
-              width: 38,
-              height: 38,
-              borderRadius: "10px",
+              width: 46,
+              height: 46,
+              borderRadius: "13px",
               flexShrink: 0,
               background: isDark
                 ? alpha("#f97316", 0.1)
@@ -176,7 +176,7 @@ const InfoCard = ({
             <Typography
               sx={{
                 fontWeight: 700,
-                fontSize: "0.82rem",
+                fontSize: "0.9rem",
                 color: isDark ? "#e2e8f0" : "#071c42",
               }}
             >
@@ -184,9 +184,8 @@ const InfoCard = ({
             </Typography>
             <Typography
               sx={{
-                fontSize: "0.74rem",
+                fontSize: "0.82rem",
                 color: isDark ? alpha("#fff", 0.35) : "#94a3b8",
-                mt: 0.2,
                 lineHeight: 1.5,
               }}
             >
@@ -269,8 +268,8 @@ export const ContactUs = () => {
         display: "flex",
         alignItems: { xs: "stretch", md: "center" },
         justifyContent: "center",
-        py: { xs: 4, sm: 5, md: 8 },
-        px: { xs: 2, sm: 2.5, md: 3 },
+        py: { xs: 4, sm: 6, md: 10 },
+        px: { xs: 2, sm: 4, md: 6, lg: 8 },
         background: isDark
           ? "radial-gradient(ellipse at 75% 10%, #1c0f0233 0%, transparent 55%), #080d1a"
           : "radial-gradient(ellipse at 20% 0%, #fff7ed 0%, transparent 45%), radial-gradient(ellipse at 85% 95%, #fef3e2 0%, transparent 45%), #f8fafc",
@@ -309,11 +308,11 @@ export const ContactUs = () => {
       />
 
       <Stack
-        spacing={{ xs: 2.5, md: 3.5 }}
+        spacing={{ xs: 3, md: 5 }}
         alignItems="center"
         sx={{
           width: "100%",
-          maxWidth: 840,
+          maxWidth: 1200,
           animation: `${fadeUp} 0.5s ease both`,
         }}
       >
@@ -350,13 +349,13 @@ export const ContactUs = () => {
             alignItems={{ xs: "flex-start", sm: "center" }}
             justifyContent="space-between"
             spacing={{ xs: 2.5, sm: 2 }}
-            sx={{ px: { xs: 2.5, sm: 3, md: 5 }, py: { xs: 3, md: 4 } }}
+            sx={{ px: { xs: 3, sm: 5, md: 7 }, py: { xs: 4, md: 6 } }}
           >
             <Box sx={{ width: "100%", minWidth: 0 }}>
               <Typography
                 sx={{
                   fontFamily: "'Syne', 'DM Sans', sans-serif",
-                  fontSize: { xs: 26, sm: 30, md: 38 },
+                  fontSize: { xs: 30, sm: 36, md: 48 },
                   fontWeight: 800,
                   letterSpacing: "-0.8px",
                   lineHeight: 1.05,
@@ -370,8 +369,8 @@ export const ContactUs = () => {
                 sx={{
                   mt: 1.2,
                   color: isDark ? alpha("#fde8d0", 0.5) : "#64748b",
-                  fontSize: { xs: "0.88rem", md: "0.92rem" },
-                  maxWidth: 340,
+                  fontSize: { xs: "0.95rem", md: "1.05rem" },
+                  maxWidth: 480,
                   lineHeight: 1.65,
                 }}
               >
@@ -427,7 +426,7 @@ export const ContactUs = () => {
 
         <Stack
           direction={{ xs: "column", md: "row" }}
-          spacing={{ xs: 2.5, md: 3 }}
+          spacing={{ xs: 3, md: 4 }}
           alignItems="stretch"
           sx={{ width: "100%" }}
         >
@@ -456,21 +455,21 @@ export const ContactUs = () => {
             />
             <CardContent
               sx={{
-                p: { xs: 2.5, sm: 3, md: 3.5 },
-                "&:last-child": { pb: { xs: 2.5, sm: 3, md: 3.5 } },
+                p: { xs: 3, sm: 4, md: 5 },
+                "&:last-child": { pb: { xs: 3, sm: 4, md: 5 } },
               }}
             >
               <Stack
                 direction="row"
                 alignItems="center"
                 spacing={1.5}
-                sx={{ mb: 3 }}
+                sx={{ mb: 4 }}
               >
                 <Box
                   sx={{
-                    width: 42,
-                    height: 42,
-                    borderRadius: "12px",
+                    width: 50,
+                    height: 50,
+                    borderRadius: "14px",
                     flexShrink: 0,
                     background: isDark ? alpha("#f97316", 0.12) : "#fff7ed",
                     border: `1px solid ${
@@ -495,7 +494,7 @@ export const ContactUs = () => {
                   <Typography
                     sx={{
                       fontWeight: 800,
-                      fontSize: "1rem",
+                      fontSize: "1.15rem",
                       color: isDark ? "#e2e8f0" : "#071c42",
                       letterSpacing: "-0.1px",
                     }}
@@ -515,7 +514,7 @@ export const ContactUs = () => {
 
               <Stack
                 component="form"
-                spacing={2.5}
+                spacing={3}
                 onSubmit={handleSubmit(onSubmit)}
               >
                 <Controller
@@ -540,7 +539,7 @@ export const ContactUs = () => {
                       {...field}
                       label={t("contact:description")}
                       multiline
-                      minRows={6}
+                      minRows={8}
                       fullWidth
                       error={!!errors.description}
                       helperText={errors.description?.message}
@@ -601,9 +600,9 @@ export const ContactUs = () => {
                       borderRadius: "13px",
                       textTransform: "none",
                       fontWeight: 700,
-                      fontSize: "0.9rem",
-                      px: 3.5,
-                      py: 1.2,
+                      fontSize: "1rem",
+                      px: 4.5,
+                      py: 1.5,
                       letterSpacing: "0.01em",
                       background:
                         "linear-gradient(135deg, #f97316 0%, #ea580c 100%)",
@@ -656,7 +655,7 @@ export const ContactUs = () => {
 
           <Box
             sx={{
-              width: { xs: "100%", md: 215 },
+              width: { xs: "100%", md: 300 },
               flexShrink: 0,
               animation: `${fadeUp} 0.5s 0.18s ease both`,
             }}
@@ -680,11 +679,11 @@ export const ContactUs = () => {
                 }}
               />
               <CardContent
-                sx={{ p: 2.5, "&:last-child": { pb: 2.5 } }}
+                sx={{ p: 3.5, "&:last-child": { pb: 3.5 } }}
               >
                 <Typography
                   sx={{
-                    fontSize: "0.7rem",
+                    fontSize: "0.75rem",
                     fontWeight: 800,
                     letterSpacing: "0.1em",
                     textTransform: "uppercase",

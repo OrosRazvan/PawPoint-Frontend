@@ -7,6 +7,9 @@ import {
   Button,
 } from "@mui/material";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
+import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
+import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
+import ScheduleRoundedIcon from "@mui/icons-material/ScheduleRounded";
 import { alpha } from "@mui/material/styles";
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
@@ -31,27 +34,27 @@ const resolveStatus = (item: AppointmentDto): "completed" | "upcoming" => {
 const mapAppointments = (
   items: AppointmentDto[],
   t: (key: string) => string
-  ): AppointmentCardItem[] => {
-    return items.map((item) => ({
-      id: item.id,
-      animalId: item.animalId,
-      animalName: item.animalName ?? t("appointment:petFallback"),
-      serviceType: item.serviceType ?? t("appointment:serviceFallback"),
-      vetCabinetId: item.vetCabinetId,
-      vetCabinetName: item.vetCabinetName ?? t("appointment:clinicFallback"),
-      vetCabinetAddress: item.vetCabinetAddress ?? null,
-      vetTimeSlotId: item.vetTimeSlotId,
+): AppointmentCardItem[] => {
+  return items.map((item) => ({
+    id: item.id,
+    animalId: item.animalId,
+    animalName: item.animalName ?? t("appointment:petFallback"),
+    serviceType: item.serviceType ?? t("appointment:serviceFallback"),
+    vetCabinetId: item.vetCabinetId,
+    vetCabinetName: item.vetCabinetName ?? t("appointment:clinicFallback"),
+    vetCabinetAddress: item.vetCabinetAddress ?? null,
+    vetTimeSlotId: item.vetTimeSlotId,
+    slotStartTimeUtc: item.slotStartTimeUtc ?? item.startTimeUtc ?? "",
+    slotEndTimeUtc: item.slotEndTimeUtc ?? item.endTimeUtc ?? "",
+    vetDoctorName: item.vetDoctorName ?? null,
+    priceRon: item.priceRon ?? null,
+    notes: item.notes ?? null,
+    status: resolveStatus({
+      ...item,
       slotStartTimeUtc: item.slotStartTimeUtc ?? item.startTimeUtc ?? "",
-      slotEndTimeUtc: item.slotEndTimeUtc ?? item.endTimeUtc ?? "",
-      vetDoctorName: item.vetDoctorName ?? null,
-      priceRon: item.priceRon ?? null,
-      notes: item.notes ?? null,
-      status: resolveStatus({
-        ...item,
-        slotStartTimeUtc: item.slotStartTimeUtc ?? item.startTimeUtc ?? "",
-      } as AppointmentDto),
-    }));
-  };
+    } as AppointmentDto),
+  }));
+};
 
 export const Appointments = () => {
   const { t } = useTranslation(["appointment"]);
@@ -81,44 +84,68 @@ export const Appointments = () => {
           alignItems={{ xs: "flex-start", md: "center" }}
           spacing={2}
         >
-          <Box>
-            <Typography
+          <Stack direction="row" spacing={2.5} alignItems="center">
+            <Box
               sx={(theme) => ({
-                fontSize: {
-                  xs: scaleFont(34, settings?.textSize),
-                  md: scaleFont(42, settings?.textSize),
-                },
-                fontWeight: 800,
-                lineHeight: 1.1,
-                color: theme.palette.text.primary,
+                width: 52,
+                height: 52,
+                borderRadius: 3,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+                color: "#fff",
+                boxShadow: `0 6px 16px ${alpha(
+                  theme.palette.primary.main,
+                  0.32
+                )}`,
+                flexShrink: 0,
               })}
             >
-              {t("appointment:title")}
-            </Typography>
+              <EventAvailableOutlinedIcon sx={{ fontSize: 26 }} />
+            </Box>
 
-            <Typography
-              sx={(theme) => ({
-                mt: 1.5,
-                fontSize: scaleFont(18, settings?.textSize),
-                color: theme.palette.text.secondary,
-              })}
-            >
-              {t("appointment:subtitle")}
-            </Typography>
-          </Box>
+            <Box>
+              <Typography
+                sx={(theme) => ({
+                  fontSize: {
+                    xs: scaleFont(28, settings?.textSize),
+                    md: scaleFont(34, settings?.textSize),
+                  },
+                  fontWeight: 800,
+                  lineHeight: 1.15,
+                  color: theme.palette.text.primary,
+                  letterSpacing: "-0.5px",
+                })}
+              >
+                {t("appointment:title")}
+              </Typography>
+
+              <Typography
+                sx={(theme) => ({
+                  mt: 0.5,
+                  fontSize: scaleFont(14, settings?.textSize),
+                  color: theme.palette.text.secondary,
+                })}
+              >
+                {t("appointment:subtitle")}
+              </Typography>
+            </Box>
+          </Stack>
 
           <Button
             startIcon={<AddOutlinedIcon />}
             onClick={() => navigate("/appointments/book")}
             sx={(theme) => ({
-              px: 2.5,
-              py: 1.2,
+              px: 2.75,
+              py: 1.25,
               borderRadius: 2.5,
               color: theme.palette.primary.contrastText,
               textTransform: "none",
               fontSize: scaleFont(14, settings?.textSize),
               fontWeight: 700,
               letterSpacing: "-0.1px",
+              whiteSpace: "nowrap",
               background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
               boxShadow:
                 theme.palette.mode === "dark"
@@ -134,7 +161,7 @@ export const Appointments = () => {
         </Stack>
 
         {isLoading ? (
-          <Box sx={{ py: 8, display: "flex", justifyContent: "center" }}>
+          <Box sx={{ py: 10, display: "flex", justifyContent: "center" }}>
             <CircularProgress />
           </Box>
         ) : isError ? (
@@ -143,20 +170,66 @@ export const Appointments = () => {
           <Stack spacing={5}>
             {upcomingItems.length > 0 && (
               <Box>
-                <Typography
-                  sx={(theme) => ({
-                    fontSize: scaleFont(24, settings?.textSize),
-                    fontWeight: 700,
-                    color: theme.palette.text.primary,
-                    mb: 3,
-                  })}
+                <Stack
+                  direction="row"
+                  spacing={1.5}
+                  alignItems="center"
+                  sx={{ mb: 2.5 }}
                 >
-                  {t("appointment:upcoming")}
-                </Typography>
+                  <Box
+                    sx={(theme) => ({
+                      width: 32,
+                      height: 32,
+                      borderRadius: 2,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      backgroundColor:
+                        theme.palette.mode === "dark"
+                          ? alpha(theme.palette.warning.main, 0.16)
+                          : "#fef3e2",
+                    })}
+                  >
+                    <ScheduleRoundedIcon
+                      sx={(theme) => ({
+                        fontSize: 17,
+                        color: theme.palette.warning.main,
+                      })}
+                    />
+                  </Box>
 
-                <Grid container spacing={3}>
+                  <Typography
+                    sx={(theme) => ({
+                      fontSize: scaleFont(18, settings?.textSize),
+                      fontWeight: 800,
+                      color: theme.palette.text.primary,
+                      letterSpacing: "-0.3px",
+                    })}
+                  >
+                    {t("appointment:upcoming")}
+                  </Typography>
+
+                  <Box
+                    sx={(theme) => ({
+                      px: 1.25,
+                      py: 0.2,
+                      borderRadius: 999,
+                      backgroundColor:
+                        theme.palette.mode === "dark"
+                          ? alpha(theme.palette.warning.main, 0.16)
+                          : "#f8ecd8",
+                      color: theme.palette.warning.main,
+                      fontSize: scaleFont(12, settings?.textSize),
+                      fontWeight: 700,
+                    })}
+                  >
+                    {upcomingItems.length}
+                  </Box>
+                </Stack>
+
+                <Grid container spacing={2.5}>
                   {upcomingItems.map((item) => (
-                    <Grid key={item.id} size={{ xs: 12, md: 4 }}>
+                    <Grid key={item.id} size={{ xs: 12, md: 6, xl: 4 }}>
                       <AppointmentCard
                         item={item}
                         onEdit={() =>
@@ -177,20 +250,66 @@ export const Appointments = () => {
 
             {completedItems.length > 0 && (
               <Box>
-                <Typography
-                  sx={(theme) => ({
-                    fontSize: scaleFont(24, settings?.textSize),
-                    fontWeight: 700,
-                    color: theme.palette.text.primary,
-                    mb: 3,
-                  })}
+                <Stack
+                  direction="row"
+                  spacing={1.5}
+                  alignItems="center"
+                  sx={{ mb: 2.5 }}
                 >
-                  {t("appointment:completed")}
-                </Typography>
+                  <Box
+                    sx={(theme) => ({
+                      width: 32,
+                      height: 32,
+                      borderRadius: 2,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      backgroundColor:
+                        theme.palette.mode === "dark"
+                          ? alpha(theme.palette.success.main, 0.14)
+                          : "#dff4f1",
+                    })}
+                  >
+                    <CheckCircleOutlineRoundedIcon
+                      sx={(theme) => ({
+                        fontSize: 17,
+                        color: theme.palette.success.main,
+                      })}
+                    />
+                  </Box>
 
-                <Grid container spacing={3}>
+                  <Typography
+                    sx={(theme) => ({
+                      fontSize: scaleFont(18, settings?.textSize),
+                      fontWeight: 800,
+                      color: theme.palette.text.primary,
+                      letterSpacing: "-0.3px",
+                    })}
+                  >
+                    {t("appointment:completed")}
+                  </Typography>
+
+                  <Box
+                    sx={(theme) => ({
+                      px: 1.25,
+                      py: 0.2,
+                      borderRadius: 999,
+                      backgroundColor:
+                        theme.palette.mode === "dark"
+                          ? alpha(theme.palette.success.main, 0.14)
+                          : "#dff4f1",
+                      color: theme.palette.success.main,
+                      fontSize: scaleFont(12, settings?.textSize),
+                      fontWeight: 700,
+                    })}
+                  >
+                    {completedItems.length}
+                  </Box>
+                </Stack>
+
+                <Grid container spacing={2.5}>
                   {completedItems.map((item) => (
-                    <Grid key={item.id} size={{ xs: 12, md: 4 }}>
+                    <Grid key={item.id} size={{ xs: 12, md: 6, xl: 4 }}>
                       <AppointmentCard item={item} />
                     </Grid>
                   ))}
@@ -198,15 +317,55 @@ export const Appointments = () => {
               </Box>
             )}
 
-            {completedItems.length === 0 && upcomingItems.length === 0 && (
-              <Typography
+            {items.length === 0 && (
+              <Box
                 sx={(theme) => ({
-                  color: theme.palette.text.secondary,
-                  fontSize: scaleFont(16, settings?.textSize),
+                  py: 8,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 2,
+                  borderRadius: 4,
+                  border: `1px dashed ${theme.palette.divider}`,
+                  backgroundColor:
+                    theme.palette.mode === "dark"
+                      ? alpha("#ffffff", 0.02)
+                      : alpha("#000000", 0.01),
                 })}
               >
-                {t("appointment:empty")}
-              </Typography>
+                <Box
+                  sx={(theme) => ({
+                    width: 56,
+                    height: 56,
+                    borderRadius: 3,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor:
+                      theme.palette.mode === "dark"
+                        ? alpha(theme.palette.primary.main, 0.14)
+                        : alpha(theme.palette.primary.main, 0.07),
+                  })}
+                >
+                  <EventAvailableOutlinedIcon
+                    sx={(theme) => ({
+                      fontSize: 28,
+                      color: theme.palette.primary.main,
+                      opacity: 0.6,
+                    })}
+                  />
+                </Box>
+
+                <Typography
+                  sx={(theme) => ({
+                    color: theme.palette.text.secondary,
+                    fontSize: scaleFont(14, settings?.textSize),
+                    fontWeight: 500,
+                  })}
+                >
+                  {t("appointment:empty")}
+                </Typography>
+              </Box>
             )}
           </Stack>
         )}

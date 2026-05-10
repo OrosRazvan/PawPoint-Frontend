@@ -73,10 +73,13 @@ const formatSlotLabel = (
   const startDate = new Date(start);
   const endDate = new Date(end);
 
-  return `${formatDateBySettings(startDate, dateFormat)} • ${startDate.toLocaleTimeString(
-    locale,
-    { hour: "2-digit", minute: "2-digit" }
-  )} - ${endDate.toLocaleTimeString(locale, {
+  return `${formatDateBySettings(
+    startDate,
+    dateFormat
+  )} • ${startDate.toLocaleTimeString(locale, {
+    hour: "2-digit",
+    minute: "2-digit",
+  })} - ${endDate.toLocaleTimeString(locale, {
     hour: "2-digit",
     minute: "2-digit",
   })}`;
@@ -101,18 +104,25 @@ export const AddDewormingDialog = ({ open, onClose }: Props) => {
 
   const fieldSx = (theme: any) => ({
     "& .MuiOutlinedInput-root": {
-      borderRadius: 2,
+      borderRadius: 2.5,
       backgroundColor:
         theme.palette.mode === "dark"
           ? alpha("#ffffff", 0.03)
           : theme.palette.background.paper,
       fontSize: scaleFont(14, settings?.textSize),
       color: theme.palette.text.primary,
+      transition: "box-shadow 0.2s ease",
       "& fieldset": {
         borderColor: theme.palette.divider,
       },
       "&:hover fieldset": {
         borderColor: theme.palette.primary.main,
+      },
+      "&.Mui-focused": {
+        boxShadow:
+          theme.palette.mode === "dark"
+            ? `0 0 0 3px ${alpha(theme.palette.primary.main, 0.2)}`
+            : "0 0 0 3px rgba(245,166,35,0.12)",
       },
       "&.Mui-focused fieldset": {
         borderColor: theme.palette.primary.main,
@@ -235,7 +245,7 @@ export const AddDewormingDialog = ({ open, onClose }: Props) => {
           boxShadow:
             theme.palette.mode === "dark"
               ? "0 24px 64px rgba(0,0,0,0.38), 0 4px 12px rgba(0,0,0,0.24)"
-              : undefined,
+              : "0 24px 64px rgba(7,28,66,0.14), 0 4px 12px rgba(7,28,66,0.06)",
         }),
       }}
     >
@@ -252,9 +262,29 @@ export const AddDewormingDialog = ({ open, onClose }: Props) => {
                     0.12
                   )} 0%, ${alpha(theme.palette.background.paper, 0.9)} 100%)`
                 : "linear-gradient(135deg, #fbf2ea 0%, #fdf7ef 100%)",
+            position: "relative",
+            overflow: "hidden",
+            "&::after": {
+              content: '""',
+              position: "absolute",
+              bottom: -24,
+              right: -24,
+              width: 100,
+              height: 100,
+              borderRadius: "50%",
+              background:
+                theme.palette.mode === "dark"
+                  ? alpha(theme.palette.primary.main, 0.1)
+                  : "rgba(245,166,35,0.08)",
+              pointerEvents: "none",
+            },
           })}
         >
-          <Stack direction="row" justifyContent="space-between">
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="flex-start"
+          >
             <Stack direction="row" spacing={2} alignItems="center">
               <Box
                 sx={{
@@ -267,6 +297,8 @@ export const AddDewormingDialog = ({ open, onClose }: Props) => {
                   background:
                     "linear-gradient(135deg, #f5a623 0%, #f0911a 100%)",
                   color: "#fff",
+                  boxShadow: "0 4px 12px rgba(245,166,35,0.32)",
+                  flexShrink: 0,
                 }}
               >
                 <BugReportOutlinedIcon sx={{ fontSize: 22 }} />
@@ -278,15 +310,19 @@ export const AddDewormingDialog = ({ open, onClose }: Props) => {
                     fontSize: scaleFont(19, settings?.textSize),
                     fontWeight: 800,
                     color: theme.palette.text.primary,
+                    lineHeight: 1.2,
+                    letterSpacing: "-0.3px",
                   })}
                 >
                   {t("deworming:addDialogTitle")}
                 </Typography>
+
                 <Typography
                   sx={(theme) => ({
                     fontSize: scaleFont(13, settings?.textSize),
                     color: theme.palette.text.secondary,
                     mt: 0.4,
+                    fontWeight: 400,
                   })}
                 >
                   {t("deworming:addDialogSubtitle")}
@@ -306,6 +342,14 @@ export const AddDewormingDialog = ({ open, onClose }: Props) => {
                 borderRadius: 2,
                 width: 32,
                 height: 32,
+                mt: 0.5,
+                "&:hover": {
+                  backgroundColor:
+                    theme.palette.mode === "dark"
+                      ? alpha("#ffffff", 0.1)
+                      : "rgba(0,0,0,0.08)",
+                  color: theme.palette.text.primary,
+                },
               })}
             >
               <CloseRoundedIcon sx={{ fontSize: 18 }} />
@@ -456,6 +500,24 @@ export const AddDewormingDialog = ({ open, onClose }: Props) => {
             />
           </Box>
 
+          {Array.isArray(slots) &&
+            slots.length === 0 &&
+            selectedCabinetId &&
+            selectedVisitDate && (
+              <Typography
+                sx={(theme) => ({
+                  mt: -1,
+                  fontSize: scaleFont(12, settings?.textSize),
+                  color:
+                    theme.palette.mode === "dark"
+                      ? theme.palette.warning.main
+                      : "#b45309",
+                })}
+              >
+                {t("deworming:noSlotsAvailable")}
+              </Typography>
+            )}
+
           <Box>
             <Typography sx={labelSx}>{t("deworming:notes")}</Typography>
             <Controller
@@ -486,8 +548,15 @@ export const AddDewormingDialog = ({ open, onClose }: Props) => {
               textTransform: "none",
               fontWeight: 700,
               fontSize: scaleFont(15, settings?.textSize),
-              background: "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
+              background:
+                "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
               color: "#fff",
+              boxShadow: "0 6px 16px rgba(245,166,35,0.28)",
+              "&:hover": {
+                background:
+                  "linear-gradient(135deg, #f0a020 0%, #e08510 100%)",
+                boxShadow: "0 8px 20px rgba(245,166,35,0.36)",
+              },
             }}
           >
             {t("deworming:save")}

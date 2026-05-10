@@ -38,9 +38,7 @@ type FormValues = {
   notes: string;
 };
 
-const normalizeType = (
-  value: string | number
-): DewormingTypeEnum | "" => {
+const normalizeType = (value: string | number): DewormingTypeEnum | "" => {
   if (typeof value === "number") {
     switch (value) {
       case 1:
@@ -90,23 +88,39 @@ export const EditDewormingDialog = ({ open, item, onClose }: Props) => {
 
   const fieldSx = (theme: any) => ({
     "& .MuiOutlinedInput-root": {
-      borderRadius: 2,
+      borderRadius: 2.5,
       backgroundColor:
         theme.palette.mode === "dark"
           ? alpha("#ffffff", 0.03)
           : theme.palette.background.paper,
       fontSize: scaleFont(14, settings?.textSize),
       color: theme.palette.text.primary,
+      transition: "box-shadow 0.2s ease",
       "& fieldset": {
         borderColor: theme.palette.divider,
       },
       "&:hover fieldset": {
         borderColor: theme.palette.primary.main,
       },
+      "&.Mui-focused": {
+        boxShadow:
+          theme.palette.mode === "dark"
+            ? `0 0 0 3px ${alpha(theme.palette.primary.main, 0.2)}`
+            : "0 0 0 3px rgba(245,166,35,0.12)",
+      },
       "&.Mui-focused fieldset": {
         borderColor: theme.palette.primary.main,
         borderWidth: 1.5,
       },
+    },
+    "& .MuiInputBase-input::placeholder": {
+      color: theme.palette.text.secondary,
+      opacity: 0.8,
+      fontSize: scaleFont(14, settings?.textSize),
+    },
+    "& .MuiFormHelperText-root": {
+      marginLeft: 0,
+      fontSize: scaleFont(12, settings?.textSize),
     },
     "& .MuiSvgIcon-root": {
       color: theme.palette.text.secondary,
@@ -185,7 +199,7 @@ export const EditDewormingDialog = ({ open, item, onClose }: Props) => {
           boxShadow:
             theme.palette.mode === "dark"
               ? "0 24px 64px rgba(0,0,0,0.38), 0 4px 12px rgba(0,0,0,0.24)"
-              : undefined,
+              : "0 24px 64px rgba(7,28,66,0.14), 0 4px 12px rgba(7,28,66,0.06)",
         }),
       }}
     >
@@ -202,9 +216,29 @@ export const EditDewormingDialog = ({ open, item, onClose }: Props) => {
                     0.12
                   )} 0%, ${alpha(theme.palette.background.paper, 0.9)} 100%)`
                 : "linear-gradient(135deg, #fbf2ea 0%, #fdf7ef 100%)",
+            position: "relative",
+            overflow: "hidden",
+            "&::after": {
+              content: '""',
+              position: "absolute",
+              bottom: -24,
+              right: -24,
+              width: 100,
+              height: 100,
+              borderRadius: "50%",
+              background:
+                theme.palette.mode === "dark"
+                  ? alpha(theme.palette.primary.main, 0.1)
+                  : "rgba(245,166,35,0.08)",
+              pointerEvents: "none",
+            },
           })}
         >
-          <Stack direction="row" justifyContent="space-between">
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="flex-start"
+          >
             <Stack direction="row" spacing={2} alignItems="center">
               <Box
                 sx={{
@@ -214,8 +248,11 @@ export const EditDewormingDialog = ({ open, item, onClose }: Props) => {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  background: "linear-gradient(135deg, #f5a623 0%, #f0911a 100%)",
+                  background:
+                    "linear-gradient(135deg, #f5a623 0%, #f0911a 100%)",
                   color: "#fff",
+                  boxShadow: "0 4px 12px rgba(245,166,35,0.32)",
+                  flexShrink: 0,
                 }}
               >
                 <BugReportOutlinedIcon sx={{ fontSize: 22 }} />
@@ -227,15 +264,19 @@ export const EditDewormingDialog = ({ open, item, onClose }: Props) => {
                     fontSize: scaleFont(19, settings?.textSize),
                     fontWeight: 800,
                     color: theme.palette.text.primary,
+                    lineHeight: 1.2,
+                    letterSpacing: "-0.3px",
                   })}
                 >
                   {t("deworming:editDialogTitle")}
                 </Typography>
+
                 <Typography
                   sx={(theme) => ({
                     fontSize: scaleFont(13, settings?.textSize),
                     color: theme.palette.text.secondary,
                     mt: 0.4,
+                    fontWeight: 400,
                   })}
                 >
                   {t("deworming:editDialogSubtitle")}
@@ -255,6 +296,14 @@ export const EditDewormingDialog = ({ open, item, onClose }: Props) => {
                 borderRadius: 2,
                 width: 32,
                 height: 32,
+                mt: 0.5,
+                "&:hover": {
+                  backgroundColor:
+                    theme.palette.mode === "dark"
+                      ? alpha("#ffffff", 0.1)
+                      : "rgba(0,0,0,0.08)",
+                  color: theme.palette.text.primary,
+                },
               })}
             >
               <CloseRoundedIcon sx={{ fontSize: 18 }} />
@@ -310,7 +359,13 @@ export const EditDewormingDialog = ({ open, item, onClose }: Props) => {
               name="notes"
               control={control}
               render={({ field }) => (
-                <TextField {...field} fullWidth multiline minRows={3} sx={fieldSx} />
+                <TextField
+                  {...field}
+                  fullWidth
+                  multiline
+                  minRows={3}
+                  sx={fieldSx}
+                />
               )}
             />
           </Box>
@@ -333,6 +388,13 @@ export const EditDewormingDialog = ({ open, item, onClose }: Props) => {
                   theme.palette.mode === "dark"
                     ? alpha("#ffffff", 0.06)
                     : "#f0f2f7",
+                "&:hover": {
+                  backgroundColor:
+                    theme.palette.mode === "dark"
+                      ? alpha("#ffffff", 0.1)
+                      : "#e5e7ee",
+                  color: theme.palette.text.primary,
+                },
               })}
             >
               {t("deworming:cancel")}
@@ -349,8 +411,15 @@ export const EditDewormingDialog = ({ open, item, onClose }: Props) => {
                 textTransform: "none",
                 fontWeight: 700,
                 fontSize: scaleFont(15, settings?.textSize),
-                background: "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
+                background:
+                  "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
                 color: "#fff",
+                boxShadow: "0 6px 16px rgba(245,166,35,0.28)",
+                "&:hover": {
+                  background:
+                    "linear-gradient(135deg, #f0a020 0%, #e08510 100%)",
+                  boxShadow: "0 8px 20px rgba(245,166,35,0.36)",
+                },
               }}
             >
               {t("deworming:saveChanges")}

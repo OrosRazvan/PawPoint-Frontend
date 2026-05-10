@@ -2,7 +2,7 @@
   "title": "Programări",
   "subtitle": "Gestionează și rezervă programări veterinare",
   "addButton": "Rezervă programare",
-  "upcoming": "Următoare",
+  "upcoming": "Programate",
   "completed": "Finalizate",
   "empty": "Nu există programări.",
   "loadError": "Programările nu au putut fi încărcate.",

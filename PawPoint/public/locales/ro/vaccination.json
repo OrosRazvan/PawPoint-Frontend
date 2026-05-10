@@ -3,7 +3,7 @@
   "subtitle": "Urmărește și gestionează toate înregistrările de vaccinare",
   "addButton": "Adaugă vaccinare",
   "completed": "Finalizate",
-  "upcoming": "Viitoare",
+  "upcoming": "Programate",
   "empty": "Nu există vaccinări.",
   "loadError": "Nu s-au putut încărca vaccinările.",
   "pet": "Animal",
