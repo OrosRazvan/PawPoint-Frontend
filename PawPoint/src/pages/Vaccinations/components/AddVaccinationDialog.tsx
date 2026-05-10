@@ -77,10 +77,13 @@ const formatSlotLabel = (
   const startDate = new Date(start);
   const endDate = new Date(end);
 
-  return `${formatDateBySettings(startDate, dateFormat)} • ${startDate.toLocaleTimeString(
-    locale,
-    { hour: "2-digit", minute: "2-digit" }
-  )} - ${endDate.toLocaleTimeString(locale, {
+  return `${formatDateBySettings(
+    startDate,
+    dateFormat
+  )} • ${startDate.toLocaleTimeString(locale, {
+    hour: "2-digit",
+    minute: "2-digit",
+  })} - ${endDate.toLocaleTimeString(locale, {
     hour: "2-digit",
     minute: "2-digit",
   })}`;
@@ -149,23 +152,19 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
   const { data: cabinets = [] } = useVetCabinets(open);
   const { data: vaccinations = [] } = useVaccinations();
 
-  const {
-    control,
-    handleSubmit,
-    reset,
-    setValue,
-  } = useForm<VaccinationFormValues>({
-    defaultValues: {
-      animalId: "",
-      vaccineName: "",
-      vetCabinetId: "",
-      visitDate: "",
-      vetTimeSlotId: "",
-      lastDate: "",
-      nextDate: "",
-      notes: "",
-    },
-  });
+  const { control, handleSubmit, reset, setValue } =
+    useForm<VaccinationFormValues>({
+      defaultValues: {
+        animalId: "",
+        vaccineName: "",
+        vetCabinetId: "",
+        visitDate: "",
+        vetTimeSlotId: "",
+        lastDate: "",
+        nextDate: "",
+        notes: "",
+      },
+    });
 
   const selectedAnimalId = useWatch({ control, name: "animalId" });
   const selectedVaccineName = useWatch({ control, name: "vaccineName" });
@@ -299,29 +298,55 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
         }),
       }}
     >
-      {/* Amber accent strip */}
-      <Box
-        sx={{
-          height: 4,
-          background: "linear-gradient(90deg, #f5a623, #f8c471)",
-        }}
-      />
-
       <DialogTitle sx={{ p: 0 }}>
-        <Box sx={{ px: 3, pt: 2.75, pb: 2.5 }}>
-          <Stack direction="row" justifyContent="space-between" alignItems="center">
+        <Box
+          sx={(theme) => ({
+            px: 3.5,
+            pt: 3,
+            pb: 2.5,
+            background:
+              theme.palette.mode === "dark"
+                ? `linear-gradient(135deg, ${alpha(
+                    theme.palette.primary.main,
+                    0.12
+                  )} 0%, ${alpha(theme.palette.background.paper, 0.9)} 100%)`
+                : "linear-gradient(135deg, #fbf2ea 0%, #fdf7ef 100%)",
+            position: "relative",
+            overflow: "hidden",
+            "&::after": {
+              content: '""',
+              position: "absolute",
+              bottom: -24,
+              right: -24,
+              width: 100,
+              height: 100,
+              borderRadius: "50%",
+              background:
+                theme.palette.mode === "dark"
+                  ? alpha(theme.palette.primary.main, 0.1)
+                  : "rgba(245,166,35,0.08)",
+              pointerEvents: "none",
+            },
+          })}
+        >
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="flex-start"
+          >
             <Stack direction="row" spacing={2} alignItems="center">
               <Box
                 sx={{
-                  width: 46,
-                  height: 46,
+                  width: 48,
+                  height: 48,
                   borderRadius: 2.5,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  background: "linear-gradient(135deg, #f5a623 0%, #f0911a 100%)",
+                  background:
+                    "linear-gradient(135deg, #f5a623 0%, #f0911a 100%)",
                   color: "#fff",
-                  boxShadow: "0 4px 14px rgba(245,166,35,0.36)",
+                  boxShadow: "0 4px 12px rgba(245,166,35,0.32)",
                   flexShrink: 0,
                 }}
               >
@@ -331,7 +356,7 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
               <Box>
                 <Typography
                   sx={(theme) => ({
-                    fontSize: scaleFont(18, settings?.textSize),
+                    fontSize: scaleFont(19, settings?.textSize),
                     fontWeight: 800,
                     color: theme.palette.text.primary,
                     lineHeight: 1.2,
@@ -340,11 +365,13 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
                 >
                   {t("vaccination:addDialogTitle")}
                 </Typography>
+
                 <Typography
                   sx={(theme) => ({
-                    fontSize: scaleFont(12.5, settings?.textSize),
+                    fontSize: scaleFont(13, settings?.textSize),
                     color: theme.palette.text.secondary,
-                    mt: 0.35,
+                    mt: 0.4,
+                    fontWeight: 400,
                   })}
                 >
                   {t("vaccination:addDialogSubtitle")}
@@ -362,8 +389,9 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
                     ? alpha("#ffffff", 0.06)
                     : "rgba(0,0,0,0.04)",
                 borderRadius: 2,
-                width: 30,
-                height: 30,
+                width: 32,
+                height: 32,
+                mt: 0.5,
                 "&:hover": {
                   backgroundColor:
                     theme.palette.mode === "dark"
@@ -373,7 +401,7 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
                 },
               })}
             >
-              <CloseRoundedIcon sx={{ fontSize: 17 }} />
+              <CloseRoundedIcon sx={{ fontSize: 18 }} />
             </IconButton>
           </Stack>
         </Box>
@@ -483,7 +511,12 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
                     {Array.isArray(slots) &&
                       slots.map((slot) => (
                         <MenuItem key={slot.id} value={slot.id}>
-                          {formatSlotLabel(slot.startTimeUtc, slot.endTimeUtc, dateFormat, locale)}
+                          {formatSlotLabel(
+                            slot.startTimeUtc,
+                            slot.endTimeUtc,
+                            dateFormat,
+                            locale
+                          )}
                         </MenuItem>
                       ))}
                   </TextField>
@@ -563,11 +596,13 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
               textTransform: "none",
               fontWeight: 700,
               fontSize: scaleFont(15, settings?.textSize),
-              background: "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
+              background:
+                "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
               color: "#fff",
               boxShadow: "0 6px 16px rgba(245,166,35,0.28)",
               "&:hover": {
-                background: "linear-gradient(135deg, #f0a020 0%, #e08510 100%)",
+                background:
+                  "linear-gradient(135deg, #f0a020 0%, #e08510 100%)",
                 boxShadow: "0 8px 20px rgba(245,166,35,0.36)",
               },
             }}
