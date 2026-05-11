@@ -1,8 +1,8 @@
-import PetsOutlinedIcon from "@mui/icons-material/PetsOutlined";
 import { Box, Stack, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useSettings } from "../../hooks/useSettings";
 import { scaleFont } from "../../utils/fontScale";
+import logo from "../../assets/logo.jpg";
 
 export const NavbarLogo = () => {
   const { data: settings } = useSettings();
@@ -21,19 +21,16 @@ export const NavbarLogo = () => {
       }}
     >
       <Box
-        sx={(theme) => ({
+        component="img"
+        src={logo}
+        alt="PawPoint Logo"
+        sx={{
           width: 40,
           height: 40,
           borderRadius: 2.5,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: theme.palette.primary.main,
-          color: theme.palette.primary.contrastText,
-        })}
-      >
-        <PetsOutlinedIcon fontSize="small" />
-      </Box>
+          objectFit: "cover",
+        }}
+      />
 
       <Typography
         sx={(theme) => ({

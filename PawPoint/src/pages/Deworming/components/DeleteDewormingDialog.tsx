@@ -226,7 +226,7 @@ export const DeleteDewormingDialog = ({ open, item, onClose }: Props) => {
                 lineHeight: 1.55,
               })}
             >
-              {t("deworming:deleteConfirmation", {
+              {t("deworming:deleteConfirmMessage", {
                 name: item?.animalName ?? "",
               })}
             </Typography>
