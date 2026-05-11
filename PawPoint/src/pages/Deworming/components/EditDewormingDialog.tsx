@@ -35,7 +35,6 @@ type Props = {
 type FormValues = {
   type: DewormingTypeEnum | "";
   intervalDays: number | "";
-  notes: string;
 };
 
 const normalizeType = (value: string | number): DewormingTypeEnum | "" => {
@@ -140,7 +139,6 @@ export const EditDewormingDialog = ({ open, item, onClose }: Props) => {
     defaultValues: {
       type: "",
       intervalDays: "",
-      notes: "",
     },
   });
 
@@ -150,7 +148,6 @@ export const EditDewormingDialog = ({ open, item, onClose }: Props) => {
     reset({
       type: normalizeType(item.type),
       intervalDays: item.intervalDays ?? "",
-      notes: item.notes ?? "",
     });
   }, [item, open, reset]);
 
@@ -163,7 +160,6 @@ export const EditDewormingDialog = ({ open, item, onClose }: Props) => {
         payload: {
           type: values.type,
           intervalDays: Number(values.intervalDays),
-          notes: values.notes.trim() || undefined,
         },
       },
       {
@@ -348,23 +344,6 @@ export const EditDewormingDialog = ({ open, item, onClose }: Props) => {
                   fullWidth
                   sx={fieldSx}
                   inputProps={{ min: 1 }}
-                />
-              )}
-            />
-          </Box>
-
-          <Box>
-            <Typography sx={labelSx}>{t("deworming:notes")}</Typography>
-            <Controller
-              name="notes"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  multiline
-                  minRows={3}
-                  sx={fieldSx}
                 />
               )}
             />

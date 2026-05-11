@@ -34,7 +34,6 @@ type FormValues = {
   vaccineName: string;
   lastDate: string;
   nextDate: string;
-  notes: string;
 };
 
 export const EditVaccinationDialog = ({ open, item, onClose }: Props) => {
@@ -99,7 +98,6 @@ export const EditVaccinationDialog = ({ open, item, onClose }: Props) => {
       vaccineName: "",
       lastDate: "",
       nextDate: "",
-      notes: "",
     },
   });
 
@@ -110,7 +108,6 @@ export const EditVaccinationDialog = ({ open, item, onClose }: Props) => {
       vaccineName: item.vaccineName ?? "",
       lastDate: item.lastDate ? item.lastDate.split("T")[0] : "",
       nextDate: item.nextDate ? item.nextDate.split("T")[0] : "",
-      notes: item.notes ?? "",
     });
   }, [item, open, reset]);
 
@@ -128,7 +125,6 @@ export const EditVaccinationDialog = ({ open, item, onClose }: Props) => {
           nextDate: values.nextDate
             ? `${values.nextDate}T00:00:00.000Z`
             : undefined,
-          notes: values.notes.trim() || undefined,
         },
       },
       {
@@ -278,23 +274,6 @@ export const EditVaccinationDialog = ({ open, item, onClose }: Props) => {
               />
             </Box>
           </Stack>
-
-          <Box sx={{ mb: 2.5 }}>
-            <Typography sx={labelSx}>{t("vaccination:notes")}</Typography>
-            <Controller
-              name="notes"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  multiline
-                  minRows={3}
-                  sx={fieldSx}
-                />
-              )}
-            />
-          </Box>
 
           <Divider sx={{ mb: 2.5 }} />
 

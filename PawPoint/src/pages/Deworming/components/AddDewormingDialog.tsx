@@ -160,7 +160,7 @@ export const AddDewormingDialog = ({ open, onClose }: Props) => {
         vetCabinetId: "",
         visitDate: "",
         vetTimeSlotId: "",
-        notes: "",
+
       },
     });
 
@@ -208,7 +208,6 @@ export const AddDewormingDialog = ({ open, onClose }: Props) => {
         intervalDays: Number(values.intervalDays),
         vetCabinetId: Number(values.vetCabinetId),
         vetTimeSlotId: Number(values.vetTimeSlotId),
-        notes: values.notes.trim() || undefined,
       },
       {
         onSuccess: () => {
@@ -517,23 +516,6 @@ export const AddDewormingDialog = ({ open, onClose }: Props) => {
                 {t("deworming:noSlotsAvailable")}
               </Typography>
             )}
-
-          <Box>
-            <Typography sx={labelSx}>{t("deworming:notes")}</Typography>
-            <Controller
-              name="notes"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  multiline
-                  minRows={3}
-                  sx={fieldSx}
-                />
-              )}
-            />
-          </Box>
 
           <Divider sx={{ mt: 1, mb: 1 }} />
 

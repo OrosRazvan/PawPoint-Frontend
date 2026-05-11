@@ -226,7 +226,7 @@ export const DeleteVaccinationDialog = ({ open, item, onClose }: Props) => {
                 lineHeight: 1.55,
               })}
             >
-              {t("vaccination:deleteConfirmation", {
+              {t("vaccination:deleteDialogTitle", {
                 name: item?.vaccineName ?? "",
               })}
             </Typography>
