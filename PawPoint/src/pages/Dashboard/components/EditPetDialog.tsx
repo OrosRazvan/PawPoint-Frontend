@@ -16,6 +16,7 @@ import {
   Checkbox,
   FormControlLabel,
   Slider,
+  Autocomplete,
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
@@ -49,6 +50,37 @@ type Props = {
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_IMAGE_SIZE_MB = 5;
 const MAX_IMAGE_SIZE_BYTES = MAX_IMAGE_SIZE_MB * 1024 * 1024;
+const SPECIES_OPTIONS = [
+  { value: "Dog", labelKey: "dog" },
+  { value: "Cat", labelKey: "cat" },
+  { value: "Bird", labelKey: "bird" },
+  { value: "Rabbit", labelKey: "rabbit" },
+  { value: "Snake", labelKey: "snake" },
+  { value: "Hamster", labelKey: "hamster" },
+  { value: "Fish", labelKey: "fish" },
+  { value: "Turtle", labelKey: "turtle" },
+  { value: "Guinea Pig", labelKey: "guineaPig" },
+  { value: "Ferret", labelKey: "ferret" },
+  { value: "Parrot", labelKey: "parrot" },
+  { value: "Canary", labelKey: "canary" },
+  { value: "Lizard", labelKey: "lizard" },
+  { value: "Gecko", labelKey: "gecko" },
+  { value: "Iguana", labelKey: "iguana" },
+  { value: "Chinchilla", labelKey: "chinchilla" },
+  { value: "Hedgehog", labelKey: "hedgehog" },
+  { value: "Mouse", labelKey: "mouse" },
+  { value: "Rat", labelKey: "rat" },
+  { value: "Horse", labelKey: "horse" },
+  { value: "Pony", labelKey: "pony" },
+  { value: "Goat", labelKey: "goat" },
+  { value: "Pig", labelKey: "pig" },
+  { value: "Chicken", labelKey: "chicken" },
+  { value: "Duck", labelKey: "duck" },
+  { value: "Goose", labelKey: "goose" },
+  { value: "Sheep", labelKey: "sheep" },
+  { value: "Cow", labelKey: "cow" },
+  { value: "Other", labelKey: "other" },
+];
 
 export const EditPetDialog = ({ open, onClose, pet }: Props) => {
   const { t } = useTranslation(["dashboard"]);
@@ -455,30 +487,64 @@ export const EditPetDialog = ({ open, onClose, pet }: Props) => {
               <Controller
                 name="species"
                 control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    error={!!errors.species}
-                    helperText={
-                      errors.species?.message
-                        ? t(`dashboard:${errors.species.message}`)
-                        : ""
-                    }
-                    fullWidth
-                    select
-                    SelectProps={{ displayEmpty: true }}
-                    sx={fieldSx}
-                  >
-                    <MenuItem value="" disabled>
-                      {t("dashboard:species")}
-                    </MenuItem>
-                    <MenuItem value="Dog">{t("dashboard:dog")}</MenuItem>
-                    <MenuItem value="Cat">{t("dashboard:cat")}</MenuItem>
-                    <MenuItem value="Bird">{t("dashboard:bird")}</MenuItem>
-                    <MenuItem value="Rabbit">{t("dashboard:rabbit")}</MenuItem>
-                    <MenuItem value="Other">{t("dashboard:other")}</MenuItem>
-                  </TextField>
-                )}
+                render={({ field }) => {
+                  const selectedOption =
+                    SPECIES_OPTIONS.find((option) => option.value === field.value) ?? null;
+
+                  return (
+                    <Autocomplete
+                      freeSolo
+                      options={SPECIES_OPTIONS}
+                      value={selectedOption}
+                      inputValue={field.value ?? ""}
+                      getOptionLabel={(option) =>
+                        typeof option === "string"
+                          ? option
+                          : t(`dashboard:${option.labelKey}`)
+                      }
+                      filterOptions={(options, state) => {
+                        const input = state.inputValue.trim().toLowerCase();
+
+                        if (!input) return options;
+
+                        return options.filter((option) => {
+                          const translatedLabel = t(`dashboard:${option.labelKey}`).toLowerCase();
+                          const rawValue = option.value.toLowerCase();
+
+                          return (
+                            translatedLabel.includes(input) ||
+                            rawValue.includes(input)
+                          );
+                        });
+                      }}
+                      onInputChange={(_, value) => {
+                        field.onChange(value);
+                      }}
+                      onChange={(_, value) => {
+                        if (typeof value === "string") {
+                          field.onChange(value);
+                          return;
+                        }
+
+                        field.onChange(value?.value ?? "");
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          placeholder={t("dashboard:species")}
+                          error={!!errors.species}
+                          helperText={
+                            errors.species?.message
+                              ? t(`dashboard:${errors.species.message}`)
+                              : ""
+                          }
+                          fullWidth
+                          sx={fieldSx}
+                        />
+                      )}
+                    />
+                  );
+                }}
               />
             </Grid>
 
