@@ -97,5 +97,23 @@
   "status": {
     "completed": "Completed",
     "upcoming": "Upcoming"
+  },
+
+  "downloadReport": "Download report",
+  "report": {
+    "title": "Appointment report",
+    "number": "Report number",
+    "issuedAt": "Issued at",
+    "field": "Field",
+    "value": "Value",
+    "pet": "Pet",
+    "service": "Service",
+    "clinic": "Clinic",
+    "address": "Address",
+    "doctor": "Veterinarian",
+    "date": "Appointment date",
+    "status": "Status",
+    "notes": "Notes",
+    "total": "Total"
   }
 }

@@ -2,11 +2,16 @@ import { Paper, Stack, Typography, Box, Chip, Button } from "@mui/material";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import LocalHospitalOutlinedIcon from "@mui/icons-material/LocalHospitalOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
 import { alpha } from "@mui/material/styles";
+import { useTranslation } from "react-i18next";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+
 import { useSettings } from "../../../hooks/useSettings";
 import { scaleFont } from "../../../utils/fontScale";
 import type { AppointmentCardItem } from "../types/appointment";
-import { useTranslation } from "react-i18next";
+import "../../../utils/pdfFont";
 
 type Props = {
   item: AppointmentCardItem;
@@ -18,7 +23,7 @@ type AppDateFormat = "DD/MM/YYYY" | "MM/DD/YYYY" | "YYYY-MM-DD";
 
 const formatDateBySettings = (
   value?: string | Date | null,
-  format: AppDateFormat = "DD/MM/YYYY",
+  format: AppDateFormat = "DD/MM/YYYY"
 ) => {
   if (!value) return "—";
 
@@ -55,8 +60,8 @@ const formatTime = (value?: string | null, locale = "en-GB") => {
 const formatDateTimeBySettings = (
   value: string | null | undefined,
   format: AppDateFormat,
-  t: (key: string, options?: any) => string,
-  locale: string,
+  t: (key: string, options?: Record<string, unknown>) => string,
+  locale: string
 ) => {
   if (!value) return "—";
 
@@ -66,11 +71,143 @@ const formatDateTimeBySettings = (
   });
 };
 
+const downloadAppointmentPdf = (
+  item: AppointmentCardItem,
+  t: (key: string, options?: Record<string, unknown>) => string,
+  dateFormat: AppDateFormat,
+  locale: string
+) => {
+  const doc = new jsPDF();
+
+  const appointmentDate = formatDateTimeBySettings(
+    item.slotStartTimeUtc,
+    dateFormat,
+    t,
+    locale
+  );
+
+  const issuedAt = new Date().toLocaleDateString(locale);
+
+  doc.setFillColor(245, 166, 35);
+  doc.rect(0, 0, 210, 32, "F");
+
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("Roboto-Regular", "normal");
+  doc.setFontSize(26);
+  doc.text("PawPoint", 14, 20);
+
+  doc.setTextColor(30, 30, 30);
+
+  doc.setFontSize(18);
+  doc.text(t("appointment:report.title"), 14, 46);
+
+  doc.setFontSize(11);
+  doc.setFont("Roboto-Regular", "normal");
+
+  doc.text(
+    `${t("appointment:report.number")}: #APT-${item.id}`,
+    14,
+    56
+  );
+
+  doc.text(
+    `${t("appointment:report.issuedAt")}: ${issuedAt}`,
+    14,
+    63
+  );
+
+  autoTable(doc, {
+    startY: 74,
+    theme: "grid",
+
+    styles: {
+      font: "Roboto-Regular",
+      fontSize: 11,
+      cellPadding: 4,
+      textColor: [40, 40, 40],
+      lineColor: [230, 230, 230],
+      lineWidth: 0.3,
+    },
+
+    headStyles: {
+      fillColor: [245, 166, 35],
+      textColor: [255, 255, 255],
+      fontStyle: "bold",
+      halign: "left",
+    },
+
+    alternateRowStyles: {
+      fillColor: [250, 250, 250],
+    },
+
+    body: [
+      [
+        t("appointment:report.pet"),
+        item.animalName || "—",
+      ],
+      [
+        t("appointment:report.service"),
+        item.serviceType || "—",
+      ],
+      [
+        t("appointment:report.clinic"),
+        item.vetCabinetName || "—",
+      ],
+      [
+        t("appointment:report.address"),
+        item.vetCabinetAddress || "—",
+      ],
+      [
+        t("appointment:report.doctor"),
+        item.vetDoctorName || "—",
+      ],
+      [
+        t("appointment:report.date"),
+        appointmentDate,
+      ],
+      [
+        t("appointment:report.status"),
+        t(`appointment:status.${item.status}`),
+      ],
+      [
+        t("appointment:report.notes"),
+        item.notes || "—",
+      ],
+    ],
+  });
+
+  const finalY =
+    (
+      doc as jsPDF & {
+        lastAutoTable?: { finalY: number };
+      }
+    ).lastAutoTable?.finalY ?? 120;
+
+  doc.setFillColor(245, 166, 35);
+  doc.roundedRect(14, finalY + 12, 70, 16, 3, 3, "F");
+
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("Roboto-Regular", "normal");
+  doc.setFontSize(13);
+
+  doc.text(
+    `${t("appointment:report.total")}: ${
+      item.priceRon != null
+        ? `${item.priceRon} RON`
+        : "—"
+    }`,
+    18,
+    finalY + 22
+  );
+
+  doc.save(`pawpoint-appointment-${item.id}.pdf`);
+};
+
 export const AppointmentCard = ({ item, onEdit }: Props) => {
   const { t, i18n } = useTranslation(["appointment"]);
-  const isCompleted = item.status === "completed";
   const { data: settings } = useSettings();
 
+  const isCompleted = item.status === "completed";
   const dateFormat: AppDateFormat = settings?.dateFormat ?? "DD/MM/YYYY";
   const locale = i18n.language === "ro" ? "ro-RO" : "en-GB";
 
@@ -103,11 +240,11 @@ export const AppointmentCard = ({ item, onEdit }: Props) => {
           background: isCompleted
             ? `linear-gradient(90deg, ${theme.palette.success.main}, ${alpha(
                 theme.palette.success.main,
-                0.4,
+                0.4
               )})`
             : `linear-gradient(90deg, ${theme.palette.warning.main}, ${alpha(
                 theme.palette.warning.main,
-                0.4,
+                0.4
               )})`,
         })}
       />
@@ -135,15 +272,15 @@ export const AppointmentCard = ({ item, onEdit }: Props) => {
                   ? theme.palette.mode === "dark"
                     ? `linear-gradient(135deg, ${alpha(
                         theme.palette.success.main,
-                        0.22,
+                        0.22
                       )} 0%, ${alpha(theme.palette.success.light, 0.14)} 100%)`
                     : "linear-gradient(135deg, #dff4f1 0%, #c8ede8 100%)"
                   : theme.palette.mode === "dark"
-                    ? `linear-gradient(135deg, ${alpha(
-                        theme.palette.warning.main,
-                        0.22,
-                      )} 0%, ${alpha(theme.palette.warning.light, 0.14)} 100%)`
-                    : "linear-gradient(135deg, #fef3e2 0%, #fde8c8 100%)",
+                  ? `linear-gradient(135deg, ${alpha(
+                      theme.palette.warning.main,
+                      0.22
+                    )} 0%, ${alpha(theme.palette.warning.light, 0.14)} 100%)`
+                  : "linear-gradient(135deg, #fef3e2 0%, #fde8c8 100%)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -201,8 +338,8 @@ export const AppointmentCard = ({ item, onEdit }: Props) => {
                   ? alpha(theme.palette.success.main, 0.18)
                   : "#dff4f1"
                 : theme.palette.mode === "dark"
-                  ? alpha(theme.palette.warning.main, 0.18)
-                  : "#f8ecd8",
+                ? alpha(theme.palette.warning.main, 0.18)
+                : "#f8ecd8",
               color: isCompleted
                 ? theme.palette.success.main
                 : theme.palette.warning.main,
@@ -218,7 +355,7 @@ export const AppointmentCard = ({ item, onEdit }: Props) => {
           })}
         />
 
-        <Stack spacing={1} sx={{ mb: isCompleted ? 0 : 2.25 }}>
+        <Stack spacing={1} sx={{ mb: 2.25 }}>
           <Stack direction="row" spacing={1.25} alignItems="center">
             <CalendarTodayOutlinedIcon
               sx={(theme) => ({
@@ -241,7 +378,7 @@ export const AppointmentCard = ({ item, onEdit }: Props) => {
                 item.slotStartTimeUtc,
                 dateFormat,
                 t,
-                locale,
+                locale
               )}
             </Typography>
           </Stack>
@@ -286,7 +423,44 @@ export const AppointmentCard = ({ item, onEdit }: Props) => {
           </Typography>
         </Stack>
 
-        {!isCompleted && (
+        {isCompleted ? (
+          <Stack direction="row" spacing={1}>
+            <Button
+              fullWidth
+              onClick={() =>
+                downloadAppointmentPdf(item, t, dateFormat, locale)
+              }
+              startIcon={
+                <DownloadRoundedIcon sx={{ fontSize: "17px !important" }} />
+              }
+              sx={(theme) => ({
+                py: 1,
+                borderRadius: 2.5,
+                textTransform: "none",
+                fontWeight: 700,
+                fontSize: scaleFont(12.5, settings?.textSize),
+                backgroundColor:
+                  theme.palette.mode === "dark"
+                    ? alpha(theme.palette.success.main, 0.14)
+                    : "#dff4f1",
+                color: theme.palette.success.main,
+                border: `1px solid ${
+                  theme.palette.mode === "dark"
+                    ? alpha(theme.palette.success.main, 0.2)
+                    : alpha(theme.palette.success.main, 0.15)
+                }`,
+                "&:hover": {
+                  backgroundColor:
+                    theme.palette.mode === "dark"
+                      ? alpha(theme.palette.success.main, 0.22)
+                      : "#d2efeb",
+                },
+              })}
+            >
+              {t("appointment:downloadReport")}
+            </Button>
+          </Stack>
+        ) : (
           <Stack direction="row" spacing={1}>
             <Button
               fullWidth
