@@ -23,5 +23,96 @@
   "view": "View",
   "markAllAsRead": "Mark all as read",
   "noDate": "No date",
-  "loading": "Loading notifications..."
+  "loading": "Loading notifications...",
+
+  "types": {
+    "AppointmentBooked": "Appointment booked",
+    "AppointmentReminder": "Appointment reminder",
+    "AppointmentRescheduled": "Appointment rescheduled",
+    "AppointmentCancelled": "Appointment cancelled",
+
+    "VaccinationBooked": "Vaccination booked",
+    "VaccinationReminder": "Vaccination reminder",
+    "VaccinationDue": "Vaccination due",
+    "VaccinationUpdated": "Vaccination updated",
+    "VaccinationCancelled": "Vaccination cancelled",
+
+    "DewormingBooked": "Deworming booked",
+    "DewormingReminder": "Deworming reminder",
+    "DewormingDue": "Deworming due",
+    "DewormingUpdated": "Deworming updated",
+    "DewormingCancelled": "Deworming cancelled",
+
+    "FeedingReminder": "Feeding reminder",
+
+    "AnimalCreated": "Animal created",
+    "AnimalUpdated": "Animal updated",
+    "AnimalDeleted": "Animal deleted",
+
+    "ProfileUpdated": "Profile updated",
+    "PasswordChanged": "Password changed",
+    "SettingsUpdated": "Settings updated",
+
+    "ContactMessageReceived": "Contact message received",
+    "ContactMessageReplyReceived": "Contact message reply received"
+  },
+
+  "titles": {
+    "Appointment booked": "Appointment booked",
+    "Appointment reminder": "Appointment reminder",
+    "Appointment rescheduled": "Appointment rescheduled",
+    "Appointment cancelled": "Appointment cancelled",
+
+    "Vaccination booked": "Vaccination booked",
+    "Vaccination reminder": "Vaccination reminder",
+    "Vaccination due soon": "Vaccination due soon",
+    "Vaccination updated": "Vaccination updated",
+    "Vaccination cancelled": "Vaccination cancelled",
+
+    "Deworming booked": "Deworming booked",
+    "Deworming reminder": "Deworming reminder",
+    "Deworming due soon": "Deworming due soon",
+    "Deworming updated": "Deworming updated",
+    "Deworming cancelled": "Deworming cancelled",
+
+    "Animal created": "Animal created",
+    "Animal updated": "Animal updated",
+    "Animal deleted": "Animal deleted",
+
+    "Profile updated": "Profile updated",
+    "Password changed": "Password changed",
+    "Settings updated": "Settings updated",
+
+    "Contact message received": "Contact message received",
+    "Contact message reply received": "Contact message reply received"
+  },
+
+  "messages": {
+    "tomorrowAppointment": "Tomorrow you have an appointment for {{animal}} at {{time}} ({{cabinet}}).",
+    "daysAppointment": "In {{days}} days you have an appointment for {{animal}} at {{time}} ({{cabinet}}).",
+    "appointmentBooked": "{{animal}} has been scheduled for {{reason}} on {{date}} at {{time}} ({{cabinet}}).",
+    "appointmentRescheduled": "The appointment for {{animal}} has been rescheduled for {{date}} at {{time}}.",
+    "appointmentCancelled": "The appointment for {{animal}} has been cancelled.",
+    "vaccinationDue": "{{animal}} needs {{vaccine}} around {{date}}.",
+    "vaccinationBooked": "The vaccination for {{animal}} has been scheduled on {{date}}.",
+    "vaccinationUpdated": "The vaccination for {{animal}} has been updated.",
+    "vaccinationCancelled": "The vaccination for {{animal}} has been cancelled.",
+    "dewormingDue": "{{animal}} needs deworming ({{type}}) around {{date}}.",
+    "dewormingBooked": "The deworming for {{animal}} has been scheduled on {{date}}.",
+    "dewormingUpdated": "The deworming for {{animal}} has been updated.",
+    "dewormingCancelled": "The deworming for {{animal}} has been cancelled.",
+    "feedingReminder": "It is time to feed {{animal}}.",
+    "animalCreated": "{{animal}} has been added.",
+    "animalUpdated": "{{animal}}'s details have been updated.",
+    "animalDeleted": "{{animal}} has been deleted.",
+    "profileUpdated": "Your profile has been updated.",
+    "passwordChanged": "Your password has been changed.",
+    "settingsUpdated": "Your settings have been updated.",
+    "contactMessageReceived": "You received a new contact message.",
+    "contactMessageReplyReceived": "You received a reply to your message.",
+    "vaccinationReminderTomorrow": "{{animal}} needs {{vaccine}} tomorrow, around {{date}}.",
+    "vaccinationReminderDays": "{{animal}} needs {{vaccine}} in {{days}} days, around {{date}}.",
+    "vaccinationBookedWithName": "{{animal}} has been scheduled for {{vaccine}} on {{date}}.",
+    "dewormingBookedWithType": "{{animal}} has been scheduled for deworming ({{type}}) on {{date}}."
+  }
 }

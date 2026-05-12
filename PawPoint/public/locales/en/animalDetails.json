@@ -23,5 +23,89 @@
     "loadError": "Failed to load pet details.",
     "deleteSuccess": "Pet deleted successfully.",
     "deleteError": "An error occurred while deleting the pet."
+  },
+  "values": {
+    "species": {
+      "Dog": "Dog",
+      "Cat": "Cat",
+      "Bird": "Bird",
+      "Rabbit": "Rabbit",
+      "Other": "Other"
+    },
+    "sex": {
+      "Male": "Male",
+      "Female": "Female"
+    }
+  },
+  "breeds": {
+    "Dog": {
+      "Golden Retriever": "Golden Retriever",
+      "Labrador Retriever": "Labrador Retriever",
+      "German Shepherd": "Ciobănesc german",
+      "French Bulldog": "Bulldog francez",
+      "Bulldog": "Bulldog",
+      "Beagle": "Beagle",
+      "Poodle": "Pudel",
+      "Rottweiler": "Rottweiler",
+      "Yorkshire Terrier": "Yorkshire Terrier",
+      "Dachshund": "Teckel",
+      "Boxer": "Boxer",
+      "Siberian Husky": "Husky siberian",
+      "Chihuahua": "Chihuahua",
+      "Border Collie": "Border Collie",
+      "Shih Tzu": "Shih Tzu",
+      "Cocker Spaniel": "Cocker Spaniel",
+      "Doberman": "Doberman",
+      "Great Dane": "Dog german",
+      "Australian Shepherd": "Ciobănesc australian",
+      "Mixed": "Metis",
+      "Other": "Altă rasă"
+    },
+    "Cat": {
+      "British Shorthair": "British Shorthair",
+      "Persian": "Persană",
+      "Maine Coon": "Maine Coon",
+      "Siamese": "Siameză",
+      "Ragdoll": "Ragdoll",
+      "Sphynx": "Sphynx",
+      "Bengal": "Bengaleză",
+      "Russian Blue": "Albastru de Rusia",
+      "Scottish Fold": "Scottish Fold",
+      "Abyssinian": "Abisiniană",
+      "Norwegian Forest": "Pisică norvegiană de pădure",
+      "Birman": "Birmaneză",
+      "American Shorthair": "American Shorthair",
+      "European Shorthair": "European Shorthair",
+      "Mixed": "Metisă",
+      "Other": "Altă rasă"
+    },
+    "Bird": {
+      "Parakeet": "Peruș",
+      "Budgerigar": "Peruș",
+      "Canary": "Canar",
+      "Cockatiel": "Nimfă",
+      "Parrot": "Papagal",
+      "Lovebird": "Agapornis",
+      "Finch": "Cinteză",
+      "Macaw": "Ara",
+      "Cockatoo": "Cacadu",
+      "African Grey": "Papagal gri african",
+      "Other": "Altă specie"
+    },
+    "Rabbit": {
+      "Holland Lop": "Holland Lop",
+      "Mini Lop": "Mini Lop",
+      "Netherland Dwarf": "Pitic olandez",
+      "Lionhead": "Cap de leu",
+      "Rex": "Rex",
+      "Flemish Giant": "Uriaș flamand",
+      "Angora": "Angora",
+      "Dutch": "Olandez",
+      "Mini Rex": "Mini Rex",
+      "Other": "Altă rasă"
+    },
+    "Other": {
+      "Other": "Altul"
+    }
   }
 }

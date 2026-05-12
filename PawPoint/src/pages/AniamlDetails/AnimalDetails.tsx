@@ -33,6 +33,41 @@ import type { AppTextSize } from "../../theme/theme";
 
 type AppDateFormat = "DD/MM/YYYY" | "MM/DD/YYYY" | "YYYY-MM-DD";
 
+const translateBreed = (
+  species: string | null | undefined,
+  breed: string | null | undefined,
+  t: (key: string, options?: Record<string, unknown>) => string
+) => {
+  if (!breed) return t("unknown");
+  if (!species) return breed;
+
+  return t(`breeds.${species}.${breed}`, {
+    defaultValue: breed,
+  });
+};
+
+const translateSpecies = (
+  species: string | null | undefined,
+  t: (key: string, options?: Record<string, unknown>) => string
+) => {
+  if (!species) return t("unknown");
+
+  return t(`values.species.${species}`, {
+    defaultValue: species,
+  });
+};
+
+const translateSex = (
+  sex: string | null | undefined,
+  t: (key: string, options?: Record<string, unknown>) => string
+) => {
+  if (!sex) return t("unknown");
+
+  return t(`values.sex.${sex}`, {
+    defaultValue: sex,
+  });
+};
+
 const formatDateBySettings = (
   value?: string | null,
   format: AppDateFormat = "DD/MM/YYYY"
@@ -105,6 +140,9 @@ export const AnimalDetails = () => {
 
   const formattedWeight = formatWeightByUnit(weightValue, weightUnit);
   const formattedBirthDate = formatDateBySettings(data?.birthDate, dateFormat);
+  const translatedSpecies = translateSpecies(data?.species, t);
+  const translatedSex = translateSex(data?.sex, t);
+  const translatedBreed = translateBreed(data?.species, data?.breed, t);
 
   const dashboardPet: DashboardPet | null = useMemo(() => {
     if (!data) return null;
@@ -351,7 +389,7 @@ export const AnimalDetails = () => {
                       }}
                     />
                   }
-                  label={data.breed ?? data.species ?? "—"}
+                  label={data.breed ? translatedBreed : translatedSpecies}
                   size="small"
                   sx={(theme) => ({
                     backgroundColor:
@@ -376,7 +414,7 @@ export const AnimalDetails = () => {
                 />
                 {data.sex && (
                   <Chip
-                    label={data.sex}
+                    label={translatedSex}
                     size="small"
                     sx={(theme) => ({
                       backgroundColor:
@@ -411,7 +449,7 @@ export const AnimalDetails = () => {
                   <StatPill
                     icon={<PetsRoundedIcon sx={{ fontSize: 15 }} />}
                     label={t("labels.species")}
-                    value={data.species}
+                    value={translatedSpecies}
                     textSize={textSize}
                   />
                 )}
@@ -529,13 +567,13 @@ export const AnimalDetails = () => {
               <DetailRow
                 icon={<PetsRoundedIcon sx={{ fontSize: 16 }} />}
                 label={t("details.species")}
-                value={data.species ?? "—"}
+                value={data.species ? translatedSpecies : "—"}
                 textSize={textSize}
               />
               <DetailRow
                 icon={<PetsRoundedIcon sx={{ fontSize: 16 }} />}
                 label={t("details.breed")}
-                value={data.breed ?? "—"}
+                value={data.breed ? translatedBreed : "—"}
                 textSize={textSize}
               />
               <DetailRow
@@ -553,7 +591,7 @@ export const AnimalDetails = () => {
               <DetailRow
                 icon={<TransgenderOutlinedIcon sx={{ fontSize: 16 }} />}
                 label={t("details.sex")}
-                value={data.sex ?? "—"}
+                value={data.sex ? translatedSex : "—"}
                 textSize={textSize}
               />
               <DetailRow

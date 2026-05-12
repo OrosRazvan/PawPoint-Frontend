@@ -27,5 +27,96 @@
   "view": "Vezi",
   "markAllAsRead": "Marchează tot ca citit",
   "noDate": "Fără dată",
-  "loading": "Se încarcă notificările..."
+  "loading": "Se încarcă notificările...",
+
+  "types": {
+    "AppointmentBooked": "Programare creată",
+    "AppointmentReminder": "Memento programare",
+    "AppointmentRescheduled": "Programare reprogrămată",
+    "AppointmentCancelled": "Programare anulată",
+
+    "VaccinationBooked": "Vaccinare programată",
+    "VaccinationReminder": "Memento vaccinare",
+    "VaccinationDue": "Vaccinare în curând",
+    "VaccinationUpdated": "Vaccinare actualizată",
+    "VaccinationCancelled": "Vaccinare anulată",
+
+    "DewormingBooked": "Deparazitare programată",
+    "DewormingReminder": "Memento deparazitare",
+    "DewormingDue": "Deparazitare în curând",
+    "DewormingUpdated": "Deparazitare actualizată",
+    "DewormingCancelled": "Deparazitare anulată",
+
+    "FeedingReminder": "Memento hrănire",
+
+    "AnimalCreated": "Animal adăugat",
+    "AnimalUpdated": "Animal actualizat",
+    "AnimalDeleted": "Animal șters",
+
+    "ProfileUpdated": "Profil actualizat",
+    "PasswordChanged": "Parolă schimbată",
+    "SettingsUpdated": "Setări actualizate",
+
+    "ContactMessageReceived": "Mesaj de contact primit",
+    "ContactMessageReplyReceived": "Răspuns primit"
+  },
+
+  "titles": {
+    "Appointment booked": "Programare creată",
+    "Appointment reminder": "Memento programare",
+    "Appointment rescheduled": "Programare reprogrămată",
+    "Appointment cancelled": "Programare anulată",
+
+    "Vaccination booked": "Vaccinare programată",
+    "Vaccination reminder": "Memento vaccinare",
+    "Vaccination due soon": "Vaccinare în curând",
+    "Vaccination updated": "Vaccinare actualizată",
+    "Vaccination cancelled": "Vaccinare anulată",
+
+    "Deworming booked": "Deparazitare programată",
+    "Deworming reminder": "Memento deparazitare",
+    "Deworming due soon": "Deparazitare în curând",
+    "Deworming updated": "Deparazitare actualizată",
+    "Deworming cancelled": "Deparazitare anulată",
+
+    "Animal created": "Animal adăugat",
+    "Animal updated": "Animal actualizat",
+    "Animal deleted": "Animal șters",
+
+    "Profile updated": "Profil actualizat",
+    "Password changed": "Parolă schimbată",
+    "Settings updated": "Setări actualizate",
+
+    "Contact message received": "Mesaj de contact primit",
+    "Contact message reply received": "Răspuns primit"
+  },
+
+  "messages": {
+    "tomorrowAppointment": "Mâine ai o programare pentru {{animal}} la {{time}} ({{cabinet}}).",
+    "daysAppointment": "În {{days}} zile ai o programare pentru {{animal}} la {{time}} ({{cabinet}}).",
+    "appointmentBooked": "{{animal}} a fost programat pentru {{reason}} pe {{date}} la {{time}} ({{cabinet}}).",
+    "appointmentRescheduled": "Programarea pentru {{animal}} a fost reprogrămată pentru {{date}} la {{time}}.",
+    "appointmentCancelled": "Programarea pentru {{animal}} a fost anulată.",
+    "vaccinationDue": "{{animal}} are nevoie de {{vaccine}} în jurul datei de {{date}}.",
+    "vaccinationBooked": "Vaccinarea pentru {{animal}} a fost programată pe {{date}}.",
+    "vaccinationUpdated": "Vaccinarea pentru {{animal}} a fost actualizată.",
+    "vaccinationCancelled": "Vaccinarea pentru {{animal}} a fost anulată.",
+    "dewormingDue": "{{animal}} are nevoie de deparazitare ({{type}}) în jurul datei de {{date}}.",
+    "dewormingBooked": "Deparazitarea pentru {{animal}} a fost programată pe {{date}}.",
+    "dewormingUpdated": "Deparazitarea pentru {{animal}} a fost actualizată.",
+    "dewormingCancelled": "Deparazitarea pentru {{animal}} a fost anulată.",
+    "feedingReminder": "Este timpul pentru hrănirea lui {{animal}}.",
+    "animalCreated": "{{animal}} a fost adăugat.",
+    "animalUpdated": "Detaliile lui {{animal}} au fost actualizate.",
+    "animalDeleted": "{{animal}} a fost șters.",
+    "profileUpdated": "Profilul tău a fost actualizat.",
+    "passwordChanged": "Parola ta a fost schimbată.",
+    "settingsUpdated": "Setările tale au fost actualizate.",
+    "contactMessageReceived": "Ai primit un nou mesaj de contact.",
+    "contactMessageReplyReceived": "Ai primit un răspuns la mesajul tău.",
+    "vaccinationReminderTomorrow": "{{animal}} are nevoie de {{vaccine}} mâine, în jurul datei de {{date}}.",
+    "vaccinationReminderDays": "{{animal}} are nevoie de {{vaccine}} în {{days}} zile, în jurul datei de {{date}}.",
+    "vaccinationBookedWithName": "{{animal}} a fost programat pentru {{vaccine}} pe {{date}}.",
+    "dewormingBookedWithType": "{{animal}} a fost programat pentru deparazitare ({{type}}) pe {{date}}."
+  }
 }

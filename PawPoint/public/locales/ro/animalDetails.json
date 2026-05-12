@@ -23,5 +23,18 @@
     "loadError": "Detaliile animalului nu au putut fi încărcate.",
     "deleteSuccess": "Animalul a fost șters cu succes.",
     "deleteError": "A apărut o eroare la ștergerea animalului."
+  },
+  "values": {
+    "species": {
+      "Dog": "Câine",
+      "Cat": "Pisică",
+      "Bird": "Pasăre",
+      "Rabbit": "Iepure",
+      "Other": "Altul"
+    },
+    "sex": {
+      "Male": "Mascul",
+      "Female": "Femelă"
+    }
   }
 }

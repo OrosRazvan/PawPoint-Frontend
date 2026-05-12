@@ -22,14 +22,156 @@ import { useSettings } from "../hooks/useSettings";
 import { scaleFont } from "../utils/fontScale";
 import type { NotificationDto } from "../pages/Notifications/types/notification";
 
-const formatDate = (value: string) => {
-  const date = new Date(value);
+const cleanContent = (content: string) =>
+  content.replace(/\s+(APPT|VAX|DEW):\d+$/i, "");
 
-  if (Number.isNaN(date.getTime())) {
-    return "—";
+// const translateNotificationType = (
+//   typeName: string,
+//   t: (key: string, options?: Record<string, unknown>) => string
+// ) =>
+//   t(`types.${typeName}`, { defaultValue: typeName });
+
+const translateNotificationTitle = (
+  name: string,
+  t: (key: string, options?: Record<string, unknown>) => string
+) =>
+  t(`titles.${name}`, { defaultValue: name });
+
+const translateNotificationContent = (
+  content: string,
+  t: (key: string, options?: Record<string, unknown>) => string
+) => {
+  const cleaned = cleanContent(content);
+
+  const animalUpdatedMatch = cleaned.match(
+    /^(.+)'s details have been updated\.$/
+  );
+
+  if (animalUpdatedMatch) {
+    return t("messages.animalUpdated", {
+      animal: animalUpdatedMatch[1],
+    });
   }
 
-  return date.toLocaleString(undefined, {
+  const tomorrowAppointmentMatch = cleaned.match(
+    /^Tomorrow you have an appointment for (.+) at (.+) \((.+)\)\.$/
+  );
+
+  if (tomorrowAppointmentMatch) {
+    return t("messages.tomorrowAppointment", {
+      animal: tomorrowAppointmentMatch[1],
+      time: tomorrowAppointmentMatch[2],
+      cabinet: tomorrowAppointmentMatch[3],
+    });
+  }
+
+  const daysAppointmentMatch = cleaned.match(
+    /^In (\d+) days you have an appointment for (.+) at (.+) \((.+)\)\.$/
+  );
+
+  if (daysAppointmentMatch) {
+    return t("messages.daysAppointment", {
+      days: daysAppointmentMatch[1],
+      animal: daysAppointmentMatch[2],
+      time: daysAppointmentMatch[3],
+      cabinet: daysAppointmentMatch[4],
+    });
+  }
+
+  const appointmentBookedMatch = cleaned.match(
+    /^(.+) has been scheduled for (.+) on (.+) at (.+) \((.+)\)\.$/
+  );
+
+  if (appointmentBookedMatch) {
+    return t("messages.appointmentBooked", {
+      animal: appointmentBookedMatch[1],
+      reason: appointmentBookedMatch[2],
+      date: appointmentBookedMatch[3],
+      time: appointmentBookedMatch[4],
+      cabinet: appointmentBookedMatch[5],
+    });
+  }
+
+  const vaccinationReminderMatch = cleaned.match(
+    /^(.+) needs (.+) tomorrow, around (.+)\.$/
+  );
+
+  if (vaccinationReminderMatch) {
+    return t("messages.vaccinationReminderTomorrow", {
+      animal: vaccinationReminderMatch[1],
+      vaccine: vaccinationReminderMatch[2],
+      date: vaccinationReminderMatch[3],
+    });
+  }
+
+  const vaccinationReminderDaysMatch = cleaned.match(
+    /^(.+) needs (.+) in (\d+) days, around (.+)\.$/
+  );
+
+  if (vaccinationReminderDaysMatch) {
+    return t("messages.vaccinationReminderDays", {
+      animal: vaccinationReminderDaysMatch[1],
+      vaccine: vaccinationReminderDaysMatch[2],
+      days: vaccinationReminderDaysMatch[3],
+      date: vaccinationReminderDaysMatch[4],
+    });
+  }
+
+  const vaccinationBookedMatch = cleaned.match(
+    /^(.+) has been scheduled for (.+) on (.+)\.$/
+  );
+
+  if (vaccinationBookedMatch) {
+    return t("messages.vaccinationBookedWithName", {
+      animal: vaccinationBookedMatch[1],
+      vaccine: vaccinationBookedMatch[2],
+      date: vaccinationBookedMatch[3],
+    });
+  }
+
+  const dewormingBookedMatch = cleaned.match(
+    /^(.+) has been scheduled for deworming \((.+)\) on (.+)\.$/
+  );
+
+  if (dewormingBookedMatch) {
+    return t("messages.dewormingBookedWithType", {
+      animal: dewormingBookedMatch[1],
+      type: dewormingBookedMatch[2],
+      date: dewormingBookedMatch[3],
+    });
+  }
+
+  const vaccinationDueMatch = cleaned.match(/^(.+) needs (.+) around (.+)\.$/);
+
+  if (vaccinationDueMatch) {
+    return t("messages.vaccinationDue", {
+      animal: vaccinationDueMatch[1],
+      vaccine: vaccinationDueMatch[2],
+      date: vaccinationDueMatch[3],
+    });
+  }
+
+  const dewormingDueMatch = cleaned.match(
+    /^(.+) needs deworming \((.+)\) around (.+)\.$/
+  );
+
+  if (dewormingDueMatch) {
+    return t("messages.dewormingDue", {
+      animal: dewormingDueMatch[1],
+      type: dewormingDueMatch[2],
+      date: dewormingDueMatch[3],
+    });
+  }
+
+  return cleaned;
+};
+
+const formatDate = (value: string, language: string) => {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) return "—";
+
+  return date.toLocaleString(language, {
     day: "2-digit",
     month: "short",
     hour: "2-digit",
@@ -91,7 +233,7 @@ const shouldShowNotificationInNavbar = (
 };
 
 export const NotificationsDropdown = ({ showCount = true }: Props) => {
-  const { t } = useTranslation("notifications");
+  const { t, i18n } = useTranslation("notifications");
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -300,7 +442,7 @@ export const NotificationsDropdown = ({ showCount = true }: Props) => {
                               lineHeight: 1.35,
                             })}
                           >
-                            {item.name}
+                            {translateNotificationTitle(item.name, t)}
                           </Typography>
 
                           <Typography
@@ -313,7 +455,7 @@ export const NotificationsDropdown = ({ showCount = true }: Props) => {
                               wordBreak: "break-word",
                             })}
                           >
-                            {item.content}
+                            {translateNotificationContent(item.content, t)}
                           </Typography>
 
                           <Typography
@@ -323,7 +465,7 @@ export const NotificationsDropdown = ({ showCount = true }: Props) => {
                               color: alpha(theme.palette.text.secondary, 0.8),
                             })}
                           >
-                            {formatDate(item.createdAt)}
+                            {formatDate(item.createdAt, i18n.language)}
                           </Typography>
                         </Box>
                       </Stack>
