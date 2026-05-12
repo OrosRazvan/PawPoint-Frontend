@@ -97,5 +97,23 @@
   "status": {
     "completed": "Finalizată",
     "upcoming": "Urmează"
+  },
+
+  "downloadReport": "Descarca raport",
+  "report": {
+    "title": "Raport programare",
+    "number": "Numar raport",
+    "issuedAt": "Data emiterii",
+    "field": "Camp",
+    "value": "Valoare",
+    "pet": "Animal",
+    "service": "Serviciu",
+    "clinic": "Cabinet",
+    "address": "Adresa",
+    "doctor": "Medic veterinar",
+    "date": "Data programarii",
+    "status": "Status",
+    "notes": "Observatii",
+    "total": "Total"
   }
 }
