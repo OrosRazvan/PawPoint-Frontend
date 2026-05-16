@@ -73,7 +73,23 @@ export const Dashboard = () => {
   );
 
   const upcomingEvents = useMemo(() => {
-    const appointmentItems = appointments.map((item: any) => {
+  const now = Date.now();
+
+  const isCompleted = (item: any) => {
+    const status = String(
+      item.status ?? item.Status ?? item.statusLabel ?? item.StatusLabel ?? ""
+    ).toLowerCase();
+
+    return (
+      status.includes("completed") ||
+      status.includes("finaliz") ||
+      status.includes("done")
+    );
+  };
+
+  const appointmentItems = appointments
+    .filter((item: any) => !isCompleted(item))
+    .map((item: any) => {
       const rawDate =
         item.slotStartTimeUtc ??
         item.SlotStartTimeUtc ??
@@ -81,6 +97,10 @@ export const Dashboard = () => {
         item.SlotStartUtc ??
         item.startTimeUtc ??
         item.StartTimeUtc ??
+        item.appointmentDate ??
+        item.AppointmentDate ??
+        item.scheduledAt ??
+        item.ScheduledAt ??
         item.dateUtc ??
         item.DateUtc ??
         item.date ??
@@ -89,101 +109,81 @@ export const Dashboard = () => {
 
       return {
         id: `appointment-${item.id}`,
-        petName:
-          item.animalName ??
-          item.petName ??
-          t("dashboard:petFallback"),
-        typeLabel:
-          item.serviceType ??
-          t("dashboard:appointmentFallback"),
+        petName: item.animalName ?? item.petName ?? t("dashboard:petFallback"),
+        typeLabel: t("dashboard:appointmentFallback"),
+        eventType: "appointment",
         statusLabel: t("dashboard:upcomingStatus"),
         rawDate,
       };
     });
 
-    const vaccinationItems = vaccinations.map((item: any) => {
+  const vaccinationItems = vaccinations
+    .filter((item: any) => !isCompleted(item))
+    .map((item: any) => {
       const rawDate =
-        item.dateUtc ??
-        item.DateUtc ??
-        item.slotStartUtc ??
-        item.SlotStartUtc ??
-        item.slotStartTimeUtc ??
-        item.SlotStartTimeUtc ??
-        item.startTimeUtc ??
-        item.StartTimeUtc ??
         item.nextDateUtc ??
         item.NextDateUtc ??
         item.nextDate ??
         item.NextDate ??
+        item.scheduledDateUtc ??
+        item.ScheduledDateUtc ??
+        item.dateUtc ??
+        item.DateUtc ??
         item.date ??
         item.Date ??
         "";
 
       return {
         id: `vaccination-${item.id}`,
-        petName:
-          item.animalName ??
-          item.petName ??
-          t("dashboard:petFallback"),
-        typeLabel:
-          item.vaccineName ??
-          t("dashboard:vaccinationFallback"),
+        petName: item.animalName ?? item.petName ?? t("dashboard:petFallback"),
+        typeLabel: t("dashboard:vaccinationFallback"),
+        eventType: "vaccination",
         statusLabel: t("dashboard:upcomingStatus"),
         rawDate,
       };
     });
 
-    const dewormingItems = dewormings.map((item: any) => {
+  const dewormingItems = dewormings
+    .filter((item: any) => !isCompleted(item))
+    .map((item: any) => {
       const rawDate =
+        item.scheduledDateUtc ??
+        item.ScheduledDateUtc ??
         item.dateUtc ??
         item.DateUtc ??
-        item.slotStartUtc ??
-        item.SlotStartUtc ??
-        item.slotStartTimeUtc ??
-        item.SlotStartTimeUtc ??
-        item.startTimeUtc ??
-        item.StartTimeUtc ??
-        item.nextDateUtc ??
-        item.NextDateUtc ??
-        item.nextDate ??
-        item.NextDate ??
         item.date ??
         item.Date ??
         "";
 
       return {
         id: `deworming-${item.id}`,
-        petName:
-          item.animalName ??
-          item.petName ??
-          t("dashboard:petFallback"),
-        typeLabel:
-          item.productName ??
-          item.type ??
-          t("dashboard:dewormingFallback"),
+        petName: item.animalName ?? item.petName ?? t("dashboard:petFallback"),
+        typeLabel: t("dashboard:dewormingFallback"),
+        eventType: "deworming",
         statusLabel: t("dashboard:upcomingStatus"),
         rawDate,
       };
     });
 
-    return [...appointmentItems, ...vaccinationItems, ...dewormingItems]
-      .map((item) => {
-        const date = new Date(item.rawDate);
-        const time = date.getTime();
-
-        return {
-          ...item,
-          time,
-        };
-      })
-      .filter((item) => !Number.isNaN(item.time) && item.time >= Date.now())
-      .sort((a, b) => a.time - b.time)
-      .slice(0, 3)
-      .map(({ time, ...item }) => ({
-        ...item,
-        dateValue: item.rawDate,
-      }));
-  }, [appointments, vaccinations, dewormings, t]);
+  return [...appointmentItems, ...vaccinationItems, ...dewormingItems]
+    .map((item) => ({
+      ...item,
+      time: new Date(item.rawDate).getTime(),
+    }))
+    .filter((item) => !Number.isNaN(item.time))
+    .filter((item) => item.time >= now)
+    .sort((a, b) => a.time - b.time)
+    .slice(0, 3)
+    .map((item) => ({
+      id: item.id,
+      petName: item.petName,
+      typeLabel: item.typeLabel,
+      eventType: item.eventType,
+      statusLabel: item.statusLabel,
+      rawDate: item.rawDate,
+      dateValue: item.rawDate,
+    }));
+}, [appointments, vaccinations, dewormings, t]);
 
   const handleViewPet = (pet: DashboardPet) => {
     navigate(`/animals/${pet.id}`);
@@ -221,7 +221,6 @@ export const Dashboard = () => {
       <DashboardContainer>
         <DashboardHeader
           title={t("dashboard:title")}
-          subtitle={t("dashboard:subtitle")}
         />
 
         {isLoading ? (

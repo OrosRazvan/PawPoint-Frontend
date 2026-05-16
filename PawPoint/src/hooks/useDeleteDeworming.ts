@@ -1,8 +1,16 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteDeworming } from "../api/deleteDeworming";
 
 export const useDeleteDeworming = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (dewormingId: number) => deleteDeworming(dewormingId),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["dashboardData"] });
+      await queryClient.invalidateQueries({ queryKey: ["userProfile"] });
+      await queryClient.invalidateQueries({ queryKey: ["dewormings"] });
+      await queryClient.invalidateQueries({ queryKey: ["vetAvailability"] });
+    },
   });
 };

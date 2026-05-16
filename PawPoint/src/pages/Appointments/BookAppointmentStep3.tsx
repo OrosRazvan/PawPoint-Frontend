@@ -246,7 +246,7 @@ export const BookAppointmentStep3 = () => {
   };
 
   const rowSx = (theme: any) => ({
-    py: { xs: 2.2, sm: 2.6, md: 3.2 },
+    py: { xs: 0.6, sm: 0.8, md: 1.0 },
     borderBottom: `1px solid ${theme.palette.divider}`,
   });
 
@@ -281,22 +281,33 @@ export const BookAppointmentStep3 = () => {
 
   const selectFieldSx = (theme: any) => ({
     width: { xs: "100%", sm: "auto" },
-    minWidth: { xs: "100%", sm: 220 },
+    minWidth: { xs: "100%", sm: 170 },
+
     "& .MuiOutlinedInput-root": {
+      height: 44,
       borderRadius: 2.5,
+
       backgroundColor:
         theme.palette.mode === "dark"
           ? alpha("#ffffff", 0.03)
           : theme.palette.background.paper,
+
       fontSize: scaleFont(14, settings?.textSize),
       color: theme.palette.text.primary,
+
+      "& .MuiSelect-select": {
+        py: 1,
+      },
+
       "& fieldset": {
         borderColor: theme.palette.divider,
       },
+
       "&.Mui-focused fieldset": {
         borderColor: theme.palette.primary.main,
         borderWidth: 1.5,
       },
+
       "& .MuiSvgIcon-root": {
         color: theme.palette.text.secondary,
       },
@@ -312,7 +323,7 @@ export const BookAppointmentStep3 = () => {
         py: { xs: 3, md: 5 },
       })}
     >
-      <Stack spacing={{ xs: 3, md: 4 }}>
+      <Stack spacing={{ xs: 1.6, md: 2 }}>
         <Typography
           sx={(theme) => ({
             fontSize: {
@@ -340,8 +351,8 @@ export const BookAppointmentStep3 = () => {
             borderRadius: 4,
             backgroundColor: theme.palette.background.paper,
             border: `1px solid ${theme.palette.divider}`,
-            px: { xs: 2, sm: 3, md: 4 },
-            py: { xs: 3, md: 4 },
+            px: { xs: 2, sm: 2.5, md: 3 },
+            py: { xs: 2, md: 2.5 },
             boxShadow:
               theme.palette.mode === "dark"
                 ? "0 10px 24px rgba(0,0,0,0.28)"

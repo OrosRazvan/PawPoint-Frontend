@@ -31,6 +31,15 @@ const translateNotificationTitle = (
   t: (key: string, options?: Record<string, unknown>) => string
 ) => t(`titles.${name}`, { defaultValue: name });
 
+const translateDewormingType = (value: string) => {
+  return value
+    .replaceAll("Combined", "Combinată")
+    .replaceAll("External", "Externă")
+    .replaceAll("Internal", "Internă")
+    .replaceAll("deworming", "deparazitare")
+    .replaceAll("Deworming", "Deparazitare");
+};
+
 const translateNotificationContent = (
   content: string,
   t: (key: string, options?: Record<string, unknown>) => string
@@ -111,6 +120,18 @@ const translateNotificationContent = (
     });
   }
 
+  const dewormingBookedMatch = cleaned.match(
+    /^(.+) has been scheduled for deworming \((.+)\) on (.+)\.$/
+  );
+
+  if (dewormingBookedMatch) {
+    return t("messages.dewormingBookedWithType", {
+      animal: dewormingBookedMatch[1],
+      type: translateDewormingType(dewormingBookedMatch[2]),
+      date: dewormingBookedMatch[3],
+    });
+  }
+
   const vaccinationBookedMatch = cleaned.match(
     /^(.+) has been scheduled for (.+) on (.+)\.$/
   );
@@ -123,15 +144,15 @@ const translateNotificationContent = (
     });
   }
 
-  const dewormingBookedMatch = cleaned.match(
-    /^(.+) has been scheduled for deworming \((.+)\) on (.+)\.$/
+  const dewormingDueMatch = cleaned.match(
+    /^(.+) needs deworming \((.+)\) around (.+)\.$/
   );
 
-  if (dewormingBookedMatch) {
-    return t("messages.dewormingBookedWithType", {
-      animal: dewormingBookedMatch[1],
-      type: dewormingBookedMatch[2],
-      date: dewormingBookedMatch[3],
+  if (dewormingDueMatch) {
+    return t("messages.dewormingDue", {
+      animal: dewormingDueMatch[1],
+      type: translateDewormingType(dewormingDueMatch[2]),
+      date: dewormingDueMatch[3],
     });
   }
 
@@ -145,19 +166,7 @@ const translateNotificationContent = (
     });
   }
 
-  const dewormingDueMatch = cleaned.match(
-    /^(.+) needs deworming \((.+)\) around (.+)\.$/
-  );
-
-  if (dewormingDueMatch) {
-    return t("messages.dewormingDue", {
-      animal: dewormingDueMatch[1],
-      type: dewormingDueMatch[2],
-      date: dewormingDueMatch[3],
-    });
-  }
-
-  return cleaned;
+  return translateDewormingType(cleaned);
 };
 
 const formatDate = (value: string, language: string) => {

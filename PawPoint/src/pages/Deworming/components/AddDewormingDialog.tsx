@@ -523,9 +523,12 @@ export const AddDewormingDialog = ({ open, onClose }: Props) => {
             type="submit"
             loading={createDewormingMutation.isPending}
             variant="contained"
-            fullWidth
             sx={{
-              py: 1.5,
+              py: 1.45,
+              px: 4,
+              width: "fit-content",
+              alignSelf: "center",
+
               borderRadius: 2.5,
               textTransform: "none",
               fontWeight: 700,

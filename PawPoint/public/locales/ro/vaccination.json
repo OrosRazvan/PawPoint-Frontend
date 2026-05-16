@@ -13,7 +13,7 @@
   "veterinarian": "Veterinar",
   "visitDate": "Data vizitei",
   "noSlotsAvailable": "Nu există intervale disponibile pentru cabinetul și data selectată.",
-  "save": "Salvează vaccinarea",
+  "save": "Salvează",
   "saveChanges": "Salvează modificările",
   "cancel": "Anulează",
   "addDialogTitle": "Adaugă vaccinare",
@@ -30,6 +30,8 @@
   "updateError": "Nu s-a putut actualiza vaccinarea.",
   "deleteSuccess": "Vaccinarea a fost ștearsă cu succes.",
   "deleteError": "Nu s-a putut șterge vaccinarea.",
+  "edit": "Modifică",
+  "delete": "Șterge",
 
   "lastDate": "Data anterioară",
   "nextDate": "Data următoare",

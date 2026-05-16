@@ -13,7 +13,7 @@
   "veterinarian": "Veterinarian",
   "visitDate": "Visit Date",
   "noSlotsAvailable": "No available time slots for the selected cabinet and date.",
-  "save": "Save vaccination",
+  "save": "Save",
   "saveChanges": "Save changes",
   "cancel": "Cancel",
   "addDialogTitle": "Add vaccination",
@@ -30,6 +30,8 @@
   "updateError": "Failed to update vaccination.",
   "deleteSuccess": "Vaccination deleted successfully.",
   "deleteError": "Failed to delete vaccination.",
+  "edit": "Edit",
+  "delete": "Delete",
 
   "lastDate": "Last date",
   "nextDate": "Next date",

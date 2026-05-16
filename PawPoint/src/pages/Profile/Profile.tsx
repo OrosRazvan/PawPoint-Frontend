@@ -19,9 +19,11 @@ import BugReportRoundedIcon from "@mui/icons-material/BugReportRounded";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import PhotoCameraOutlinedIcon from "@mui/icons-material/PhotoCameraOutlined";
 import SaveRoundedIcon from "@mui/icons-material/SaveRounded";
+import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import { useEffect, useMemo, useState } from "react";
 import { useSnackbar } from "notistack";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useUserProfile } from "../../hooks/useUserProfile";
 import { useUpdateUserProfile } from "../../hooks/useUpdateUserProfile";
 import { useAppointments } from "../../hooks/useAppointments";
@@ -30,9 +32,7 @@ import { useDewormings } from "../../hooks/useDewormings";
 import { useSettings } from "../../hooks/useSettings";
 import { useDashboard } from "../../hooks/useDashboard";
 import { scaleFont } from "../../utils/fontScale";
-import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import { clearTokens } from "../../auth/tokenStorage";
-import { useTranslation } from "react-i18next";
 
 type ActivityItem = {
   id: string;
@@ -78,6 +78,8 @@ const MAX_IMAGE_SIZE_BYTES = MAX_IMAGE_SIZE_MB * 1024 * 1024;
 
 export const Profile = () => {
   const { enqueueSnackbar } = useSnackbar();
+  const navigate = useNavigate();
+  const { t } = useTranslation("profile");
 
   const {
     data: profile,
@@ -112,10 +114,6 @@ export const Profile = () => {
   };
 
   const pets = dashboardData?.pets ?? [];
-
-  const navigate = useNavigate();
-  const { t } = useTranslation("profile");
-
   const dateFormat: AppDateFormat = settings?.dateFormat ?? "DD/MM/YYYY";
 
   const cardSx = (theme: any) => ({
@@ -150,6 +148,185 @@ export const Profile = () => {
     },
   });
 
+  const activityItems = useMemo<ActivityItem[]>(() => {
+  const getLatestValidDate = (...values: Array<string | undefined | null>) => {
+    return (
+      values
+        .filter(Boolean)
+        .map((value) => ({
+          value: value as string,
+          time: new Date(value as string).getTime(),
+        }))
+        .filter((item) => !Number.isNaN(item.time))
+        .sort((a, b) => b.time - a.time)[0]?.value ?? ""
+    );
+  };
+
+  const isDeleted = (item: any) => {
+    const status = String(
+      item.status ?? item.Status ?? item.statusLabel ?? item.StatusLabel ?? ""
+    ).toLowerCase();
+
+    return (
+      item.isDeleted === true ||
+      item.IsDeleted === true ||
+      item.deleted === true ||
+      item.Deleted === true ||
+      status.includes("deleted") ||
+      status.includes("șters") ||
+      status.includes("sters") ||
+      status.includes("cancelled") ||
+      status.includes("canceled")
+    );
+  };
+
+  const getClinic = (item: any) =>
+    item.vetCabinetName ??
+    item.VetCabinetName ??
+    item.veterinarianName ??
+    item.VeterinarianName ??
+    item.clinicName ??
+    item.ClinicName ??
+    t("clinicFallback");
+
+  const getAppointmentDate = (item: any) =>
+    getLatestValidDate(
+      item.slotStartTimeUtc,
+      item.SlotStartTimeUtc,
+      item.slotStartUtc,
+      item.SlotStartUtc,
+      item.startTimeUtc,
+      item.StartTimeUtc,
+      item.appointmentDateUtc,
+      item.AppointmentDateUtc,
+      item.appointmentDate,
+      item.AppointmentDate,
+      item.scheduledDateUtc,
+      item.ScheduledDateUtc,
+      item.scheduledDate,
+      item.ScheduledDate,
+      item.dateUtc,
+      item.DateUtc,
+      item.date,
+      item.Date
+    );
+
+  const getVaccinationDate = (item: any) =>
+    getLatestValidDate(
+      item.scheduledDateUtc,
+      item.ScheduledDateUtc,
+      item.scheduledDate,
+      item.ScheduledDate,
+      item.vaccinationDateUtc,
+      item.VaccinationDateUtc,
+      item.vaccinationDate,
+      item.VaccinationDate,
+      item.administeredDateUtc,
+      item.AdministeredDateUtc,
+      item.administeredDate,
+      item.AdministeredDate,
+      item.dateAdministeredUtc,
+      item.DateAdministeredUtc,
+      item.dateAdministered,
+      item.DateAdministered,
+      item.nextDateUtc,
+      item.NextDateUtc,
+      item.nextDate,
+      item.NextDate,
+      item.dateUtc,
+      item.DateUtc,
+      item.date,
+      item.Date
+    );
+
+  const getDewormingDate = (item: any) =>
+    getLatestValidDate(
+      item.scheduledDateUtc,
+      item.ScheduledDateUtc,
+      item.scheduledDate,
+      item.ScheduledDate,
+      item.administrationDateUtc,
+      item.AdministrationDateUtc,
+      item.administrationDate,
+      item.AdministrationDate,
+      item.administeredAtUtc,
+      item.AdministeredAtUtc,
+      item.administeredAt,
+      item.AdministeredAt,
+      item.dateUtc,
+      item.DateUtc,
+      item.date,
+      item.Date
+    );
+
+  const appointmentItems: ActivityItem[] = appointments
+    .filter((item: any) => !isDeleted(item))
+    .map((item: any, index: number) => ({
+      id: `appointment-${
+        item.id ??
+        item.appointmentId ??
+        item.AppointmentId ??
+        index
+      }`,
+      type: "appointment",
+      title: t("activityForPet", {
+        activity: t("appointmentFallback"),
+        pet: item.animalName ?? item.petName ?? t("petFallback"),
+      }),
+      dateValue: getAppointmentDate(item),
+      clinic: getClinic(item),
+    }));
+
+  const vaccinationItems: ActivityItem[] = vaccinations
+    .filter((item: any) => !isDeleted(item))
+    .map((item: any, index: number) => ({
+      id: `vaccination-${
+        item.id ??
+        item.vaccinationId ??
+        item.VaccinationId ??
+        item.animalVaccinationId ??
+        item.AnimalVaccinationId ??
+        index
+      }`,
+      type: "vaccination",
+      title: t("activityForPet", {
+        activity: t("vaccinationFallback"),
+        pet: item.animalName ?? item.petName ?? t("petFallback"),
+      }),
+      dateValue: getVaccinationDate(item),
+      clinic: getClinic(item),
+    }));
+
+  const dewormingItems: ActivityItem[] = dewormings
+    .filter((item: any) => !isDeleted(item))
+    .map((item: any, index: number) => ({
+      id: `deworming-${
+        item.id ??
+        item.dewormingId ??
+        item.DewormingId ??
+        item.animalDewormingId ??
+        item.AnimalDewormingId ??
+        index
+      }`,
+      type: "deworming",
+      title: t("activityForPet", {
+        activity: t("dewormingFallback"),
+        pet: item.animalName ?? item.petName ?? t("petFallback"),
+      }),
+      dateValue: getDewormingDate(item),
+      clinic: getClinic(item),
+    }));
+
+  return [...appointmentItems, ...vaccinationItems, ...dewormingItems]
+    .map((item) => ({
+      ...item,
+      time: new Date(item.dateValue).getTime(),
+    }))
+    .filter((item) => !Number.isNaN(item.time))
+    .sort((a, b) => b.time - a.time)
+    .slice(0, 6);
+}, [appointments, vaccinations, dewormings, t]);
+
   const handleLogout = () => {
     clearTokens();
     sessionStorage.clear();
@@ -168,109 +345,6 @@ export const Profile = () => {
       }
     };
   }, [previewUrl]);
-
-  const activityItems = useMemo<ActivityItem[]>(() => {
-    const appointmentItems: ActivityItem[] = appointments.map((item: any) => ({
-      id: `appointment-${item.id}`,
-      type: "appointment",
-      title: t("activityForPet", {
-        activity: item.serviceType ?? t("appointmentFallback"),
-        pet: item.animalName ?? t("petFallback"),
-      }),
-      dateValue:
-        item.slotStartTimeUtc ??
-        item.SlotStartTimeUtc ??
-        item.slotStartUtc ??
-        item.SlotStartUtc ??
-        item.startTimeUtc ??
-        item.StartTimeUtc ??
-        "",
-      clinic:
-        item.vetCabinetName ??
-        item.VetCabinetName ??
-        item.veterinarianName ??
-        item.VeterinarianName ??
-        item.clinicName ??
-        item.ClinicName ??
-        t("clinicFallback"),
-    }));
-
-    const vaccinationItems: ActivityItem[] = vaccinations.map((item: any) => ({
-      id: `vaccination-${item.id}`,
-      type: "vaccination",
-      title: t("activityForPet", {
-        activity: item.vaccineName ?? t("vaccinationFallback"),
-        pet: item.animalName ?? t("petFallback"),
-      }),
-      dateValue:
-        item.dateUtc ??
-        item.DateUtc ??
-        item.slotStartUtc ??
-        item.SlotStartUtc ??
-        item.slotStartTimeUtc ??
-        item.SlotStartTimeUtc ??
-        item.scheduledAtUtc ??
-        item.startTimeUtc ??
-        item.StartTimeUtc ??
-        item.nextDateUtc ??
-        item.NextDateUtc ??
-        item.nextDate ??
-        item.NextDate ??
-        item.date ??
-        item.Date ??
-        "",
-      clinic:
-        item.vetCabinetName ??
-        item.VetCabinetName ??
-        item.veterinarianName ??
-        item.VeterinarianName ??
-        item.clinicName ??
-        item.ClinicName ??
-        t("clinicFallback"),
-    }));
-
-    const dewormingItems: ActivityItem[] = dewormings.map((item: any) => ({
-      id: `deworming-${item.id}`,
-      type: "deworming",
-      title: t("activityForPet", {
-        activity: item.productName ?? item.type ?? t("dewormingFallback"),
-        pet: item.animalName ?? t("petFallback"),
-      }),
-      dateValue:
-        item.dateUtc ??
-        item.DateUtc ??
-        item.slotStartUtc ??
-        item.SlotStartUtc ??
-        item.slotStartTimeUtc ??
-        item.SlotStartTimeUtc ??
-        item.scheduledAtUtc ??
-        item.startTimeUtc ??
-        item.StartTimeUtc ??
-        item.nextDateUtc ??
-        item.NextDateUtc ??
-        item.nextDate ??
-        item.NextDate ??
-        item.date ??
-        item.Date ??
-        "",
-      clinic:
-        item.vetCabinetName ??
-        item.VetCabinetName ??
-        item.veterinarianName ??
-        item.VeterinarianName ??
-        item.clinicName ??
-        item.ClinicName ??
-        t("clinicFallback"),
-    }));
-
-    return [...appointmentItems, ...vaccinationItems, ...dewormingItems]
-      .sort((a, b) => {
-        const aTime = new Date(a.dateValue).getTime();
-        const bTime = new Date(b.dateValue).getTime();
-        return bTime - aTime;
-      })
-      .slice(0, 6);
-  }, [appointments, vaccinations, dewormings, t]);
 
   const handleSaveName = () => {
     updateProfile(
@@ -313,9 +387,7 @@ export const Profile = () => {
   ) => {
     const file = event.target.files?.[0];
 
-    if (!file) {
-      return;
-    }
+    if (!file) return;
 
     if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
       enqueueSnackbar("Poți încărca doar JPG, PNG sau WEBP.", {
@@ -344,9 +416,7 @@ export const Profile = () => {
   };
 
   const handleSaveProfilePicture = () => {
-    if (!selectedProfilePicture) {
-      return;
-    }
+    if (!selectedProfilePicture) return;
 
     updateProfile(
       {
@@ -360,9 +430,11 @@ export const Profile = () => {
             variant: "success",
           });
           setSelectedProfilePicture(null);
+
           if (previewUrl) {
             URL.revokeObjectURL(previewUrl);
           }
+
           setPreviewUrl("");
         },
         onError: () => {
@@ -374,7 +446,8 @@ export const Profile = () => {
     );
   };
 
-  const displayedProfilePicture = previewUrl || safeProfile.profilePictureUrl || "";
+  const displayedProfilePicture =
+    previewUrl || safeProfile.profilePictureUrl || "";
 
   if (isProfileLoading) {
     return (
@@ -459,7 +532,8 @@ export const Profile = () => {
                         fontSize: scaleFont(40, settings?.textSize),
                         fontWeight: 800,
                         background: `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, ${theme.palette.primary.main} 100%)`,
-                        color: theme.palette.mode === "dark" ? "#111827" : "#ffffff",
+                        color:
+                          theme.palette.mode === "dark" ? "#111827" : "#ffffff",
                       })}
                     >
                       {getInitial(safeProfile.fullName)}
@@ -589,18 +663,6 @@ export const Profile = () => {
                             color: "#ffffff",
                             background:
                               "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
-                            boxShadow: "0 4px 12px rgba(245,166,35,0.35)",
-                            transition: "all 0.2s ease",
-                            "&:hover": {
-                              background:
-                                "linear-gradient(135deg, #f0981a 0%, #e88510 100%)",
-                              boxShadow: "0 6px 16px rgba(245,166,35,0.45)",
-                              transform: "translateY(-1px)",
-                            },
-                            "&.Mui-disabled": {
-                              opacity: 0.6,
-                              color: "#fff",
-                            },
                           }}
                         >
                           <EditRoundedIcon />
@@ -666,18 +728,6 @@ export const Profile = () => {
                             color: "#ffffff",
                             background:
                               "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
-                            boxShadow: "0 4px 12px rgba(245,166,35,0.35)",
-                            transition: "all 0.2s ease",
-                            "&:hover": {
-                              background:
-                                "linear-gradient(135deg, #f0981a 0%, #e88510 100%)",
-                              boxShadow: "0 6px 16px rgba(245,166,35,0.45)",
-                              transform: "translateY(-1px)",
-                            },
-                            "&.Mui-disabled": {
-                              opacity: 0.6,
-                              color: "#fff",
-                            },
                           }}
                         >
                           <EditRoundedIcon />
@@ -699,12 +749,6 @@ export const Profile = () => {
                         textTransform: "none",
                         fontSize: scaleFont(16, settings?.textSize),
                         fontWeight: 700,
-                        "&:hover": {
-                          backgroundColor:
-                            theme.palette.mode === "dark"
-                              ? alpha("#ffffff", 0.1)
-                              : "#e6e6e6",
-                        },
                       })}
                     >
                       {t("changePassword")}
@@ -721,9 +765,6 @@ export const Profile = () => {
                         textTransform: "none",
                         fontSize: scaleFont(16, settings?.textSize),
                         fontWeight: 700,
-                        "&:hover": {
-                          backgroundColor: alpha(theme.palette.error.main, 0.18),
-                        },
                       })}
                     >
                       {t("logout")}
@@ -758,7 +799,9 @@ export const Profile = () => {
                     const icon =
                       item.type === "appointment" ? (
                         <CalendarMonthRoundedIcon
-                          sx={(theme) => ({ color: theme.palette.secondary.main })}
+                          sx={(theme) => ({
+                            color: theme.palette.secondary.main,
+                          })}
                         />
                       ) : item.type === "vaccination" ? (
                         <VaccinesRoundedIcon
@@ -766,7 +809,9 @@ export const Profile = () => {
                         />
                       ) : (
                         <BugReportRoundedIcon
-                          sx={(theme) => ({ color: theme.palette.success.main })}
+                          sx={(theme) => ({
+                            color: theme.palette.success.main,
+                          })}
                         />
                       );
 
@@ -797,7 +842,11 @@ export const Profile = () => {
                           alignItems={{ xs: "flex-start", sm: "flex-start" }}
                           spacing={2}
                         >
-                          <Stack direction="row" spacing={2} alignItems="flex-start">
+                          <Stack
+                            direction="row"
+                            spacing={2}
+                            alignItems="flex-start"
+                          >
                             <Box
                               sx={(theme) => ({
                                 width: { xs: 46, sm: 54 },
@@ -837,7 +886,10 @@ export const Profile = () => {
                                   color: theme.palette.text.secondary,
                                 })}
                               >
-                                {formatDateBySettings(item.dateValue, dateFormat)}
+                                {formatDateBySettings(
+                                  item.dateValue,
+                                  dateFormat
+                                )}
                               </Typography>
 
                               <Typography
@@ -922,14 +974,6 @@ export const Profile = () => {
                             borderRadius: 4,
                             border: `1px solid ${theme.palette.divider}`,
                             backgroundColor: theme.palette.background.paper,
-                            transition: "box-shadow 0.2s ease, transform 0.2s ease",
-                            "&:hover": {
-                              boxShadow:
-                                theme.palette.mode === "dark"
-                                  ? "0 12px 32px rgba(0,0,0,0.28), 0 2px 8px rgba(0,0,0,0.18)"
-                                  : "0 12px 32px rgba(7,28,66,0.09), 0 2px 8px rgba(7,28,66,0.04)",
-                              transform: "translateY(-2px)",
-                            },
                           })}
                         >
                           <Box
@@ -942,7 +986,10 @@ export const Profile = () => {
                                 ? `linear-gradient(135deg, ${alpha(
                                     theme.palette.primary.main,
                                     0.14
-                                  )} 0%, ${alpha(theme.palette.primary.light, 0.22)} 100%)`
+                                  )} 0%, ${alpha(
+                                    theme.palette.primary.light,
+                                    0.22
+                                  )} 100%)`
                                 : "linear-gradient(135deg, #fbf2ea 0%, #fde8c8 100%)",
                               display: "flex",
                               alignItems: "center",
@@ -952,21 +999,6 @@ export const Profile = () => {
                               position: "relative",
                             })}
                           >
-                            {!pet.imageUrl && (
-                              <Box
-                                sx={(theme) => ({
-                                  position: "absolute",
-                                  width: 100,
-                                  height: 100,
-                                  borderRadius: "50%",
-                                  background:
-                                    theme.palette.mode === "dark"
-                                      ? alpha(theme.palette.primary.main, 0.16)
-                                      : "rgba(245,166,35,0.15)",
-                                })}
-                              />
-                            )}
-
                             {pet.imageUrl ? (
                               <Box
                                 component="img"
@@ -1006,39 +1038,15 @@ export const Profile = () => {
                               {pet.name}
                             </Typography>
 
-                            <Stack direction="row" alignItems="center" spacing={0.8}>
-                              <Typography
-                                sx={(theme) => ({
-                                  fontSize: scaleFont(13, settings?.textSize),
-                                  color: theme.palette.text.secondary,
-                                  fontWeight: 500,
-                                })}
-                              >
-                                {pet.breed}
-                              </Typography>
-
-                              <Box
-                                sx={(theme) => ({
-                                  width: 3,
-                                  height: 3,
-                                  borderRadius: "50%",
-                                  backgroundColor:
-                                    theme.palette.mode === "dark"
-                                      ? alpha(theme.palette.text.secondary, 0.6)
-                                      : "#c9d0da",
-                                })}
-                              />
-
-                              <Typography
-                                sx={(theme) => ({
-                                  fontSize: scaleFont(13, settings?.textSize),
-                                  color: theme.palette.text.secondary,
-                                  fontWeight: 500,
-                                })}
-                              >
-                                {pet.weight}
-                              </Typography>
-                            </Stack>
+                            <Typography
+                              sx={(theme) => ({
+                                fontSize: scaleFont(13, settings?.textSize),
+                                color: theme.palette.text.secondary,
+                                fontWeight: 500,
+                              })}
+                            >
+                              {pet.breed} · {pet.weight}
+                            </Typography>
                           </Stack>
 
                           <Button
@@ -1052,20 +1060,12 @@ export const Profile = () => {
                             sx={{
                               py: 1.2,
                               borderRadius: 2.5,
-                              background: "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
+                              background:
+                                "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
                               color: "#fff",
                               textTransform: "none",
                               fontSize: scaleFont(14, settings?.textSize),
                               fontWeight: 700,
-                              letterSpacing: "-0.1px",
-                              boxShadow: "0 4px 12px rgba(245,166,35,0.35)",
-                              transition: "all 0.2s ease",
-                              "&:hover": {
-                                background:
-                                  "linear-gradient(135deg, #f0981a 0%, #e88510 100%)",
-                                boxShadow: "0 6px 16px rgba(245,166,35,0.45)",
-                                transform: "translateY(-1px)",
-                              },
                             }}
                           >
                             {t("view")}

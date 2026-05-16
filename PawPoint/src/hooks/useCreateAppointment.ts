@@ -7,6 +7,8 @@ export const useCreateAppointment = () => {
   return useMutation({
     mutationFn: createAppointment,
     onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["dashboardData"] });
+      await queryClient.invalidateQueries({ queryKey: ["userProfile"] });
       await queryClient.invalidateQueries({ queryKey: ["appointments"] });
       await queryClient.invalidateQueries({ queryKey: ["vetAvailability"] });
     },
