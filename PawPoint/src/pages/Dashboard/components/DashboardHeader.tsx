@@ -4,14 +4,13 @@ import { scaleFont } from "../../../utils/fontScale";
 
 type Props = {
   title: string;
-  subtitle: string;
 };
 
-export const DashboardHeader = ({ title, subtitle }: Props) => {
+export const DashboardHeader = ({ title }: Props) => {
   const { data: settings } = useSettings();
 
   return (
-    <Stack spacing={1.5} sx={{ mb: 5 }}>
+    <Stack spacing={1.5} sx={{ mb: 2 }}>
       <Box sx={{ position: "relative", display: "inline-block" }}>
         <Typography
           sx={(theme) => ({
@@ -34,18 +33,6 @@ export const DashboardHeader = ({ title, subtitle }: Props) => {
           {title}
         </Typography>
       </Box>
-
-      <Typography
-        sx={(theme) => ({
-          fontSize: scaleFont(16, settings?.textSize),
-          color: theme.palette.text.secondary,
-          fontWeight: 400,
-          letterSpacing: "0.1px",
-          maxWidth: 480,
-        })}
-      >
-        {subtitle}
-      </Typography>
     </Stack>
   );
 };

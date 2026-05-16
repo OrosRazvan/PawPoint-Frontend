@@ -41,6 +41,9 @@
   "deleteSuccess": "Deparazitarea a fost ștearsă cu succes.",
   "deleteError": "Deparazitarea nu a putut fi ștearsă.",
 
+  "edit": "Modifică",
+  "delete": "Șterge",
+
   "type": "Tip",
   "selectType": "Selectează tipul",
   "intervalDays": "Interval (zile)",

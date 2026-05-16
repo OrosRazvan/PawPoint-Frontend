@@ -41,6 +41,9 @@
   "deleteSuccess": "Deworming deleted successfully.",
   "deleteError": "Failed to delete deworming.",
 
+  "edit": "Edit",
+  "delete": "Delete",
+
   "type": "Type",
   "selectType": "Select type",
   "intervalDays": "Interval (days)",

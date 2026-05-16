@@ -19,8 +19,11 @@ type RawUpcomingEvent = {
   status?: string;
   statusLabel?: string;
   dateValue?: string;
+  rawDate?: string;
   dateUtc?: string;
   DateUtc?: string;
+  scheduledDateUtc?: string;
+  ScheduledDateUtc?: string;
   slotStartUtc?: string;
   SlotStartUtc?: string;
   slotStartTimeUtc?: string;
@@ -44,15 +47,19 @@ export const UpcomingEventsSection = ({ events }: Props) => {
 
   const formatDate = (value?: string) => {
     if (!value) return "—";
+
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return "—";
+
     return date.toLocaleDateString(locale);
   };
 
   const formatTime = (value?: string) => {
     if (!value) return "—";
+
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return "—";
+
     return date.toLocaleTimeString(locale, {
       hour: "2-digit",
       minute: "2-digit",
@@ -64,6 +71,9 @@ export const UpcomingEventsSection = ({ events }: Props) => {
       .map((item, index) => {
         const rawDate =
           item.dateValue ??
+          item.rawDate ??
+          item.scheduledDateUtc ??
+          item.ScheduledDateUtc ??
           item.dateUtc ??
           item.DateUtc ??
           item.slotStartUtc ??
@@ -78,18 +88,26 @@ export const UpcomingEventsSection = ({ events }: Props) => {
 
         const parsedTime = new Date(rawDate).getTime();
 
-        const typeLabel =
+        const rawTypeLabel =
           item.typeLabel ??
           item.title ??
           item.eventType ??
           item.type ??
           t("eventFallback");
 
-        const normalizedType = typeLabel.toLowerCase();
+        const normalizedType = rawTypeLabel.toLowerCase();
+        const normalizedEventType = String(item.eventType ?? "").toLowerCase();
 
-        let eventKind: "appointment" | "vaccination" | "deworming" = "deworming";
+        let eventKind: "appointment" | "vaccination" | "deworming" =
+          "deworming";
 
-        if (
+        if (normalizedEventType === "appointment") {
+          eventKind = "appointment";
+        } else if (normalizedEventType === "vaccination") {
+          eventKind = "vaccination";
+        } else if (normalizedEventType === "deworming") {
+          eventKind = "deworming";
+        } else if (
           normalizedType.includes("appointment") ||
           normalizedType.includes("consult") ||
           normalizedType.includes("program") ||
@@ -99,26 +117,43 @@ export const UpcomingEventsSection = ({ events }: Props) => {
         } else if (
           normalizedType.includes("vacc") ||
           normalizedType.includes("vaccine") ||
-          normalizedType.includes("vaccin")
+          normalizedType.includes("vaccin") ||
+          normalizedType === "vac" ||
+          normalizedType.includes("combined")
         ) {
           eventKind = "vaccination";
         }
+
+        const displayTypeLabel =
+          eventKind === "appointment"
+            ? t("appointmentFallback")
+            : eventKind === "vaccination"
+            ? t("vaccinationFallback")
+            : t("dewormingFallback");
 
         return {
           id: String(item.id ?? index),
           petName:
             item.petName ?? item.animalName ?? item.name ?? t("petFallback"),
-          typeLabel,
+          typeLabel: displayTypeLabel,
           statusLabel: item.statusLabel ?? item.status ?? t("upcomingStatus"),
           rawDate,
           dateLabel: item.dateLabel ?? formatDate(rawDate),
           timeLabel: item.timeLabel ?? formatTime(rawDate),
-          sortValue:
-            Number.isNaN(parsedTime) ? Number.MAX_SAFE_INTEGER : parsedTime,
+          sortValue: Number.isNaN(parsedTime)
+            ? Number.MAX_SAFE_INTEGER
+            : parsedTime,
           eventKind,
         };
       })
-      .filter((item) => item.sortValue !== Number.MAX_SAFE_INTEGER)
+      .filter((item) => {
+        const now = Date.now();
+
+        return (
+          item.sortValue !== Number.MAX_SAFE_INTEGER &&
+          item.sortValue >= now
+        );
+      })
       .sort((a, b) => a.sortValue - b.sortValue)
       .slice(0, 3);
   }, [events, t, locale]);
@@ -130,6 +165,7 @@ export const UpcomingEventsSection = ({ events }: Props) => {
           {normalizedEvents.map((item) => {
             const isAppointment = item.eventKind === "appointment";
             const isVaccination = item.eventKind === "vaccination";
+
             const accentColor = isAppointment
               ? "secondary"
               : isVaccination
@@ -138,15 +174,24 @@ export const UpcomingEventsSection = ({ events }: Props) => {
 
             const icon = isAppointment ? (
               <CalendarMonthRoundedIcon
-                sx={(theme) => ({ color: theme.palette.secondary.main, fontSize: 20 })}
+                sx={(theme) => ({
+                  color: theme.palette.secondary.main,
+                  fontSize: 20,
+                })}
               />
             ) : isVaccination ? (
               <VaccinesRoundedIcon
-                sx={(theme) => ({ color: theme.palette.info.main, fontSize: 20 })}
+                sx={(theme) => ({
+                  color: theme.palette.info.main,
+                  fontSize: 20,
+                })}
               />
             ) : (
               <BugReportRoundedIcon
-                sx={(theme) => ({ color: theme.palette.success.main, fontSize: 20 })}
+                sx={(theme) => ({
+                  color: theme.palette.success.main,
+                  fontSize: 20,
+                })}
               />
             );
 
@@ -171,7 +216,10 @@ export const UpcomingEventsSection = ({ events }: Props) => {
                     boxShadow:
                       theme.palette.mode === "dark"
                         ? "0 4px 20px rgba(0,0,0,0.2)"
-                        : `0 4px 20px ${alpha(theme.palette[accentColor].main, 0.08)}`,
+                        : `0 4px 20px ${alpha(
+                            theme.palette[accentColor].main,
+                            0.08
+                          )}`,
                     transform: "translateY(-1px)",
                   },
                 })}

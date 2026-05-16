@@ -39,7 +39,7 @@
   "availabilityLoadError": "Disponibilitatea nu a putut fi încărcată.",
   "availableHours": "Ore disponibile",
   "availableHoursFor": "Ore disponibile pentru {{date}}:",
-  "availableSlots": "sloturi disponibile",
+  "availableSlots": "lucuri disponibile",
   "selectDayPrompt": "Selectează o zi pentru a vedea orele disponibile.",
   "noHoursOnDay": "Nu există ore disponibile în această zi.",
   "noCabinetSelected": "Nu a fost selectat niciun cabinet",
@@ -48,8 +48,8 @@
   "calendarAvailable": "Disponibil",
   "calendarLimited": "Limitat / zi plină",
   "calendarUnavailable": "Indisponibil",
-  "calendarNoSlots": "fără sloturi",
-  "calendarSlots": "{{count}} sloturi",
+  "calendarNoSlots": "fără locuri",
+  "calendarSlots": "{{count}} locuri",
 
   "summary": "Sumar",
   "veterinarian": "Veterinar",
@@ -70,7 +70,7 @@
   "serviceFallback": "Consultație",
   "dateTimeLabel": "{{date}} la {{time}}",
 
-  "noSlots": "Fără sloturi",
+  "noSlots": "Fără locuri",
   "selectDate": "Selectează data",
 
   "weekSun": "Dum",
@@ -99,7 +99,7 @@
     "upcoming": "Urmează"
   },
 
-  "downloadReport": "Descarca raport",
+  "downloadReport": "Descarcă raport",
   "report": {
     "title": "Raport programare",
     "number": "Numar raport",

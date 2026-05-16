@@ -365,17 +365,6 @@ export const ContactUs = () => {
               >
                 {t("contact:title")}
               </Typography>
-              <Typography
-                sx={{
-                  mt: 1.2,
-                  color: isDark ? alpha("#fde8d0", 0.5) : "#64748b",
-                  fontSize: { xs: "0.95rem", md: "1.05rem" },
-                  maxWidth: 480,
-                  lineHeight: 1.65,
-                }}
-              >
-                {t("contact:subtitle")}
-              </Typography>
 
               <Box
                 sx={{

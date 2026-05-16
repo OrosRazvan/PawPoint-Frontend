@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  Avatar,
   Box,
   Button,
   CircularProgress,
@@ -14,8 +15,10 @@ import { alpha } from "@mui/material/styles";
 import AssistantMessageBubble from "./AssistantMessageBubble";
 import type { ChatMessage, AssistantResponse } from "../types/assistant";
 import { useAssistantMessage } from "../../../hooks/useAssistantMessage";
+import { useUserProfile } from "../../../hooks/useUserProfile";
 import { scaleFont } from "../../../utils/fontScale";
 import type { AppTextSize } from "../../../utils/textSize";
+import chatbotAvatar from "../../../assets/chatbot/chatbot-avatar.png";
 
 function createMessageId() {
   return crypto.randomUUID();
@@ -34,6 +37,7 @@ export default function AssistantChat({
 }: AssistantChatProps) {
   const { t } = useTranslation("assistant");
   const { mutateAsync: askAssistant, isPending } = useAssistantMessage();
+  const { data: profile } = useUserProfile();
 
   const [input, setInput] = useState("");
 
@@ -57,12 +61,25 @@ export default function AssistantChat({
     },
   ]);
 
-  const bottomRef = useRef<HTMLDivElement | null>(null);
+  const messagesContainerRef = useRef<HTMLDivElement | null>(null);
 
   const canSend = useMemo(
     () => input.trim().length > 0 && !isPending,
     [input, isPending]
   );
+
+  const scrollMessagesToBottom = () => {
+    setTimeout(() => {
+      const container = messagesContainerRef.current;
+
+      if (!container) return;
+
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: "smooth",
+      });
+    }, 50);
+  };
 
   const pushUserMessage = (text: string) => {
     setMessages((prev) => [
@@ -90,10 +107,12 @@ export default function AssistantChat({
 
   const sendMessage = async (text: string) => {
     const trimmed = text.trim();
+
     if (!trimmed || isPending) return;
 
     pushUserMessage(trimmed);
     setInput("");
+    scrollMessagesToBottom();
 
     try {
       const response = await askAssistant({ message: trimmed });
@@ -107,9 +126,7 @@ export default function AssistantChat({
         suggestions: [],
       });
     } finally {
-      setTimeout(() => {
-        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 50);
+      scrollMessagesToBottom();
     }
   };
 
@@ -122,7 +139,12 @@ export default function AssistantChat({
     <Paper
       elevation={0}
       sx={(theme) => {
-        const resolvedMode = darkMode ? "dark" : lightMode ? "light" : theme.palette.mode;
+        const resolvedMode = darkMode
+          ? "dark"
+          : lightMode
+          ? "light"
+          : theme.palette.mode;
+
         const isDark = resolvedMode === "dark";
 
         return {
@@ -145,9 +167,16 @@ export default function AssistantChat({
           px: 3,
           py: 2.5,
           borderBottom: `1px solid ${theme.palette.divider}`,
-          background: theme.palette.mode === "dark"
-            ? `linear-gradient(180deg, ${alpha(theme.palette.primary.dark, 0.28)} 0%, ${alpha(theme.palette.background.paper, 0.98)} 100%)`
-            : `linear-gradient(180deg, ${alpha(theme.palette.primary.light, 0.24)} 0%, ${alpha(theme.palette.background.paper, 0.98)} 100%)`,
+          background:
+            theme.palette.mode === "dark"
+              ? `linear-gradient(180deg, ${alpha(
+                  theme.palette.primary.dark,
+                  0.28
+                )} 0%, ${alpha(theme.palette.background.paper, 0.98)} 100%)`
+              : `linear-gradient(180deg, ${alpha(
+                  theme.palette.primary.light,
+                  0.24
+                )} 0%, ${alpha(theme.palette.background.paper, 0.98)} 100%)`,
         })}
       >
         <Typography
@@ -160,6 +189,7 @@ export default function AssistantChat({
         >
           {t("assistant.pageTitle")}
         </Typography>
+
         <Typography
           variant="body1"
           sx={(theme) => ({
@@ -173,6 +203,7 @@ export default function AssistantChat({
       </Box>
 
       <Box
+        ref={messagesContainerRef}
         sx={{
           flex: 1,
           overflowY: "auto",
@@ -189,27 +220,50 @@ export default function AssistantChat({
               darkMode={darkMode}
               lightMode={lightMode}
               fontScale={fontScale}
+              userProfilePictureUrl={profile?.profilePictureUrl ?? undefined}
+              userFullName={profile?.fullName}
             />
           ))}
 
           {isPending ? (
-            <Box sx={{ display: "flex", justifyContent: "flex-start" }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "flex-start",
+                alignItems: "flex-start",
+                gap: 2,
+              }}
+            >
+              <Avatar
+                src={chatbotAvatar}
+                sx={{
+                  width: 56,
+                  height: 56,
+                  mt: 0.25,
+                  flexShrink: 0,
+                  border: "1px solid rgba(245,166,35,0.28)",
+                  boxShadow: "0 8px 22px rgba(245,166,35,0.16)",
+                  backgroundColor: "#fff",
+                }}
+              />
+
               <Paper
                 elevation={0}
                 sx={(theme) => ({
                   px: 2,
-                  py: 1.5,
+                  py: 1.3,
                   borderRadius: 4,
                   backgroundColor:
                     theme.palette.mode === "dark"
                       ? alpha(theme.palette.common.white, 0.04)
-                      : alpha(theme.palette.primary.main, 0.06),
+                      : theme.palette.background.paper,
                   color: theme.palette.text.primary,
                   border: `1px solid ${theme.palette.divider}`,
                 })}
               >
                 <Stack direction="row" spacing={1.5} alignItems="center">
                   <CircularProgress size={18} color="primary" />
+
                   <Typography
                     variant="body2"
                     sx={{ fontSize: scaleFont(14, fontScale) }}
@@ -220,8 +274,6 @@ export default function AssistantChat({
               </Paper>
             </Box>
           ) : null}
-
-          <div ref={bottomRef} />
         </Stack>
       </Box>
 
