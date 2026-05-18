@@ -52,6 +52,7 @@ export type VetAvailabilitySlotDto = {
   endTimeUtc: string;
   capacity?: number;
   bookedCount?: number;
+  availableCount?: number;
 };
 
 export type AnimalDto = {

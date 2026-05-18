@@ -14,7 +14,10 @@ import { useTranslation } from "react-i18next";
 import { useVetAvailability } from "../../hooks/useVetAvailability";
 import { useSettings } from "../../hooks/useSettings";
 import { scaleFont } from "../../utils/fontScale";
-import type { VetCabinetDto } from "./types/appointment";
+import type {
+  VetCabinetDto,
+  VetAvailabilitySlotDto,
+} from "./types/appointment";
 
 type EditingAppointment = {
   id: number;
@@ -32,14 +35,6 @@ type LocationState = {
   serviceType: string;
 };
 
-type VetAvailabilitySlotDto = {
-  id?: number;
-  vetCabinetId?: number;
-  startTimeUtc: string;
-  endTimeUtc: string;
-  capacity?: number;
-  bookedCount?: number;
-};
 
 type AppDateFormat = "DD/MM/YYYY" | "MM/DD/YYYY" | "YYYY-MM-DD";
 
@@ -73,6 +68,21 @@ const formatDateKey = (date: Date) => {
 
   return `${year}-${month}-${day}`;
 };
+
+const startOfDay = (date: Date) =>
+  new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+const isSameMonth = (a: Date, b: Date) =>
+  a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth();
+
+const isPastDay = (date: Date, today: Date) =>
+  startOfDay(date).getTime() < startOfDay(today).getTime();
+
+const isToday = (date: Date, today: Date) =>
+  startOfDay(date).getTime() === startOfDay(today).getTime();
+
+const isSlotInPast = (slot: VetAvailabilitySlotDto) =>
+  new Date(slot.startTimeUtc).getTime() < Date.now();
 
 const formatTime = (value: string) => {
   const date = new Date(value);
@@ -121,7 +131,7 @@ const isSlotAvailable = (slot: VetAvailabilitySlotDto) => {
   const capacity = slot.capacity ?? 1;
   const bookedCount = slot.bookedCount ?? 0;
 
-  return bookedCount < capacity;
+  return bookedCount < capacity && !isSlotInPast(slot);
 };
 
 const getServiceLabel = (serviceType: string, t: (key: string) => string) => {
@@ -137,13 +147,36 @@ const getServiceLabel = (serviceType: string, t: (key: string) => string) => {
   }
 };
 
+const formatSelectedDateTitle = (
+  selectedDateKey: string | null,
+  dateFormat: AppDateFormat,
+  locale: string,
+  today: Date,
+  t: (key: string) => string
+) => {
+  if (!selectedDateKey) return t("selectDate");
+
+  const date = new Date(`${selectedDateKey}T00:00:00`);
+
+  const weekDay = date.toLocaleDateString(locale, {
+    weekday: "long",
+  });
+
+  const formattedDate = formatDateBySettings(date, dateFormat);
+
+  return isToday(date, today)
+    ? `${t("today")} • ${weekDay} • ${formattedDate}`
+    : `${weekDay} • ${formattedDate}`;
+};
+
 export const BookAppointmentStep2 = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { t } = useTranslation("appointment");
+  const { t, i18n } = useTranslation("appointment");
   const { data: settings } = useSettings();
 
   const dateFormat: AppDateFormat = settings?.dateFormat ?? "DD/MM/YYYY";
+  const locale = i18n.language === "ro" ? "ro-RO" : "en-GB";
 
   const weekDays = [
     t("weekSun"),
@@ -179,12 +212,16 @@ export const BookAppointmentStep2 = () => {
   const selectedCabinet = state?.selectedCabinet ?? null;
   const serviceType = state?.serviceType ?? "Consult";
 
-  const today = new Date();
+  const today = useMemo(() => new Date(), []);
 
   const [currentMonth, setCurrentMonth] = useState(
     new Date(today.getFullYear(), today.getMonth(), 1)
   );
-  const [selectedDateKey, setSelectedDateKey] = useState<string | null>(null);
+
+  const [selectedDateKey, setSelectedDateKey] = useState<string | null>(
+    formatDateKey(today)
+  );
+
   const [selectedSlot, setSelectedSlot] = useState<VetAvailabilitySlotDto | null>(
     null
   );
@@ -195,6 +232,7 @@ export const BookAppointmentStep2 = () => {
     data: availability = [],
     isLoading,
     isError,
+    refetch,
   } = useVetAvailability({
     vetCabinetId: selectedCabinet?.id,
     from,
@@ -203,9 +241,20 @@ export const BookAppointmentStep2 = () => {
   });
 
   useEffect(() => {
-    setSelectedDateKey(null);
+    if (!selectedCabinet?.id) return;
+
+    refetch();
+  }, [selectedCabinet?.id, from, to, refetch]);
+
+  useEffect(() => {
+    if (isSameMonth(currentMonth, today)) {
+      setSelectedDateKey(formatDateKey(today));
+    } else {
+      setSelectedDateKey(null);
+    }
+
     setSelectedSlot(null);
-  }, [currentMonth, selectedCabinet?.id]);
+  }, [currentMonth, selectedCabinet?.id, today]);
 
   const slotsByDay = useMemo(() => {
     const map = new Map<string, VetAvailabilitySlotDto[]>();
@@ -244,22 +293,47 @@ export const BookAppointmentStep2 = () => {
     return slots.filter(isSlotAvailable);
   }, [selectedDateKey, slotsByDay]);
 
-  const selectedDateLabel = useMemo(() => {
-    if (!selectedDateKey) return "";
-    return formatDateBySettings(selectedDateKey, dateFormat);
-  }, [selectedDateKey, dateFormat]);
+  useEffect(() => {
+    if (!selectedSlot) return;
+
+    const stillAvailable = selectedDaySlots.some(
+      (slot) => slot.id === selectedSlot.id
+    );
+
+    if (!stillAvailable) {
+      setSelectedSlot(null);
+    }
+  }, [selectedDaySlots, selectedSlot]);
+
+  const selectedDateLabel = useMemo(
+    () =>
+      formatSelectedDateTitle(
+        selectedDateKey,
+        dateFormat,
+        locale,
+        today,
+        t
+      ),
+    [selectedDateKey, dateFormat, locale, today, t]
+  );
 
   useEffect(() => {
-    if (!selectedDateKey) {
-      const firstAvailableDay = Array.from(slotsByDay.entries()).find(([, slots]) =>
-        slots.some(isSlotAvailable)
-      );
+    if (selectedDateKey) return;
 
-      if (firstAvailableDay) {
-        setSelectedDateKey(firstAvailableDay[0]);
+    const firstAvailableDay = Array.from(slotsByDay.entries()).find(
+      ([key, slots]) => {
+        const dayDate = new Date(`${key}T00:00:00`);
+        return (
+          !isPastDay(dayDate, today) &&
+          slots.some((slot) => isSlotAvailable(slot))
+        );
       }
+    );
+
+    if (firstAvailableDay) {
+      setSelectedDateKey(firstAvailableDay[0]);
     }
-  }, [slotsByDay, selectedDateKey]);
+  }, [slotsByDay, selectedDateKey, today]);
 
   useEffect(() => {
     setSelectedSlot(null);
@@ -367,6 +441,10 @@ export const BookAppointmentStep2 = () => {
   };
 
   const getDayVariant = (date: Date) => {
+    if (isPastDay(date, today)) {
+      return "past";
+    }
+
     const key = formatDateKey(date);
     const daySlots = slotsByDay.get(key) ?? [];
 
@@ -505,6 +583,7 @@ export const BookAppointmentStep2 = () => {
                       sx={{ mb: 3 }}
                     >
                       <Button
+                        disabled={isSameMonth(currentMonth, today)}
                         onClick={() =>
                           setCurrentMonth(
                             new Date(
@@ -525,6 +604,13 @@ export const BookAppointmentStep2 = () => {
                               ? alpha("#ffffff", 0.05)
                               : "#f3eee7",
                           flexShrink: 0,
+                          "&.Mui-disabled": {
+                            color: theme.palette.text.disabled,
+                            backgroundColor:
+                              theme.palette.mode === "dark"
+                                ? alpha("#ffffff", 0.03)
+                                : "#f0f0f0",
+                          },
                         })}
                       >
                         <ChevronLeftRoundedIcon />
@@ -633,19 +719,34 @@ export const BookAppointmentStep2 = () => {
                         const key = formatDateKey(date);
                         const variant = getDayVariant(date);
                         const daySlots = slotsByDay.get(key) ?? [];
-                        const availableCount = daySlots.filter(isSlotAvailable).length;
+                        const availableCount = daySlots
+                          .filter(isSlotAvailable)
+                          .reduce((sum, slot) => {
+                            const count =
+                              slot.availableCount ??
+                              Math.max(0, (slot.capacity ?? 1) - (slot.bookedCount ?? 0));
+
+                            return sum + count;
+                          }, 0);
                         const isSelected = selectedDateKey === key;
+                        const isTodayDate = isToday(date, today);
+                        const isDisabled =
+                          variant === "unavailable" ||
+                          variant === "past";
 
                         return (
                           <Box
                             key={key}
-                            onClick={() =>
-                              variant !== "unavailable" && setSelectedDateKey(key)
-                            }
+                            onClick={() => {
+                              if (!isDisabled) {
+                                setSelectedDateKey(key);
+                              }
+                            }}
                             sx={(theme) => {
                               let backgroundColor = theme.palette.background.paper;
                               let border = `1px solid ${theme.palette.divider}`;
                               let cursor = "pointer";
+                              let opacity = 1;
 
                               if (variant === "available") {
                                 backgroundColor = isSelected
@@ -678,6 +779,23 @@ export const BookAppointmentStep2 = () => {
                                 cursor = "default";
                               }
 
+                              if (variant === "past") {
+                                backgroundColor =
+                                  theme.palette.mode === "dark"
+                                    ? alpha("#ffffff", 0.025)
+                                    : "#f5f5f5";
+                                border = `1px solid ${alpha(
+                                  theme.palette.divider,
+                                  0.65
+                                )}`;
+                                cursor = "not-allowed";
+                                opacity = 0.48;
+                              }
+
+                              if (isTodayDate && !isSelected && variant !== "past") {
+                                border = `2px solid ${theme.palette.primary.main}`;
+                              }
+
                               return {
                                 minHeight: { xs: 58, sm: 66, md: 78 },
                                 p: { xs: 0.7, sm: 1, md: 1.4 },
@@ -685,12 +803,43 @@ export const BookAppointmentStep2 = () => {
                                 backgroundColor,
                                 border,
                                 cursor,
+                                opacity,
                                 transition: "all 0.2s ease",
                                 minWidth: 0,
                                 overflow: "hidden",
+                                position: "relative",
+                                "&:hover": isDisabled
+                                  ? {}
+                                  : {
+                                      transform: "translateY(-1px)",
+                                    },
                               };
                             }}
                           >
+                            {isTodayDate && (
+                              <Box
+                                sx={(theme) => ({
+                                  position: "absolute",
+                                  top: 6,
+                                  right: 6,
+                                  px: 0.7,
+                                  py: 0.15,
+                                  borderRadius: 999,
+                                  backgroundColor: isSelected
+                                    ? alpha(theme.palette.primary.contrastText, 0.2)
+                                    : alpha(theme.palette.primary.main, 0.14),
+                                  color: isSelected
+                                    ? theme.palette.primary.contrastText
+                                    : theme.palette.primary.main,
+                                  fontSize: scaleFont(9, settings?.textSize),
+                                  fontWeight: 800,
+                                  lineHeight: 1.4,
+                                })}
+                              >
+                                {t("today")}
+                              </Box>
+                            )}
+
                             <Typography
                               sx={(theme) => ({
                                 fontSize: {
@@ -700,7 +849,7 @@ export const BookAppointmentStep2 = () => {
                                 },
                                 fontWeight: 800,
                                 color:
-                                  variant === "unavailable"
+                                  variant === "unavailable" || variant === "past"
                                     ? theme.palette.text.secondary
                                     : selectedDateKey === key
                                     ? theme.palette.primary.contrastText
@@ -720,7 +869,7 @@ export const BookAppointmentStep2 = () => {
                                   md: scaleFont(12, settings?.textSize),
                                 },
                                 color:
-                                  variant === "unavailable"
+                                  variant === "unavailable" || variant === "past"
                                     ? theme.palette.text.secondary
                                     : selectedDateKey === key
                                     ? alpha(theme.palette.primary.contrastText, 0.82)
@@ -735,7 +884,9 @@ export const BookAppointmentStep2 = () => {
                                 wordBreak: "break-word",
                               })}
                             >
-                              {variant === "unavailable"
+                              {variant === "past"
+                                ? t("pastDate")
+                                : variant === "unavailable"
                                 ? t("noSlots")
                                 : variant === "full"
                                 ? t("full")
@@ -750,7 +901,7 @@ export const BookAppointmentStep2 = () => {
                   <Box
                     sx={(theme) => ({
                       width: "100%",
-                      maxWidth: { xl: 360 },
+                      maxWidth: { xl: 380 },
                       borderRadius: 3,
                       border: `1px solid ${theme.palette.divider}`,
                       backgroundColor:
@@ -758,6 +909,9 @@ export const BookAppointmentStep2 = () => {
                           ? alpha("#ffffff", 0.03)
                           : "#faf8f5",
                       p: { xs: 2, sm: 2.5, md: 3 },
+                      position: { xl: "sticky" },
+                      top: { xl: 24 },
+                      alignSelf: { xl: "flex-start" },
                     })}
                   >
                     <Typography
@@ -772,10 +926,18 @@ export const BookAppointmentStep2 = () => {
                         wordBreak: "break-word",
                       })}
                     >
-                      {selectedDateLabel || t("selectDate")}
+                      {selectedDateLabel}
                     </Typography>
 
-                    <Stack spacing={1.5} sx={{ mt: 2.5 }}>
+                    <Stack
+                      spacing={1.5}
+                      sx={{
+                        mt: 2.5,
+                        maxHeight: { xs: 280, sm: 320, xl: 420 },
+                        overflowY: "auto",
+                        pr: 0.5,
+                      }}
+                    >
                       {selectedDaySlots.length === 0 ? (
                         <Typography
                           sx={(theme) => ({
@@ -829,87 +991,80 @@ export const BookAppointmentStep2 = () => {
                         })
                       )}
                     </Stack>
-                  </Box>
-                </Stack>
 
-                <Stack
-                  direction={{ xs: "column-reverse", sm: "row" }}
-                  justifyContent="space-between"
-                  spacing={2}
-                  sx={{ pt: 2 }}
-                >
-                  <Button
-                    onClick={handleBack}
-                    startIcon={<ChevronLeftRoundedIcon />}
-                    sx={(theme) => ({
-                      width: { xs: "100%", sm: "auto" },
-                      minWidth: { xs: "100%", sm: 140 },
-                      px: 3.5,
-                      py: 1.55,
-                      borderRadius: 2.5,
-                      textTransform: "none",
-                      fontSize: scaleFont(18, settings?.textSize),
-                      fontWeight: 700,
-                      backgroundColor:
-                        theme.palette.mode === "dark"
-                          ? alpha("#ffffff", 0.06)
-                          : "#e8e2d9",
-                      color: theme.palette.text.primary,
-                      "&:hover": {
-                        backgroundColor:
-                          theme.palette.mode === "dark"
-                            ? alpha("#ffffff", 0.1)
-                            : "#ddd5ca",
-                      },
-                    })}
-                  >
-                    {t("back")}
-                  </Button>
-
-                  <Button
-                    onClick={handleNext}
-                    disabled={!selectedSlot}
-                    endIcon={<ChevronRightRoundedIcon />}
-                    sx={(theme) => ({
-                      width: { xs: "100%", sm: "auto" },
-                      minWidth: { xs: "100%", sm: 180 },
-                      px: 3.5,
-                      py: 1.55,
-                      borderRadius: 2.5,
-                      textTransform: "none",
-                      fontSize: scaleFont(18, settings?.textSize),
-                      fontWeight: 700,
-                      backgroundColor: selectedSlot
-                        ? theme.palette.primary.main
-                        : theme.palette.mode === "dark"
-                        ? alpha(theme.palette.primary.main, 0.25)
-                        : "#f4d28a",
-                      color: selectedSlot
-                        ? theme.palette.primary.contrastText
-                        : theme.palette.mode === "dark"
-                        ? alpha("#ffffff", 0.45)
-                        : "#8c7a4e",
-                      "&:hover": {
-                        backgroundColor: selectedSlot
-                          ? theme.palette.primary.dark
-                          : theme.palette.mode === "dark"
-                          ? alpha(theme.palette.primary.main, 0.25)
-                          : "#f4d28a",
-                      },
-                      "&.Mui-disabled": {
-                        backgroundColor:
-                          theme.palette.mode === "dark"
+                    <Stack spacing={1.5} sx={{ mt: 2.5 }}>
+                      <Button
+                        onClick={handleNext}
+                        disabled={!selectedSlot}
+                        endIcon={<ChevronRightRoundedIcon />}
+                        sx={(theme) => ({
+                          width: "100%",
+                          px: 3.5,
+                          py: 1.4,
+                          borderRadius: 2.5,
+                          textTransform: "none",
+                          fontSize: scaleFont(17, settings?.textSize),
+                          fontWeight: 700,
+                          backgroundColor: selectedSlot
+                            ? theme.palette.primary.main
+                            : theme.palette.mode === "dark"
                             ? alpha(theme.palette.primary.main, 0.25)
                             : "#f4d28a",
-                        color:
-                          theme.palette.mode === "dark"
+                          color: selectedSlot
+                            ? theme.palette.primary.contrastText
+                            : theme.palette.mode === "dark"
                             ? alpha("#ffffff", 0.45)
                             : "#8c7a4e",
-                      },
-                    })}
-                  >
-                    {t("next")}
-                  </Button>
+                          "&:hover": {
+                            backgroundColor: selectedSlot
+                              ? theme.palette.primary.dark
+                              : theme.palette.mode === "dark"
+                              ? alpha(theme.palette.primary.main, 0.25)
+                              : "#f4d28a",
+                          },
+                          "&.Mui-disabled": {
+                            backgroundColor:
+                              theme.palette.mode === "dark"
+                                ? alpha(theme.palette.primary.main, 0.25)
+                                : "#f4d28a",
+                            color:
+                              theme.palette.mode === "dark"
+                                ? alpha("#ffffff", 0.45)
+                                : "#8c7a4e",
+                          },
+                        })}
+                      >
+                        {t("next")}
+                      </Button>
+
+                      <Button
+                        onClick={handleBack}
+                        startIcon={<ChevronLeftRoundedIcon />}
+                        sx={(theme) => ({
+                          width: "100%",
+                          px: 3.5,
+                          py: 1.25,
+                          borderRadius: 2.5,
+                          textTransform: "none",
+                          fontSize: scaleFont(16, settings?.textSize),
+                          fontWeight: 700,
+                          backgroundColor:
+                            theme.palette.mode === "dark"
+                              ? alpha("#ffffff", 0.06)
+                              : "#e8e2d9",
+                          color: theme.palette.text.primary,
+                          "&:hover": {
+                            backgroundColor:
+                              theme.palette.mode === "dark"
+                                ? alpha("#ffffff", 0.1)
+                                : "#ddd5ca",
+                          },
+                        })}
+                      >
+                        {t("back")}
+                      </Button>
+                    </Stack>
+                  </Box>
                 </Stack>
               </>
             )}

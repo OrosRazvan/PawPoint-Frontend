@@ -23,5 +23,11 @@ export const useVetAvailability = ({
         to: String(to),
       }),
     enabled: enabled && !!vetCabinetId && !!from && !!to,
+
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   });
 };

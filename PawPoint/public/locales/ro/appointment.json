@@ -6,6 +6,7 @@
   "completed": "Finalizate",
   "empty": "Nu există programări.",
   "loadError": "Programările nu au putut fi încărcate.",
+  "edit" : "Modifică",
 
   "bookPageTitle": "Programează o vizită",
 
@@ -33,13 +34,15 @@
   "sortRatingDesc": "Rating ↓",
 
   "loadCabinetsError": "Cabinetele veterinare nu au putut fi încărcate.",
+  "searchCabinets": "Caută cabinet...",
+  "noCabinetsFound": "Nu am găsit niciun cabinet.",
   "workingHoursValue": "9:00 - 20:00",
 
   "availabilityTitle": "Disponibilitate",
   "availabilityLoadError": "Disponibilitatea nu a putut fi încărcată.",
   "availableHours": "Ore disponibile",
   "availableHoursFor": "Ore disponibile pentru {{date}}:",
-  "availableSlots": "lucuri disponibile",
+  "availableSlots": "locuri disponibile",
   "selectDayPrompt": "Selectează o zi pentru a vedea orele disponibile.",
   "noHoursOnDay": "Nu există ore disponibile în această zi.",
   "noCabinetSelected": "Nu a fost selectat niciun cabinet",
@@ -51,7 +54,7 @@
   "calendarNoSlots": "fără locuri",
   "calendarSlots": "{{count}} locuri",
 
-  "summary": "Sumar",
+  "summary": "Rezumat",
   "veterinarian": "Veterinar",
   "animal": "Animal",
   "date": "Data",
@@ -115,5 +118,17 @@
     "status": "Status",
     "notes": "Observatii",
     "total": "Total"
-  }
+  },
+
+  "filters": {
+    "last3Months": "Ultimele 3 luni",
+    "last6Months": "3 - 6 luni",
+    "lastYear": "Un an"
+  },
+
+  "today": "Azi",
+  "pastDate": "Trecut",
+  "full": "Plin",
+
+  "appointmentDetails": "Detalii programare"
 }

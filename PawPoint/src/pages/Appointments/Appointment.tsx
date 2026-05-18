@@ -10,14 +10,20 @@ import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
 import ScheduleRoundedIcon from "@mui/icons-material/ScheduleRounded";
+import CheckIcon from "@mui/icons-material/Check";
 import { alpha } from "@mui/material/styles";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAppointments } from "../../hooks/useAppointments";
 import { useSettings } from "../../hooks/useSettings";
 import { scaleFont } from "../../utils/fontScale";
 import { AppointmentCard } from "./components/AppointmentCard";
+import {
+  CompletedPeriodFilter,
+  type CompletedFilterMonths,
+} from "../../components/CompletedPeriodFilter";
+import { filterCompletedByPeriod } from "../../utils/completedPeriodFilter";
 import type { AppointmentCardItem, AppointmentDto } from "./types/appointment";
 
 const resolveStatus = (item: AppointmentDto): "completed" | "upcoming" => {
@@ -63,10 +69,25 @@ export const Appointments = () => {
 
   const { data = [], isLoading, isError } = useAppointments();
 
+  const [completedFilterMonths, setCompletedFilterMonths] =
+    useState<CompletedFilterMonths>(3);
+
   const items = useMemo(() => mapAppointments(data, t), [data, t]);
 
-  const completedItems = items.filter((item) => item.status === "completed");
-  const upcomingItems = items.filter((item) => item.status === "upcoming");
+  const completedItems = useMemo(
+    () => items.filter((item) => item.status === "completed"),
+    [items]
+  );
+
+  const upcomingItems = useMemo(
+    () => items.filter((item) => item.status === "upcoming"),
+    [items]
+  );
+
+  const filteredCompletedItems = useMemo(
+    () => filterCompletedByPeriod(completedItems, completedFilterMonths),
+    [completedItems, completedFilterMonths]
+  );
 
   return (
     <Box
@@ -251,64 +272,84 @@ export const Appointments = () => {
             {completedItems.length > 0 && (
               <Box>
                 <Stack
-                  direction="row"
-                  spacing={1.5}
-                  alignItems="center"
+                  direction={{ xs: "column", sm: "row" }}
+                  justifyContent="space-between"
+                  alignItems={{ xs: "flex-start", sm: "center" }}
+                  spacing={2}
                   sx={{ mb: 2.5 }}
                 >
-                  <Box
-                    sx={(theme) => ({
-                      width: 32,
-                      height: 32,
-                      borderRadius: 2,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      backgroundColor:
-                        theme.palette.mode === "dark"
-                          ? alpha(theme.palette.success.main, 0.14)
-                          : "#dff4f1",
-                    })}
-                  >
-                    <CheckCircleOutlineRoundedIcon
+                  <Stack direction="row" spacing={1.5} alignItems="center">
+                    <Box
                       sx={(theme) => ({
-                        fontSize: 17,
-                        color: theme.palette.success.main,
+                        width: 32,
+                        height: 32,
+                        borderRadius: 2,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor:
+                          theme.palette.mode === "dark"
+                            ? alpha(theme.palette.success.main, 0.14)
+                            : "#dff4f1",
                       })}
-                    />
-                  </Box>
+                    >
+                      <CheckCircleOutlineRoundedIcon
+                        sx={(theme) => ({
+                          fontSize: 17,
+                          color: theme.palette.success.main,
+                        })}
+                      />
+                    </Box>
 
-                  <Typography
-                    sx={(theme) => ({
-                      fontSize: scaleFont(18, settings?.textSize),
-                      fontWeight: 800,
-                      color: theme.palette.text.primary,
-                      letterSpacing: "-0.3px",
-                    })}
-                  >
-                    {t("appointment:completed")}
-                  </Typography>
+                    <Typography
+                      sx={(theme) => ({
+                        fontSize: scaleFont(18, settings?.textSize),
+                        fontWeight: 800,
+                        color: theme.palette.text.primary,
+                        letterSpacing: "-0.3px",
+                      })}
+                    >
+                      {t("appointment:completed")}
+                    </Typography>
 
-                  <Box
-                    sx={(theme) => ({
-                      px: 1.25,
-                      py: 0.2,
-                      borderRadius: 999,
-                      backgroundColor:
-                        theme.palette.mode === "dark"
-                          ? alpha(theme.palette.success.main, 0.14)
-                          : "#dff4f1",
-                      color: theme.palette.success.main,
-                      fontSize: scaleFont(12, settings?.textSize),
-                      fontWeight: 700,
-                    })}
-                  >
-                    {completedItems.length}
-                  </Box>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 0.75,
+                        px: 1.25,
+                        py: 0.4,
+                        borderRadius: 999,
+                        backgroundColor: (theme) =>
+                          theme.palette.mode === "dark"
+                            ? alpha(theme.palette.success.main, 0.14)
+                            : "#dff4f1",
+                        border: (theme) =>
+                          `1.5px solid ${alpha(
+                            theme.palette.success.main,
+                            0.28
+                          )}`,
+                        color: "success.main",
+                        fontSize: scaleFont(12, settings?.textSize),
+                        fontWeight: 700,
+                      }}
+                    >
+                      <CheckIcon
+                        sx={{ fontSize: scaleFont(13, settings?.textSize) }}
+                      />
+                      {filteredCompletedItems.length}
+                    </Box>
+                  </Stack>
+
+                  <CompletedPeriodFilter
+                    value={completedFilterMonths}
+                    onChange={setCompletedFilterMonths}
+                    namespace="appointment"
+                  />
                 </Stack>
 
                 <Grid container spacing={2.5}>
-                  {completedItems.map((item) => (
+                  {filteredCompletedItems.map((item) => (
                     <Grid key={item.id} size={{ xs: 12, md: 6, xl: 4 }}>
                       <AppointmentCard item={item} />
                     </Grid>

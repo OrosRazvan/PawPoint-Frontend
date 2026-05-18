@@ -53,8 +53,8 @@ const cardSx = (theme: Theme) => ({
       ? "rgba(255,255,255,0.08)"
       : "rgba(0,0,0,0.06)"
   }`,
-  px: { xs: 3, sm: 4, md: 5 },
-  py: { xs: 4, md: 5 },
+  px: { xs: 2.5, sm: 3, md: 3.5 },
+  py: { xs: 3, md: 3.5 },
   boxShadow:
     theme.palette.mode === "dark"
       ? "0 1px 0 rgba(255,255,255,0.05) inset, 0 24px 64px rgba(0,0,0,0.45)"
@@ -265,12 +265,12 @@ export const Settings = () => {
                linear-gradient(180deg, #0f0e0c 0%, #111010 100%)`
             : `radial-gradient(ellipse 80% 60% at 50% -10%, rgba(247,174,26,0.06) 0%, transparent 70%),
                #f5f3ef`,
-        px: { xs: 2, sm: 4, md: 6, lg: 8 },
-        py: { xs: 4, md: 6, lg: 8 },
+        px: { xs: 2, sm: 3, md: 4, lg: 5 },
+        py: { xs: 2.5, md: 3.5, lg: 4 },
       })}
     >
       <Box sx={{ maxWidth: 1200, mx: "auto" }}>
-        <Stack spacing={5}>
+        <Stack spacing={3}>
 
           {/* ── Page title ────────────────────────────────────────────────── */}
           <Box>
@@ -304,7 +304,7 @@ export const Settings = () => {
             sx={{
               display: "grid",
               gridTemplateColumns: { xs: "1fr", lg: "1fr 1fr" },
-              gap: { xs: 4, md: 5 },
+              gap: { xs: 2.5, md: 3 },
               alignItems: "start",
             }}
           >
@@ -313,7 +313,7 @@ export const Settings = () => {
                 APPEARANCE CARD
             ════════════════════════════════════════════════════════════ */}
             <Box sx={cardSx}>
-              <Stack spacing={4}>
+              <Stack spacing={1.5}>
 
                 {/* Header */}
                 <Stack direction="row" spacing={2} alignItems="center">
@@ -509,7 +509,7 @@ export const Settings = () => {
                 NOTIFICATIONS CARD
             ════════════════════════════════════════════════════════════ */}
             <Box sx={cardSx}>
-              <Stack spacing={4}>
+              <Stack spacing={1.5}>
 
                 {/* Header */}
                 <Stack direction="row" spacing={2} alignItems="center">
