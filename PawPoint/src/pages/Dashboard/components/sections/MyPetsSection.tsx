@@ -81,6 +81,7 @@ export const MyPetsSection = ({
                 name={pet.name}
                 breed={pet.breed}
                 weight={pet.weight}
+                weightKg={pet.weightKg}
                 imageLetter={pet.imageLetter}
                 imageUrl={pet.imageUrl}
                 imagePositionY={pet.imagePositionY}

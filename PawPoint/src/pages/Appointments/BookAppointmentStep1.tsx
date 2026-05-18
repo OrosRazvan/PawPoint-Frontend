@@ -7,10 +7,13 @@ import {
   Stack,
   TextField,
   Typography,
+  IconButton,
 } from "@mui/material";
 import PetsRoundedIcon from "@mui/icons-material/PetsRounded";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import StarRoundedIcon from "@mui/icons-material/StarRounded";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import { alpha } from "@mui/material/styles";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -55,6 +58,32 @@ export const BookAppointmentStep1 = () => {
       color: theme.palette.text.primary,
       "& fieldset": {
         borderColor: theme.palette.divider,
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: theme.palette.primary.main,
+        borderWidth: 1.5,
+      },
+      "& .MuiSvgIcon-root": {
+        color: theme.palette.text.secondary,
+      },
+    },
+  });
+
+  const searchFieldSx = (theme: any) => ({
+    minWidth: { xs: "100%", sm: 240, md: 300 },
+    "& .MuiOutlinedInput-root": {
+      borderRadius: 2.5,
+      backgroundColor:
+        theme.palette.mode === "dark"
+          ? alpha("#ffffff", 0.03)
+          : theme.palette.background.paper,
+      fontSize: scaleFont(14, settings?.textSize),
+      color: theme.palette.text.primary,
+      "& fieldset": {
+        borderColor: theme.palette.divider,
+      },
+      "&:hover fieldset": {
+        borderColor: theme.palette.action.active,
       },
       "&.Mui-focused fieldset": {
         borderColor: theme.palette.primary.main,
@@ -136,6 +165,7 @@ export const BookAppointmentStep1 = () => {
     navState?.appointment?.serviceType ?? "Consult"
   );
   const [sortBy, setSortBy] = useState("priceAsc");
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedCabinetId, setSelectedCabinetId] = useState<number | null>(
     navState?.appointment?.vetCabinetId ?? null
   );
@@ -149,8 +179,25 @@ export const BookAppointmentStep1 = () => {
     enabled: true,
   });
 
-  const sortedCabinets = useMemo(() => {
-    const result = [...cabinets];
+  const filteredAndSortedCabinets = useMemo(() => {
+    const normalizedSearch = searchQuery.trim().toLowerCase();
+
+    const result = cabinets.filter((cabinet) => {
+      if (!normalizedSearch) return true;
+
+      const searchableText = [
+        cabinet.name,
+        cabinet.address,
+        cabinet.city,
+        cabinet.phoneNumber,
+        cabinet.website,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      return searchableText.includes(normalizedSearch);
+    });
 
     result.sort((a, b) => {
       switch (sortBy) {
@@ -178,12 +225,14 @@ export const BookAppointmentStep1 = () => {
     });
 
     return result;
-  }, [cabinets, sortBy]);
+  }, [cabinets, searchQuery, sortBy]);
 
   const selectedCabinet = useMemo(
     () =>
-      sortedCabinets.find((cabinet) => cabinet.id === selectedCabinetId) ?? null,
-    [sortedCabinets, selectedCabinetId]
+      filteredAndSortedCabinets.find(
+        (cabinet) => cabinet.id === selectedCabinetId
+      ) ?? null,
+    [filteredAndSortedCabinets, selectedCabinetId]
   );
 
   const handleNext = () => {
@@ -253,32 +302,151 @@ export const BookAppointmentStep1 = () => {
               spacing={2}
             >
               <Stack
-                direction={{ xs: "column", sm: "row" }}
-                spacing={{ xs: 0.75, sm: 1.5 }}
-                alignItems={{ xs: "flex-start", sm: "center" }}
+                direction={{ xs: "column", md: "row" }}
+                spacing={{ xs: 1.25, md: 2 }}
+                alignItems={{ xs: "stretch", md: "center" }}
               >
-                <Typography
-                  sx={(theme) => ({
-                    fontSize: scaleFont(18, settings?.textSize),
-                    fontWeight: 600,
-                    color: theme.palette.text.primary,
-                    minWidth: 56,
-                  })}
+                <Stack
+                  direction={{ xs: "column", xl: "row" }}
+                  spacing={{ xs: 1.5, xl: 2 }}
+                  alignItems={{ xs: "stretch", xl: "center" }}
+                  sx={{ width: "100%", minWidth: 0 }}
                 >
-                  {t("service")}:
-                </Typography>
+                  <Typography
+                    sx={(theme) => ({
+                      fontSize: scaleFont(18, settings?.textSize),
+                      fontWeight: 600,
+                      color: theme.palette.text.primary,
+                      minWidth: 56,
+                    })}
+                  >
+                    {t("service")}:
+                  </Typography>
 
-                <Typography
+                  <Typography
+                    sx={(theme) => ({
+                      fontSize: scaleFont(18, settings?.textSize),
+                      fontWeight: 600,
+                      color: theme.palette.text.primary,
+                      minWidth: 56,
+                      wordBreak: "break-word",
+                    })}
+                  >
+                    {t("consult")}
+                  </Typography>
+                </Stack>
+
+                <TextField
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setSelectedCabinetId(null);
+                  }}
+                  placeholder={t("searchCabinets")}
+                  size="small"
+                  fullWidth
                   sx={(theme) => ({
-                    fontSize: scaleFont(18, settings?.textSize),
-                    fontWeight: 600,
+                  width: { xs: "100%", md: 300 },
+                  minWidth: { md: 300 },
+
+                  "& .MuiOutlinedInput-root": {
+                    height: 44,
+                    borderRadius: 999,
+                    backgroundColor:
+                      theme.palette.mode === "dark"
+                        ? alpha(theme.palette.primary.main, 0.12)
+                        : "#ffffff",
+
+                    fontSize: scaleFont(13, settings?.textSize),
+                    fontWeight: 500,
                     color: theme.palette.text.primary,
-                    minWidth: 56,
-                    wordBreak: "break-word",
+
+                    px: 1.25,
+
+                    transition: "all 0.18s ease",
+
+                    "& fieldset": {
+                      borderWidth: "1px",
+                      borderColor: alpha(theme.palette.primary.main, 0.18),
+                    },
+
+                    "&:hover": {
+                      backgroundColor:
+                        theme.palette.mode === "dark"
+                          ? alpha(theme.palette.primary.main, 0.18)
+                          : "#ffffff",
+                    },
+
+                    "&:hover fieldset": {
+                      borderColor: alpha(theme.palette.primary.main, 0.4),
+                    },
+
+                    "&.Mui-focused": {
+                      backgroundColor: theme.palette.background.paper,
+                      boxShadow: `0 0 0 4px ${alpha(
+                        theme.palette.primary.main,
+                        0.12
+                      )}`,
+                    },
+
+                    "&.Mui-focused fieldset": {
+                      borderWidth: "1px",
+                      borderColor: theme.palette.primary.main,
+                    },
+
+                    "& input": {
+                      py: 1.15,
+                    },
+
+                    "& input::placeholder": {
+                      color: theme.palette.text.secondary,
+                      opacity: 0.9,
+                      fontWeight: 500,
+                    },
+                  },
+                })}
+                  InputProps={{
+                    startAdornment: (
+                      <SearchRoundedIcon
+                  sx={(theme) => ({
+                    mr: 1,
+                    fontSize: 19,
+                    color: searchQuery
+                      ? theme.palette.primary.main
+                      : alpha(theme.palette.text.primary, 0.55),
+                    transition: "color 0.15s ease",
                   })}
-                >
-                  {t("consult")}
-                </Typography>
+                />
+                    ),
+                    endAdornment: searchQuery ? (
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          setSearchQuery("");
+                          setSelectedCabinetId(null);
+                        }}
+                        sx={(theme) => ({
+                          p: 0.35,
+                          mr: -0.5,
+                          color: theme.palette.text.secondary,
+                          backgroundColor:
+                            theme.palette.mode === "dark"
+                              ? alpha("#ffffff", 0.06)
+                              : alpha(theme.palette.common.black, 0.04),
+                          "&:hover": {
+                            backgroundColor:
+                              theme.palette.mode === "dark"
+                                ? alpha("#ffffff", 0.1)
+                                : alpha(theme.palette.common.black, 0.08),
+                            color: theme.palette.text.primary,
+                          },
+                        })}
+                      >
+                        <CloseRoundedIcon sx={{ fontSize: 15 }} />
+                      </IconButton>
+                    ) : null,
+                  }}
+                />
               </Stack>
 
               <Stack
@@ -327,143 +495,156 @@ export const BookAppointmentStep1 = () => {
               <Typography color="error">{t("loadCabinetsError")}</Typography>
             ) : (
               <Stack spacing={3}>
-                {sortedCabinets.map((cabinet) => {
-                  const isSelected = selectedCabinetId === cabinet.id;
+                {filteredAndSortedCabinets.length === 0 ? (
+                  <Typography
+                    sx={(theme) => ({
+                      py: 3,
+                      textAlign: "center",
+                      fontSize: scaleFont(15, settings?.textSize),
+                      color: theme.palette.text.secondary,
+                    })}
+                  >
+                    {t("noCabinetsFound")}
+                  </Typography>
+                ) : (
+                  filteredAndSortedCabinets.map((cabinet) => {
+                    const isSelected = selectedCabinetId === cabinet.id;
 
-                  return (
-                    <Box
-                      key={cabinet.id}
-                      sx={cardSx(isSelected)}
-                      onClick={() => setSelectedCabinetId(cabinet.id)}
-                    >
-                      <Stack
-                        direction="row"
-                        spacing={{ xs: 1.5, sm: 2, md: 2.5 }}
-                        alignItems="center"
-                        sx={{ minWidth: 0, flex: 1 }}
+                    return (
+                      <Box
+                        key={cabinet.id}
+                        sx={cardSx(isSelected)}
+                        onClick={() => setSelectedCabinetId(cabinet.id)}
                       >
-                        <Box
-                          sx={(theme) => ({
-                            width: { xs: 60, sm: 70, md: 82 },
-                            height: { xs: 60, sm: 70, md: 82 },
-                            borderRadius: 3,
-                            backgroundColor: theme.palette.primary.main,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            color: theme.palette.primary.contrastText,
-                            flexShrink: 0,
-                          })}
+                        <Stack
+                          direction="row"
+                          spacing={{ xs: 1.5, sm: 2, md: 2.5 }}
+                          alignItems="center"
+                          sx={{ minWidth: 0, flex: 1 }}
                         >
-                          <PetsRoundedIcon
-                            sx={{ fontSize: { xs: 28, sm: 32, md: 38 } }}
-                          />
-                        </Box>
-
-                        <Box sx={{ minWidth: 0, flex: 1 }}>
-                          <Typography
+                          <Box
                             sx={(theme) => ({
-                              fontSize: {
-                                xs: scaleFont(18, settings?.textSize),
-                                sm: scaleFont(20, settings?.textSize),
-                                md: scaleFont(22, settings?.textSize),
-                              },
-                              fontWeight: 800,
-                              color: theme.palette.text.primary,
-                              lineHeight: 1.2,
-                              wordBreak: "break-word",
+                              width: { xs: 60, sm: 70, md: 82 },
+                              height: { xs: 60, sm: 70, md: 82 },
+                              borderRadius: 3,
+                              backgroundColor: theme.palette.primary.main,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              color: theme.palette.primary.contrastText,
+                              flexShrink: 0,
                             })}
                           >
-                            {cabinet.name}
-                          </Typography>
+                            <PetsRoundedIcon
+                              sx={{ fontSize: { xs: 28, sm: 32, md: 38 } }}
+                            />
+                          </Box>
 
-                          <Typography
-                            sx={(theme) => ({
-                              mt: 0.8,
-                              fontSize: scaleFont(14, settings?.textSize),
-                              color: theme.palette.text.secondary,
-                              wordBreak: "break-word",
-                            })}
-                          >
-                            {cabinet.address || "—"}
-                          </Typography>
-
-                          <Stack
-                            direction={{ xs: "column", sm: "row" }}
-                            spacing={{ xs: 0.5, sm: 1 }}
-                            alignItems={{ xs: "flex-start", sm: "center" }}
-                            sx={{ mt: 1.4 }}
-                          >
-                            <Stack
-                              direction="row"
-                              spacing={0.75}
-                              alignItems="center"
+                          <Box sx={{ minWidth: 0, flex: 1 }}>
+                            <Typography
+                              sx={(theme) => ({
+                                fontSize: {
+                                  xs: scaleFont(18, settings?.textSize),
+                                  sm: scaleFont(20, settings?.textSize),
+                                  md: scaleFont(22, settings?.textSize),
+                                },
+                                fontWeight: 800,
+                                color: theme.palette.text.primary,
+                                lineHeight: 1.2,
+                                wordBreak: "break-word",
+                              })}
                             >
-                              <StarRoundedIcon
-                                sx={(theme) => ({
-                                  fontSize: 18,
-                                  color: theme.palette.warning.main,
-                                })}
-                              />
-                              <Typography
-                                sx={(theme) => ({
-                                  fontSize: scaleFont(15, settings?.textSize),
-                                  fontWeight: 700,
-                                  color: theme.palette.text.primary,
-                                })}
-                              >
-                                {cabinet.rating != null
-                                  ? cabinet.rating.toFixed(1)
-                                  : "—"}
-                              </Typography>
-                            </Stack>
+                              {cabinet.name}
+                            </Typography>
 
                             <Typography
                               sx={(theme) => ({
+                                mt: 0.8,
                                 fontSize: scaleFont(14, settings?.textSize),
                                 color: theme.palette.text.secondary,
+                                wordBreak: "break-word",
                               })}
                             >
-                              • {formatPrice(cabinet.basePriceRon)}
+                              {cabinet.address || "—"}
                             </Typography>
-                          </Stack>
-                        </Box>
-                      </Stack>
 
-                      <Button
-                        endIcon={<ChevronRightRoundedIcon />}
-                        sx={(theme) => ({
-                          alignSelf: { xs: "stretch", sm: "center" },
-                          width: { xs: "100%", sm: "auto" },
-                          px: 2.4,
-                          py: 1.1,
-                          borderRadius: 2.5,
-                          minWidth: { xs: "100%", sm: 130 },
-                          textTransform: "none",
-                          fontSize: scaleFont(15, settings?.textSize),
-                          fontWeight: 700,
-                          backgroundColor: isSelected
-                            ? theme.palette.primary.main
-                            : theme.palette.mode === "dark"
-                            ? alpha("#ffffff", 0.05)
-                            : "#f3eee7",
-                          color: isSelected
-                            ? theme.palette.primary.contrastText
-                            : theme.palette.text.primary,
-                          "&:hover": {
+                            <Stack
+                              direction={{ xs: "column", sm: "row" }}
+                              spacing={{ xs: 0.5, sm: 1 }}
+                              alignItems={{ xs: "flex-start", sm: "center" }}
+                              sx={{ mt: 1.4 }}
+                            >
+                              <Stack
+                                direction="row"
+                                spacing={0.75}
+                                alignItems="center"
+                              >
+                                <StarRoundedIcon
+                                  sx={(theme) => ({
+                                    fontSize: 18,
+                                    color: theme.palette.warning.main,
+                                  })}
+                                />
+                                <Typography
+                                  sx={(theme) => ({
+                                    fontSize: scaleFont(15, settings?.textSize),
+                                    fontWeight: 700,
+                                    color: theme.palette.text.primary,
+                                  })}
+                                >
+                                  {cabinet.rating != null
+                                    ? cabinet.rating.toFixed(1)
+                                    : "—"}
+                                </Typography>
+                              </Stack>
+
+                              <Typography
+                                sx={(theme) => ({
+                                  fontSize: scaleFont(14, settings?.textSize),
+                                  color: theme.palette.text.secondary,
+                                })}
+                              >
+                                • {formatPrice(cabinet.basePriceRon)}
+                              </Typography>
+                            </Stack>
+                          </Box>
+                        </Stack>
+
+                        <Button
+                          endIcon={<ChevronRightRoundedIcon />}
+                          sx={(theme) => ({
+                            alignSelf: { xs: "stretch", sm: "center" },
+                            width: { xs: "100%", sm: "auto" },
+                            px: 2.4,
+                            py: 1.1,
+                            borderRadius: 2.5,
+                            minWidth: { xs: "100%", sm: 130 },
+                            textTransform: "none",
+                            fontSize: scaleFont(15, settings?.textSize),
+                            fontWeight: 700,
                             backgroundColor: isSelected
-                              ? theme.palette.primary.dark
+                              ? theme.palette.primary.main
                               : theme.palette.mode === "dark"
-                              ? alpha("#ffffff", 0.08)
-                              : "#ece4d8",
-                          },
-                        })}
-                      >
-                        {isSelected ? t("selected") : t("select")}
-                      </Button>
-                    </Box>
-                  );
-                })}
+                              ? alpha("#ffffff", 0.05)
+                              : "#f3eee7",
+                            color: isSelected
+                              ? theme.palette.primary.contrastText
+                              : theme.palette.text.primary,
+                            "&:hover": {
+                              backgroundColor: isSelected
+                                ? theme.palette.primary.dark
+                                : theme.palette.mode === "dark"
+                                ? alpha("#ffffff", 0.08)
+                                : "#ece4d8",
+                            },
+                          })}
+                        >
+                          {isSelected ? t("selected") : t("select")}
+                        </Button>
+                      </Box>
+                    );
+                  })
+                )}
               </Stack>
             )}
 

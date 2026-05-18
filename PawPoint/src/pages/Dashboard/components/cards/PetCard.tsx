@@ -12,12 +12,14 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import { useSettings } from "../../../../hooks/useSettings";
 import { scaleFont } from "../../../../utils/fontScale";
+import { formatWeightByUnit } from "../../../../utils/weight";
 import { useTranslation } from "react-i18next";
 
 type Props = {
   name: string;
   breed: string;
-  weight: string;
+  weight?: string;
+  weightKg?: number | null;
   imageLetter: string;
   imageUrl?: string | null;
   imagePositionY?: number | null;
@@ -30,6 +32,7 @@ export const PetCard = ({
   name,
   breed,
   weight,
+  weightKg,
   imageLetter,
   imageUrl,
   imagePositionY,
@@ -39,6 +42,13 @@ export const PetCard = ({
 }: Props) => {
   const { data: settings } = useSettings();
   const { t } = useTranslation("dashboard");
+
+  const weightUnit: "kg" | "lb" = settings?.weightUnit === "lb" ? "lb" : "kg";
+
+  const displayWeight =
+    typeof weightKg === "number"
+      ? formatWeightByUnit(weightKg, weightUnit)
+      : weight ?? "—";
 
   return (
     <Paper
@@ -58,17 +68,16 @@ export const PetCard = ({
         },
       })}
     >
-      {/* Image area */}
       <Box
         sx={(theme) => ({
           height: 190,
           background: imageUrl
             ? "transparent"
             : theme.palette.mode === "dark"
-            ? `linear-gradient(140deg, ${alpha(theme.palette.primary.main, 0.18)} 0%, ${alpha(
-                theme.palette.primary.light,
-                0.26
-              )} 100%)`
+            ? `linear-gradient(140deg, ${alpha(
+                theme.palette.primary.main,
+                0.18
+              )} 0%, ${alpha(theme.palette.primary.light, 0.26)} 100%)`
             : "linear-gradient(140deg, #fff8f0 0%, #fde8c8 100%)",
           display: "flex",
           alignItems: "center",
@@ -93,6 +102,7 @@ export const PetCard = ({
                 right: -20,
               })}
             />
+
             <Box
               sx={(theme) => ({
                 position: "absolute",
@@ -139,7 +149,6 @@ export const PetCard = ({
         )}
       </Box>
 
-      {/* Content area */}
       <Box sx={{ p: 2.5 }}>
         <Stack spacing={0.3} sx={{ mb: 2.5 }}>
           <Typography
@@ -164,6 +173,7 @@ export const PetCard = ({
             >
               {breed}
             </Typography>
+
             <Box
               sx={(theme) => ({
                 width: 3,
@@ -172,6 +182,7 @@ export const PetCard = ({
                 backgroundColor: alpha(theme.palette.text.secondary, 0.4),
               })}
             />
+
             <Typography
               sx={(theme) => ({
                 fontSize: scaleFont(13, settings?.textSize),
@@ -179,7 +190,7 @@ export const PetCard = ({
                 fontWeight: 500,
               })}
             >
-              {weight}
+              {displayWeight}
             </Typography>
           </Stack>
         </Stack>
@@ -187,7 +198,9 @@ export const PetCard = ({
         <Stack direction="row" spacing={1}>
           <Button
             fullWidth
-            startIcon={<VisibilityOutlinedIcon sx={{ fontSize: "17px !important" }} />}
+            startIcon={
+              <VisibilityOutlinedIcon sx={{ fontSize: "17px !important" }} />
+            }
             onClick={onView}
             sx={{
               py: 1.25,

@@ -6,6 +6,7 @@
   "completed": "Completed",
   "empty": "No appointments found.",
   "loadError": "Failed to load appointments.",
+  "edit" : "Edit",
 
   "bookPageTitle": "Schedule a Visit",
 
@@ -33,6 +34,8 @@
   "sortRatingDesc": "Rating ↓",
 
   "loadCabinetsError": "Failed to load veterinary cabinets.",
+  "searchCabinets": "Search cabinet...",
+  "noCabinetsFound": "No cabinets found.",
   "workingHoursValue": "9am to 8pm",
 
   "availabilityTitle": "Availability",
@@ -115,5 +118,17 @@
     "status": "Status",
     "notes": "Notes",
     "total": "Total"
-  }
+  },
+
+  "filters": {
+    "last3Months": "Last 3 months",
+    "last6Months": "3 - 6 months",
+    "lastYear": "1 year"
+  },
+
+  "today": "Today",
+  "pastDate": "Past",
+  "full": "Full",
+
+  "appointmentDetails": "Appointment Details"
 }

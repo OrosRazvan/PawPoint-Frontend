@@ -32,6 +32,7 @@ import { useDewormings } from "../../hooks/useDewormings";
 import { useSettings } from "../../hooks/useSettings";
 import { useDashboard } from "../../hooks/useDashboard";
 import { scaleFont } from "../../utils/fontScale";
+import { formatWeightByUnit } from "../../utils/weight";
 import { clearTokens } from "../../auth/tokenStorage";
 
 type ActivityItem = {
@@ -115,6 +116,7 @@ export const Profile = () => {
 
   const pets = dashboardData?.pets ?? [];
   const dateFormat: AppDateFormat = settings?.dateFormat ?? "DD/MM/YYYY";
+  const weightUnit: "kg" | "lb" = settings?.weightUnit === "lb" ? "lb" : "kg";
 
   const cardSx = (theme: any) => ({
     borderRadius: 4,
@@ -149,183 +151,180 @@ export const Profile = () => {
   });
 
   const activityItems = useMemo<ActivityItem[]>(() => {
-  const getLatestValidDate = (...values: Array<string | undefined | null>) => {
-    return (
-      values
-        .filter(Boolean)
-        .map((value) => ({
-          value: value as string,
-          time: new Date(value as string).getTime(),
-        }))
-        .filter((item) => !Number.isNaN(item.time))
-        .sort((a, b) => b.time - a.time)[0]?.value ?? ""
-    );
-  };
+    const getLatestValidDate = (...values: Array<string | undefined | null>) => {
+      return (
+        values
+          .filter(Boolean)
+          .map((value) => ({
+            value: value as string,
+            time: new Date(value as string).getTime(),
+          }))
+          .filter((item) => !Number.isNaN(item.time))
+          .sort((a, b) => b.time - a.time)[0]?.value ?? ""
+      );
+    };
 
-  const isDeleted = (item: any) => {
-    const status = String(
-      item.status ?? item.Status ?? item.statusLabel ?? item.StatusLabel ?? ""
-    ).toLowerCase();
+    const isDeleted = (item: any) => {
+      const status = String(
+        item.status ?? item.Status ?? item.statusLabel ?? item.StatusLabel ?? ""
+      ).toLowerCase();
 
-    return (
-      item.isDeleted === true ||
-      item.IsDeleted === true ||
-      item.deleted === true ||
-      item.Deleted === true ||
-      status.includes("deleted") ||
-      status.includes("șters") ||
-      status.includes("sters") ||
-      status.includes("cancelled") ||
-      status.includes("canceled")
-    );
-  };
+      return (
+        item.isDeleted === true ||
+        item.IsDeleted === true ||
+        item.deleted === true ||
+        item.Deleted === true ||
+        status.includes("deleted") ||
+        status.includes("șters") ||
+        status.includes("sters") ||
+        status.includes("cancelled") ||
+        status.includes("canceled")
+      );
+    };
 
-  const getClinic = (item: any) =>
-    item.vetCabinetName ??
-    item.VetCabinetName ??
-    item.veterinarianName ??
-    item.VeterinarianName ??
-    item.clinicName ??
-    item.ClinicName ??
-    t("clinicFallback");
+    const getClinic = (item: any) =>
+      item.vetCabinetName ??
+      item.VetCabinetName ??
+      item.veterinarianName ??
+      item.VeterinarianName ??
+      item.clinicName ??
+      item.ClinicName ??
+      t("clinicFallback");
 
-  const getAppointmentDate = (item: any) =>
-    getLatestValidDate(
-      item.slotStartTimeUtc,
-      item.SlotStartTimeUtc,
-      item.slotStartUtc,
-      item.SlotStartUtc,
-      item.startTimeUtc,
-      item.StartTimeUtc,
-      item.appointmentDateUtc,
-      item.AppointmentDateUtc,
-      item.appointmentDate,
-      item.AppointmentDate,
-      item.scheduledDateUtc,
-      item.ScheduledDateUtc,
-      item.scheduledDate,
-      item.ScheduledDate,
-      item.dateUtc,
-      item.DateUtc,
-      item.date,
-      item.Date
-    );
+    const getAppointmentDate = (item: any) =>
+      getLatestValidDate(
+        item.slotStartTimeUtc,
+        item.SlotStartTimeUtc,
+        item.slotStartUtc,
+        item.SlotStartUtc,
+        item.startTimeUtc,
+        item.StartTimeUtc,
+        item.appointmentDateUtc,
+        item.AppointmentDateUtc,
+        item.appointmentDate,
+        item.AppointmentDate,
+        item.scheduledDateUtc,
+        item.ScheduledDateUtc,
+        item.scheduledDate,
+        item.ScheduledDate,
+        item.dateUtc,
+        item.DateUtc,
+        item.date,
+        item.Date
+      );
 
-  const getVaccinationDate = (item: any) =>
-    getLatestValidDate(
-      item.scheduledDateUtc,
-      item.ScheduledDateUtc,
-      item.scheduledDate,
-      item.ScheduledDate,
-      item.vaccinationDateUtc,
-      item.VaccinationDateUtc,
-      item.vaccinationDate,
-      item.VaccinationDate,
-      item.administeredDateUtc,
-      item.AdministeredDateUtc,
-      item.administeredDate,
-      item.AdministeredDate,
-      item.dateAdministeredUtc,
-      item.DateAdministeredUtc,
-      item.dateAdministered,
-      item.DateAdministered,
-      item.nextDateUtc,
-      item.NextDateUtc,
-      item.nextDate,
-      item.NextDate,
-      item.dateUtc,
-      item.DateUtc,
-      item.date,
-      item.Date
-    );
+    const getVaccinationDate = (item: any) =>
+      getLatestValidDate(
+        item.scheduledDateUtc,
+        item.ScheduledDateUtc,
+        item.scheduledDate,
+        item.ScheduledDate,
+        item.vaccinationDateUtc,
+        item.VaccinationDateUtc,
+        item.vaccinationDate,
+        item.VaccinationDate,
+        item.administeredDateUtc,
+        item.AdministeredDateUtc,
+        item.administeredDate,
+        item.AdministeredDate,
+        item.dateAdministeredUtc,
+        item.DateAdministeredUtc,
+        item.dateAdministered,
+        item.DateAdministered,
+        item.nextDateUtc,
+        item.NextDateUtc,
+        item.nextDate,
+        item.NextDate,
+        item.dateUtc,
+        item.DateUtc,
+        item.date,
+        item.Date
+      );
 
-  const getDewormingDate = (item: any) =>
-    getLatestValidDate(
-      item.scheduledDateUtc,
-      item.ScheduledDateUtc,
-      item.scheduledDate,
-      item.ScheduledDate,
-      item.administrationDateUtc,
-      item.AdministrationDateUtc,
-      item.administrationDate,
-      item.AdministrationDate,
-      item.administeredAtUtc,
-      item.AdministeredAtUtc,
-      item.administeredAt,
-      item.AdministeredAt,
-      item.dateUtc,
-      item.DateUtc,
-      item.date,
-      item.Date
-    );
+    const getDewormingDate = (item: any) =>
+      getLatestValidDate(
+        item.scheduledDateUtc,
+        item.ScheduledDateUtc,
+        item.scheduledDate,
+        item.ScheduledDate,
+        item.administrationDateUtc,
+        item.AdministrationDateUtc,
+        item.administrationDate,
+        item.AdministrationDate,
+        item.administeredAtUtc,
+        item.AdministeredAtUtc,
+        item.administeredAt,
+        item.AdministeredAt,
+        item.dateUtc,
+        item.DateUtc,
+        item.date,
+        item.Date
+      );
 
-  const appointmentItems: ActivityItem[] = appointments
-    .filter((item: any) => !isDeleted(item))
-    .map((item: any, index: number) => ({
-      id: `appointment-${
-        item.id ??
-        item.appointmentId ??
-        item.AppointmentId ??
-        index
-      }`,
-      type: "appointment",
-      title: t("activityForPet", {
-        activity: t("appointmentFallback"),
-        pet: item.animalName ?? item.petName ?? t("petFallback"),
-      }),
-      dateValue: getAppointmentDate(item),
-      clinic: getClinic(item),
-    }));
+    const appointmentItems: ActivityItem[] = appointments
+      .filter((item: any) => !isDeleted(item))
+      .map((item: any, index: number) => ({
+        id: `appointment-${
+          item.id ?? item.appointmentId ?? item.AppointmentId ?? index
+        }`,
+        type: "appointment",
+        title: t("activityForPet", {
+          activity: t("appointmentFallback"),
+          pet: item.animalName ?? item.petName ?? t("petFallback"),
+        }),
+        dateValue: getAppointmentDate(item),
+        clinic: getClinic(item),
+      }));
 
-  const vaccinationItems: ActivityItem[] = vaccinations
-    .filter((item: any) => !isDeleted(item))
-    .map((item: any, index: number) => ({
-      id: `vaccination-${
-        item.id ??
-        item.vaccinationId ??
-        item.VaccinationId ??
-        item.animalVaccinationId ??
-        item.AnimalVaccinationId ??
-        index
-      }`,
-      type: "vaccination",
-      title: t("activityForPet", {
-        activity: t("vaccinationFallback"),
-        pet: item.animalName ?? item.petName ?? t("petFallback"),
-      }),
-      dateValue: getVaccinationDate(item),
-      clinic: getClinic(item),
-    }));
+    const vaccinationItems: ActivityItem[] = vaccinations
+      .filter((item: any) => !isDeleted(item))
+      .map((item: any, index: number) => ({
+        id: `vaccination-${
+          item.id ??
+          item.vaccinationId ??
+          item.VaccinationId ??
+          item.animalVaccinationId ??
+          item.AnimalVaccinationId ??
+          index
+        }`,
+        type: "vaccination",
+        title: t("activityForPet", {
+          activity: t("vaccinationFallback"),
+          pet: item.animalName ?? item.petName ?? t("petFallback"),
+        }),
+        dateValue: getVaccinationDate(item),
+        clinic: getClinic(item),
+      }));
 
-  const dewormingItems: ActivityItem[] = dewormings
-    .filter((item: any) => !isDeleted(item))
-    .map((item: any, index: number) => ({
-      id: `deworming-${
-        item.id ??
-        item.dewormingId ??
-        item.DewormingId ??
-        item.animalDewormingId ??
-        item.AnimalDewormingId ??
-        index
-      }`,
-      type: "deworming",
-      title: t("activityForPet", {
-        activity: t("dewormingFallback"),
-        pet: item.animalName ?? item.petName ?? t("petFallback"),
-      }),
-      dateValue: getDewormingDate(item),
-      clinic: getClinic(item),
-    }));
+    const dewormingItems: ActivityItem[] = dewormings
+      .filter((item: any) => !isDeleted(item))
+      .map((item: any, index: number) => ({
+        id: `deworming-${
+          item.id ??
+          item.dewormingId ??
+          item.DewormingId ??
+          item.animalDewormingId ??
+          item.AnimalDewormingId ??
+          index
+        }`,
+        type: "deworming",
+        title: t("activityForPet", {
+          activity: t("dewormingFallback"),
+          pet: item.animalName ?? item.petName ?? t("petFallback"),
+        }),
+        dateValue: getDewormingDate(item),
+        clinic: getClinic(item),
+      }));
 
-  return [...appointmentItems, ...vaccinationItems, ...dewormingItems]
-    .map((item) => ({
-      ...item,
-      time: new Date(item.dateValue).getTime(),
-    }))
-    .filter((item) => !Number.isNaN(item.time))
-    .sort((a, b) => b.time - a.time)
-    .slice(0, 6);
-}, [appointments, vaccinations, dewormings, t]);
+    return [...appointmentItems, ...vaccinationItems, ...dewormingItems]
+      .map((item) => ({
+        ...item,
+        time: new Date(item.dateValue).getTime(),
+      }))
+      .filter((item) => !Number.isNaN(item.time))
+      .sort((a, b) => b.time - a.time)
+      .slice(0, 6);
+  }, [appointments, vaccinations, dewormings, t]);
 
   const handleLogout = () => {
     clearTokens();
@@ -965,114 +964,137 @@ export const Profile = () => {
 
                 {pets.length > 0 ? (
                   <Grid container spacing={3}>
-                    {pets.map((pet: any) => (
-                      <Grid key={pet.id} size={{ xs: 12, sm: 6, lg: 4 }}>
-                        <Paper
-                          elevation={0}
-                          sx={(theme) => ({
-                            p: 2,
-                            borderRadius: 4,
-                            border: `1px solid ${theme.palette.divider}`,
-                            backgroundColor: theme.palette.background.paper,
-                          })}
-                        >
-                          <Box
+                    {pets.map((pet: any) => {
+                      const displayWeight =
+                        typeof pet.weightKg === "number"
+                          ? formatWeightByUnit(pet.weightKg, weightUnit)
+                          : pet.weight ?? "—";
+
+                      return (
+                        <Grid key={pet.id} size={{ xs: 12, sm: 6, lg: 4 }}>
+                          <Paper
+                            elevation={0}
                             sx={(theme) => ({
-                              height: 180,
-                              borderRadius: 3,
-                              background: pet.imageUrl
-                                ? "transparent"
-                                : theme.palette.mode === "dark"
-                                ? `linear-gradient(135deg, ${alpha(
-                                    theme.palette.primary.main,
-                                    0.14
-                                  )} 0%, ${alpha(
-                                    theme.palette.primary.light,
-                                    0.22
-                                  )} 100%)`
-                                : "linear-gradient(135deg, #fbf2ea 0%, #fde8c8 100%)",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              mb: 2,
+                              borderRadius: 5,
+                              border: `1px solid ${theme.palette.divider}`,
+                              backgroundColor: theme.palette.background.paper,
                               overflow: "hidden",
-                              position: "relative",
+                              transition:
+                                "box-shadow 0.22s ease, transform 0.22s ease",
+                              "&:hover": {
+                                boxShadow:
+                                  theme.palette.mode === "dark"
+                                    ? "0 16px 40px rgba(0,0,0,0.32)"
+                                    : "0 16px 40px rgba(7,28,66,0.1)",
+                                transform: "translateY(-3px)",
+                              },
                             })}
                           >
-                            {pet.imageUrl ? (
-                              <Box
-                                component="img"
-                                src={pet.imageUrl}
-                                alt={pet.name}
+                            <Box
+                              sx={(theme) => ({
+                                height: 190,
+                                background: pet.imageUrl
+                                  ? "transparent"
+                                  : theme.palette.mode === "dark"
+                                  ? `linear-gradient(140deg, ${alpha(
+                                      theme.palette.primary.main,
+                                      0.18
+                                    )} 0%, ${alpha(
+                                      theme.palette.primary.light,
+                                      0.26
+                                    )} 100%)`
+                                  : "linear-gradient(140deg, #fff8f0 0%, #fde8c8 100%)",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                overflow: "hidden",
+                              })}
+                            >
+                              {pet.imageUrl ? (
+                                <Box
+                                  component="img"
+                                  src={pet.imageUrl}
+                                  alt={pet.name}
+                                  sx={{
+                                    width: "100%",
+                                    height: "100%",
+                                    objectFit: "cover",
+                                    objectPosition: `center ${
+                                      pet.imagePositionY ?? 50
+                                    }%`,
+                                  }}
+                                />
+                              ) : (
+                                <Typography
+                                  sx={(theme) => ({
+                                    fontSize: scaleFont(
+                                      56,
+                                      settings?.textSize
+                                    ),
+                                    fontWeight: 900,
+                                    color: theme.palette.primary.main,
+                                  })}
+                                >
+                                  {pet.imageLetter}
+                                </Typography>
+                              )}
+                            </Box>
+
+                            <Box sx={{ p: 2.5 }}>
+                              <Stack spacing={0.3} sx={{ mb: 2.5 }}>
+                                <Typography
+                                  sx={(theme) => ({
+                                    fontSize: scaleFont(
+                                      18,
+                                      settings?.textSize
+                                    ),
+                                    fontWeight: 800,
+                                    color: theme.palette.text.primary,
+                                  })}
+                                >
+                                  {pet.name}
+                                </Typography>
+
+                                <Typography
+                                  sx={(theme) => ({
+                                    fontSize: scaleFont(
+                                      13,
+                                      settings?.textSize
+                                    ),
+                                    color: theme.palette.text.secondary,
+                                    fontWeight: 500,
+                                  })}
+                                >
+                                  {pet.breed} · {displayWeight}
+                                </Typography>
+                              </Stack>
+
+                              <Button
+                                fullWidth
+                                startIcon={
+                                  <VisibilityOutlinedIcon
+                                    sx={{ fontSize: "17px !important" }}
+                                  />
+                                }
+                                onClick={() => navigate(`/animals/${pet.id}`)}
                                 sx={{
-                                  width: "100%",
-                                  height: "100%",
-                                  objectFit: "cover",
+                                  py: 1.25,
+                                  borderRadius: 3,
+                                  background:
+                                    "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
+                                  color: "#fff",
+                                  textTransform: "none",
+                                  fontSize: scaleFont(14, settings?.textSize),
+                                  fontWeight: 700,
                                 }}
-                              />
-                            ) : (
-                              <Typography
-                                sx={(theme) => ({
-                                  fontSize: scaleFont(48, settings?.textSize),
-                                  fontWeight: 800,
-                                  color: theme.palette.primary.main,
-                                  lineHeight: 1,
-                                  position: "relative",
-                                  zIndex: 1,
-                                })}
                               >
-                                {pet.imageLetter}
-                              </Typography>
-                            )}
-                          </Box>
-
-                          <Stack spacing={0.5} sx={{ mb: 2 }}>
-                            <Typography
-                              sx={(theme) => ({
-                                fontSize: scaleFont(18, settings?.textSize),
-                                fontWeight: 800,
-                                color: theme.palette.text.primary,
-                                lineHeight: 1.2,
-                              })}
-                            >
-                              {pet.name}
-                            </Typography>
-
-                            <Typography
-                              sx={(theme) => ({
-                                fontSize: scaleFont(13, settings?.textSize),
-                                color: theme.palette.text.secondary,
-                                fontWeight: 500,
-                              })}
-                            >
-                              {pet.breed} · {pet.weight}
-                            </Typography>
-                          </Stack>
-
-                          <Button
-                            fullWidth
-                            startIcon={
-                              <VisibilityOutlinedIcon
-                                sx={{ fontSize: "18px !important" }}
-                              />
-                            }
-                            onClick={() => navigate(`/animals/${pet.id}`)}
-                            sx={{
-                              py: 1.2,
-                              borderRadius: 2.5,
-                              background:
-                                "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
-                              color: "#fff",
-                              textTransform: "none",
-                              fontSize: scaleFont(14, settings?.textSize),
-                              fontWeight: 700,
-                            }}
-                          >
-                            {t("view")}
-                          </Button>
-                        </Paper>
-                      </Grid>
-                    ))}
+                                {t("view")}
+                              </Button>
+                            </Box>
+                          </Paper>
+                        </Grid>
+                      );
+                    })}
                   </Grid>
                 ) : (
                   <Typography

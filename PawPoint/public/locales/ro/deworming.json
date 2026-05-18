@@ -61,5 +61,11 @@
   "status": {
     "completed": "Finalizată",
     "upcoming": "Programată"
+  },
+
+  "filters": {
+    "last3Months": "Ultimele 3 luni",
+    "last6Months": "3 - 6 luni",
+    "lastYear": "Un an"
   }
 }
