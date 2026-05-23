@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { LoadingButton } from "@mui/lab";
 import {
   Dialog,
@@ -16,15 +16,21 @@ import {
 import { alpha } from "@mui/material/styles";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import BugReportOutlinedIcon from "@mui/icons-material/BugReportOutlined";
-import { Controller, useForm, type SubmitHandler } from "react-hook-form";
+import { Controller, useForm, useWatch, type SubmitHandler } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { useSnackbar } from "notistack";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+
+import { getAnimals } from "../../../api/getAnimal";
 import { useUpdateDeworming } from "../../../hooks/useUpdateDeworming";
+import { useDewormingVetCabinets } from "../../../hooks/useDewormingVetCabinets";
+import { useDewormingAvailability } from "../../../hooks/useDewormingAvailability";
+import { useServicePrice } from "../../../hooks/useServicePrice";
 import { useSettings } from "../../../hooks/useSettings";
 import { scaleFont } from "../../../utils/fontScale";
-import type { DewormingCardItem } from "../types/deworming";
-import { DewormingTypeEnum } from "../types/deworming";
+import type { DewormingCardItem, DewormingTypeEnum } from "../types/deworming";
+import { DewormingTypeEnum as DewormingType } from "../types/deworming";
+import { formatConvertedPrice } from "../../../utils/price";
 
 type Props = {
   open: boolean;
@@ -33,50 +39,101 @@ type Props = {
 };
 
 type FormValues = {
+  animalId: number | "";
   type: DewormingTypeEnum | "";
-  intervalDays: number | "";
+  vetCabinetId: number | "";
+  visitDate: string;
+  vetTimeSlotId: number | "";
+  notes: string;
+};
+
+type AppDateFormat = "DD/MM/YYYY" | "MM/DD/YYYY" | "YYYY-MM-DD";
+
+const toDateOnly = (value: Date) => value.toISOString().split("T")[0];
+
+const formatDateBySettings = (
+  value?: string | Date | null,
+  format: AppDateFormat = "DD/MM/YYYY"
+) => {
+  if (!value) return "—";
+
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return "—";
+
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+
+  switch (format) {
+    case "MM/DD/YYYY":
+      return `${month}/${day}/${year}`;
+    case "YYYY-MM-DD":
+      return `${year}-${month}-${day}`;
+    default:
+      return `${day}/${month}/${year}`;
+  }
+};
+
+const formatSlotLabel = (
+  start: string,
+  end: string,
+  dateFormat: AppDateFormat,
+  locale: string
+) => {
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+
+  return `${formatDateBySettings(
+    startDate,
+    dateFormat
+  )} • ${startDate.toLocaleTimeString(locale, {
+    hour: "2-digit",
+    minute: "2-digit",
+  })} - ${endDate.toLocaleTimeString(locale, {
+    hour: "2-digit",
+    minute: "2-digit",
+  })}`;
 };
 
 const normalizeType = (value: string | number): DewormingTypeEnum | "" => {
   if (typeof value === "number") {
     switch (value) {
       case 1:
-        return DewormingTypeEnum.Internal;
+        return DewormingType.Internal;
       case 2:
-        return DewormingTypeEnum.External;
+        return DewormingType.External;
       case 3:
-        return DewormingTypeEnum.Combined;
+        return DewormingType.Combined;
       case 4:
-        return DewormingTypeEnum.Control;
+        return DewormingType.Control;
       default:
         return "";
     }
   }
 
-  if (typeof value === "string") {
-    switch (value.toLowerCase()) {
-      case "internal":
-        return DewormingTypeEnum.Internal;
-      case "external":
-        return DewormingTypeEnum.External;
-      case "combined":
-        return DewormingTypeEnum.Combined;
-      case "control":
-        return DewormingTypeEnum.Control;
-      default:
-        return "";
-    }
+  switch (value.toLowerCase()) {
+    case "internal":
+      return DewormingType.Internal;
+    case "external":
+      return DewormingType.External;
+    case "combined":
+      return DewormingType.Combined;
+    case "control":
+      return DewormingType.Control;
+    default:
+      return "";
   }
-
-  return "";
 };
 
 export const EditDewormingDialog = ({ open, item, onClose }: Props) => {
-  const { t } = useTranslation(["deworming"]);
+  const { t, i18n } = useTranslation(["deworming"]);
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
   const updateDewormingMutation = useUpdateDeworming();
   const { data: settings } = useSettings();
+
+  const dateFormat: AppDateFormat = settings?.dateFormat ?? "DD/MM/YYYY";
+  const locale = i18n.language === "ro" ? "ro-RO" : "en-GB";
 
   const dewormingTypes = [
     { value: 1, label: t("deworming:typeInternal") },
@@ -84,6 +141,69 @@ export const EditDewormingDialog = ({ open, item, onClose }: Props) => {
     { value: 3, label: t("deworming:typeCombined") },
     { value: 4, label: t("deworming:typeControl") },
   ];
+
+  const { control, handleSubmit, reset, setValue } = useForm<FormValues>({
+    defaultValues: {
+      animalId: "",
+      type: "",
+      vetCabinetId: "",
+      visitDate: "",
+      vetTimeSlotId: "",
+      notes: "",
+    },
+  });
+
+  const selectedType = useWatch({ control, name: "type" });
+  const selectedCabinetId = useWatch({ control, name: "vetCabinetId" });
+  const selectedVisitDate = useWatch({ control, name: "visitDate" });
+
+  const { data: animals = [] } = useQuery({
+    queryKey: ["animals"],
+    queryFn: getAnimals,
+    enabled: open,
+  });
+
+  const { data: cabinets = [] } = useDewormingVetCabinets(open);
+
+  const availabilityFrom = useMemo(() => {
+    if (selectedVisitDate) return selectedVisitDate;
+    return toDateOnly(new Date());
+  }, [selectedVisitDate]);
+
+  const availabilityTo = useMemo(() => {
+    const base = selectedVisitDate ? new Date(selectedVisitDate) : new Date();
+    base.setDate(base.getDate() + 1);
+    return toDateOnly(base);
+  }, [selectedVisitDate]);
+
+  const { data: slots = [] } = useDewormingAvailability({
+    vetCabinetId: selectedCabinetId ? Number(selectedCabinetId) : undefined,
+    from: availabilityFrom,
+    to: availabilityTo,
+    enabled: open && !!selectedCabinetId && !!selectedVisitDate,
+  });
+
+  const { data: servicePrice } = useServicePrice({
+    vetCabinetId: selectedCabinetId,
+    serviceType: "Deworming",
+    dewormingType: selectedType,
+    enabled: open,
+  });
+
+  useEffect(() => {
+    if (!item || !open) return;
+
+    reset({
+      animalId: item.animalId,
+      type: normalizeType(item.type),
+      vetCabinetId: item.vetCabinetId,
+      visitDate: item.slotStartTimeUtc
+        ? item.slotStartTimeUtc.split("T")[0]
+        : "",
+      vetTimeSlotId: item.vetTimeSlotId,
+      notes: item.notes ?? "",
+    });
+  }, [item, open, reset]);
 
   const fieldSx = (theme: any) => ({
     "& .MuiOutlinedInput-root": {
@@ -135,41 +255,105 @@ export const EditDewormingDialog = ({ open, item, onClose }: Props) => {
     mb: 0.6,
   });
 
-  const { control, handleSubmit, reset } = useForm<FormValues>({
-    defaultValues: {
-      type: "",
-      intervalDays: "",
-    },
-  });
-
-  useEffect(() => {
-    if (!item || !open) return;
-
-    reset({
-      type: normalizeType(item.type),
-      intervalDays: item.intervalDays ?? "",
-    });
-  }, [item, open, reset]);
-
   const onSubmit: SubmitHandler<FormValues> = (values) => {
-    if (!item || !values.type || !values.intervalDays) return;
+    if (
+      !item ||
+      !values.animalId ||
+      !values.type ||
+      !values.vetCabinetId ||
+      !values.vetTimeSlotId
+    ) {
+      return;
+    }
 
     updateDewormingMutation.mutate(
       {
         dewormingId: item.id,
         payload: {
+          animalId: Number(values.animalId),
           type: values.type,
-          intervalDays: Number(values.intervalDays),
+          vetCabinetId: Number(values.vetCabinetId),
+          vetTimeSlotId: Number(values.vetTimeSlotId),
+          notes: values.notes?.trim() || undefined,
         },
       },
       {
-        onSuccess: () => {
+        onSuccess: (updated) => {
+          const selectedSlot = slots.find(
+            (slot) => slot.id === Number(values.vetTimeSlotId)
+          );
+
+          const selectedCabinet = cabinets.find(
+            (cabinet) => cabinet.id === Number(values.vetCabinetId)
+          );
+
+          queryClient.setQueryData(["dewormings"], (old: any[] | undefined) => {
+            if (!old) return old;
+
+            return old.map((deworming) =>
+              deworming.id === item.id
+                ? {
+                    ...deworming,
+                    ...updated,
+
+                    animalId: Number(values.animalId),
+                    type: values.type,
+
+                    vetCabinetId: Number(values.vetCabinetId),
+                    vetCabinetName:
+                      selectedCabinet?.name ??
+                      updated.vetCabinetName ??
+                      deworming.vetCabinetName,
+
+                    vetTimeSlotId: Number(values.vetTimeSlotId),
+
+                    date:
+                      selectedSlot?.startTimeUtc ??
+                      updated.dateUtc ??
+                      updated.date ??
+                      deworming.date,
+
+                    dateUtc:
+                      selectedSlot?.startTimeUtc ??
+                      updated.dateUtc ??
+                      updated.date ??
+                      deworming.dateUtc,
+
+                    slotStartTimeUtc:
+                      selectedSlot?.startTimeUtc ??
+                      updated.slotStartUtc ??
+                      updated.slotStartTimeUtc ??
+                      deworming.slotStartTimeUtc,
+
+                    slotStartUtc:
+                      selectedSlot?.startTimeUtc ??
+                      updated.slotStartUtc ??
+                      updated.slotStartTimeUtc ??
+                      deworming.slotStartUtc,
+
+                    slotEndTimeUtc:
+                      selectedSlot?.endTimeUtc ??
+                      updated.slotEndUtc ??
+                      updated.slotEndTimeUtc ??
+                      deworming.slotEndTimeUtc,
+
+                    slotEndUtc:
+                      selectedSlot?.endTimeUtc ??
+                      updated.slotEndUtc ??
+                      updated.slotEndTimeUtc ??
+                      deworming.slotEndUtc,
+                  }
+                : deworming
+            );
+          });
+
           enqueueSnackbar(t("deworming:updateSuccess"), {
             variant: "success",
           });
 
-          queryClient.invalidateQueries({ queryKey: ["dewormings"] });
           queryClient.invalidateQueries({ queryKey: ["dashboardData"] });
+          queryClient.invalidateQueries({ queryKey: ["dewormingAvailability"] });
+
           onClose();
         },
         onError: () => {
@@ -313,6 +497,26 @@ export const EditDewormingDialog = ({ open, item, onClose }: Props) => {
       <DialogContent sx={{ px: 3.5, pt: 3, pb: 3.5 }}>
         <Stack component="form" spacing={2} onSubmit={handleSubmit(onSubmit)}>
           <Box>
+            <Typography sx={labelSx}>{t("deworming:pet")}</Typography>
+            <Controller
+              name="animalId"
+              control={control}
+              render={({ field }) => (
+                <TextField {...field} fullWidth select sx={fieldSx}>
+                  <MenuItem value="" disabled>
+                    {t("deworming:selectPet")}
+                  </MenuItem>
+                  {animals.map((animal) => (
+                    <MenuItem key={animal.id} value={animal.id}>
+                      {animal.name}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              )}
+            />
+          </Box>
+
+          <Box>
             <Typography sx={labelSx}>{t("deworming:type")}</Typography>
             <Controller
               name="type"
@@ -333,18 +537,126 @@ export const EditDewormingDialog = ({ open, item, onClose }: Props) => {
           </Box>
 
           <Box>
-            <Typography sx={labelSx}>{t("deworming:intervalDays")}</Typography>
+            <Typography sx={labelSx}>{t("deworming:vetCabinet")}</Typography>
             <Controller
-              name="intervalDays"
+              name="vetCabinetId"
               control={control}
               render={({ field }) => (
                 <TextField
                   {...field}
-                  type="number"
+                  fullWidth
+                  select
+                  sx={fieldSx}
+                  onChange={(e) => {
+                    field.onChange(e.target.value);
+                    setValue("vetTimeSlotId", "");
+                  }}
+                >
+                  <MenuItem value="" disabled>
+                    {t("deworming:selectVetCabinet")}
+                  </MenuItem>
+                  {cabinets.map((cabinet) => (
+                    <MenuItem key={cabinet.id} value={cabinet.id}>
+                      {cabinet.name}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              )}
+            />
+          </Box>
+
+          {servicePrice && (
+            <Box
+              sx={(theme) => ({
+                mt: -0.5,
+                px: 2,
+                py: 1.5,
+                borderRadius: 2.5,
+                backgroundColor:
+                  theme.palette.mode === "dark"
+                    ? alpha(theme.palette.primary.main, 0.12)
+                    : alpha(theme.palette.primary.main, 0.06),
+                border: `1px solid ${alpha(theme.palette.primary.main, 0.18)}`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              })}
+            >
+              <Typography
+                sx={(theme) => ({
+                  fontSize: scaleFont(13.5, settings?.textSize),
+                  fontWeight: 600,
+                  color: theme.palette.text.secondary,
+                })}
+              >
+                {t("deworming:estimatedPrice")}
+              </Typography>
+
+              <Typography
+                sx={(theme) => ({
+                  fontSize: scaleFont(15, settings?.textSize),
+                  fontWeight: 800,
+                  color: theme.palette.primary.main,
+                  letterSpacing: "-0.2px",
+                })}
+              >
+                {formatConvertedPrice(
+                  servicePrice.price,
+                  servicePrice.currency,
+                  settings?.currency ?? "EUR"
+                )}
+              </Typography>
+            </Box>
+          )}
+
+          <Box>
+            <Typography sx={labelSx}>{t("deworming:visitDate")}</Typography>
+            <Controller
+              name="visitDate"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  type="date"
                   fullWidth
                   sx={fieldSx}
-                  inputProps={{ min: 1 }}
+                  inputProps={{
+                    min: toDateOnly(new Date()),
+                    max: toDateOnly(
+                      new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+                    ),
+                  }}
+                  onChange={(e) => {
+                    field.onChange(e.target.value);
+                    setValue("vetTimeSlotId", "");
+                  }}
                 />
+              )}
+            />
+          </Box>
+
+          <Box>
+            <Typography sx={labelSx}>{t("deworming:timeSlot")}</Typography>
+            <Controller
+              name="vetTimeSlotId"
+              control={control}
+              render={({ field }) => (
+                <TextField {...field} fullWidth select sx={fieldSx}>
+                  <MenuItem value="" disabled>
+                    {t("deworming:selectTimeSlot")}
+                  </MenuItem>
+                  {Array.isArray(slots) &&
+                    slots.map((slot) => (
+                      <MenuItem key={slot.id} value={slot.id}>
+                        {formatSlotLabel(
+                          slot.startTimeUtc,
+                          slot.endTimeUtc,
+                          dateFormat,
+                          locale
+                        )}
+                      </MenuItem>
+                    ))}
+                </TextField>
               )}
             />
           </Box>

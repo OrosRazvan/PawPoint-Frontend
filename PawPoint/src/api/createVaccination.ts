@@ -4,7 +4,7 @@ import type { VaccinationDto } from "../pages/Vaccinations/types/vaccination";
 
 export type CreateVaccinationRequest = {
   animalId: number;
-  vaccineName: string;
+  vaccineType: number | string;
   vetCabinetId: number;
   vetTimeSlotId: number;
   lastDate?: string;

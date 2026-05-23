@@ -1,18 +1,33 @@
+export const Currency = {
+  Eur: 1,
+  Ron: 2,
+} as const;
+
+export type Currency =
+  (typeof Currency)[keyof typeof Currency];
+
 export type AppointmentDto = {
   id: number;
   animalId: number;
   animalName: string;
   serviceType: string;
+
   vetCabinetId: number;
   vetCabinetName: string;
   vetCabinetAddress?: string | null;
+
   vetTimeSlotId: number;
+
   slotStartTimeUtc?: string | null;
   slotEndTimeUtc?: string | null;
   startTimeUtc?: string | null;
   endTimeUtc?: string | null;
+
   vetDoctorName?: string | null;
-  priceRon?: number | null;
+
+  price?: number | null;
+  currency?: Currency;
+
   notes?: string | null;
 };
 
@@ -21,15 +36,23 @@ export type AppointmentCardItem = {
   animalId: number;
   animalName: string;
   serviceType: string;
+
   vetCabinetId: number;
   vetCabinetName: string;
   vetCabinetAddress?: string | null;
+
   vetTimeSlotId: number;
+
   slotStartTimeUtc: string;
   slotEndTimeUtc: string;
+
   vetDoctorName?: string | null;
-  priceRon?: number | null;
+
+  price?: number | null;
+  currency?: Currency;
+
   notes?: string | null;
+
   status: "completed" | "upcoming";
 };
 
@@ -42,7 +65,8 @@ export type VetCabinetDto = {
   website?: string;
   rating?: number;
   distanceKm?: number;
-  basePriceRon?: number;
+  price?: number | null;
+  currency?: Currency;
 };
 
 export type VetAvailabilitySlotDto = {
@@ -65,7 +89,10 @@ export type CreateAppointmentRequest = {
   vetCabinetId: number;
   vetTimeSlotId: number;
   serviceType: string;
-  estimatedPriceRon?: number | null;
+
+  price?: number | null;
+  currency?: Currency;
+
   notes?: string | null;
   notify24hInAdvance?: boolean;
 };

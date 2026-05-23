@@ -31,6 +31,7 @@ import type {
   VetCabinetDto,
   VetAvailabilitySlotDto,
 } from "./types/appointment";
+import { Currency } from "./types/appointment";
 
 type EditingAppointment = {
   id: number;
@@ -88,10 +89,16 @@ const formatTime = (value?: string | null) => {
   });
 };
 
-const formatPrice = (value?: number | null) => {
-  if (value == null) return "—";
-  return `${value} RON`;
-};
+const formatPrice = (
+    value?: number | null,
+    currency?: Currency
+  ) => {
+    if (value == null) return "—";
+
+    return `${value} ${
+      currency === Currency.Ron ? "RON" : "EUR"
+    }`;
+  };
 
 const getServiceLabel = (serviceType: string, t: (key: string) => string) => {
   switch (serviceType) {
@@ -195,7 +202,7 @@ export const BookAppointmentStep3 = () => {
     );
   }
 
-  const estimatedPrice = selectedCabinet.basePriceRon ?? null;
+  const estimatedPrice = selectedCabinet.price ?? null;
 
   const handleBack = () => {
     navigate("/appointments/book/date-time", {
@@ -217,7 +224,8 @@ export const BookAppointmentStep3 = () => {
         {
           appointmentId,
           vetTimeSlotId: selectedSlot.id,
-          estimatedPriceRon: estimatedPrice,
+          price: estimatedPrice,
+          currency: selectedCabinet.currency,
           notes: null,
           status: "Confirmed",
           notify24hInAdvance,
@@ -238,7 +246,8 @@ export const BookAppointmentStep3 = () => {
         vetCabinetId: selectedCabinet.id,
         vetTimeSlotId: selectedSlot.id,
         serviceType,
-        estimatedPriceRon: estimatedPrice,
+        price: estimatedPrice,
+        currency: selectedCabinet.currency,
         notes: null,
         notify24hInAdvance,
       },

@@ -1,9 +1,14 @@
+export type CurrencyPreference = "EUR" | "RON";
+
 export type UserSettingsDto = {
   userId: number;
   darkMode: boolean;
   textSize: "Small" | "Medium" | "Large";
   weightUnit: "kg" | "lb";
   dateFormat: "DD/MM/YYYY" | "MM/DD/YYYY" | "YYYY-MM-DD";
+
+  currency: CurrencyPreference;
+
   notificationPreferenceId: number;
   notificationPreference: string;
   enableNotifications: boolean;
@@ -18,6 +23,9 @@ export type UpdateUserSettingsDto = {
   textSize?: "Small" | "Medium" | "Large";
   weightUnit?: "kg" | "lb";
   dateFormat?: "DD/MM/YYYY" | "MM/DD/YYYY" | "YYYY-MM-DD";
+
+  currency?: CurrencyPreference;
+
   enableNotifications?: boolean;
   vaccinationNotifications?: boolean;
   appointmentNotifications?: boolean;

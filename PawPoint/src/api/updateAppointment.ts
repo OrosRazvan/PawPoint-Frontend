@@ -4,7 +4,8 @@ import { UPDATE_APPOINTMENT_ENDPOINT } from "./endpoints/endpoints";
 type UpdateAppointmentPayload = {
   appointmentId: number;
   vetTimeSlotId?: number;
-  estimatedPriceRon?: number | null;
+  price?: number | null;
+  currency?: number;
   notes?: string | null;
   status?: string;
   notify24hInAdvance?: boolean;

@@ -20,6 +20,7 @@ import { useTranslation } from "react-i18next";
 import { useAppointmentVetCabinets } from "../../hooks/useAppointmentVetCabinets";
 import { useSettings } from "../../hooks/useSettings";
 import { scaleFont } from "../../utils/fontScale";
+import { Currency } from "./types/appointment";
 
 const sortOptions = [
   { value: "priceAsc", labelKey: "sortPriceAsc" },
@@ -154,15 +155,21 @@ export const BookAppointmentStep1 = () => {
     lineHeight: 1.2,
   });
 
-  const formatPrice = (value?: number) => {
+  const formatPrice = (
+    value?: number | null,
+    currency?: Currency
+  ) => {
     if (value == null) return "—";
-    return `${value} RON`;
+
+    return `${value} ${
+      currency === Currency.Ron ? "RON" : "EUR"
+    }`;
   };
 
   const navState = (location.state ?? null) as Step1LocationState | null;
 
   const [serviceType] = useState(
-    navState?.appointment?.serviceType ?? "Consult"
+    navState?.appointment?.serviceType ?? "Consultation"
   );
   const [sortBy, setSortBy] = useState("priceAsc");
   const [searchQuery, setSearchQuery] = useState("");
@@ -203,12 +210,12 @@ export const BookAppointmentStep1 = () => {
       switch (sortBy) {
         case "priceAsc":
           return (
-            (a.basePriceRon ?? Number.MAX_SAFE_INTEGER) -
-            (b.basePriceRon ?? Number.MAX_SAFE_INTEGER)
+            (a.price ?? Number.MAX_SAFE_INTEGER) -
+            (b.price ?? Number.MAX_SAFE_INTEGER)
           );
 
         case "priceDesc":
-          return (b.basePriceRon ?? -1) - (a.basePriceRon ?? -1);
+          return (b.price ?? -1) - (a.price ?? -1);
 
         case "ratingAsc":
           return (
@@ -604,7 +611,7 @@ export const BookAppointmentStep1 = () => {
                                   color: theme.palette.text.secondary,
                                 })}
                               >
-                                • {formatPrice(cabinet.basePriceRon)}
+                                • {formatPrice(cabinet.price, cabinet.currency)}
                               </Typography>
                             </Stack>
                           </Box>

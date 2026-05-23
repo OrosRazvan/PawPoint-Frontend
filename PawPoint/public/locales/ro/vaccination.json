@@ -54,5 +54,10 @@
     "last3Months": "Ultimele 3 luni",
     "last6Months": "3 - 6 luni",
     "lastYear": "Un an"
-  }
+  },
+
+  "vaccineType": "Tip vaccin",
+  "selectVaccineType": "Selectează tipul vaccinului",
+  "estimatedPrice": "Preț estimativ",
+  "priceLabel": "Preț: {{price}}"
 }

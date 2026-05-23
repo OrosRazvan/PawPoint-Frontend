@@ -136,7 +136,43 @@ export const Settings = () => {
   const [form, setForm] = useState<UserSettingsDto | null>(null);
 
   useEffect(() => {
-    if (data) setForm(data);
+    if (!data) return;
+
+    const textSize =
+      data.textSize === "Small" || data.textSize === "Medium" || data.textSize === "Large"
+        ? data.textSize
+        : "Medium";
+
+    const weightUnit =
+      data.weightUnit === "kg" || data.weightUnit === "lb"
+        ? data.weightUnit
+        : "kg";
+
+    const dateFormat =
+      data.dateFormat === "DD/MM/YYYY" ||
+      data.dateFormat === "MM/DD/YYYY" ||
+      data.dateFormat === "YYYY-MM-DD"
+        ? data.dateFormat
+        : "DD/MM/YYYY";
+
+    const currency =
+      data.currency === "RON" || data.currency === "EUR"
+        ? data.currency
+        : "EUR";
+
+    const notificationBadgeMode =
+      data.notificationBadgeMode === "dot" || data.notificationBadgeMode === "count"
+        ? data.notificationBadgeMode
+        : "count";
+
+    setForm({
+      ...data,
+      textSize,
+      weightUnit,
+      dateFormat,
+      currency,
+      notificationBadgeMode,
+    });
   }, [data]);
 
   // ── Loading ──────────────────────────────────────────────────────────────
@@ -234,18 +270,40 @@ export const Settings = () => {
     if (!form) return;
     const payload: UpdateUserSettingsDto = {
       darkMode: form.darkMode,
-      textSize: form.textSize,
-      weightUnit: form.weightUnit,
-      dateFormat: form.dateFormat,
+      textSize:
+        form.textSize === "Small" || form.textSize === "Medium" || form.textSize === "Large"
+          ? form.textSize
+          : "Medium",
+      weightUnit:
+        form.weightUnit === "kg" || form.weightUnit === "lb"
+          ? form.weightUnit
+          : "kg",
+      dateFormat:
+        form.dateFormat === "DD/MM/YYYY" ||
+        form.dateFormat === "MM/DD/YYYY" ||
+        form.dateFormat === "YYYY-MM-DD"
+          ? form.dateFormat
+          : "DD/MM/YYYY",
+      currency:
+        form.currency === "RON" || form.currency === "EUR"
+          ? form.currency
+          : "EUR",
       enableNotifications: form.enableNotifications,
       vaccinationNotifications: form.vaccinationNotifications,
       appointmentNotifications: form.appointmentNotifications,
       dewormingNotifications: form.dewormingNotifications,
-      notificationBadgeMode: form.notificationBadgeMode,
+      notificationBadgeMode:
+        form.notificationBadgeMode === "dot" || form.notificationBadgeMode === "count"
+          ? form.notificationBadgeMode
+          : "count",
     };
     updateSettingsMutation.mutate(payload, {
       onSuccess: (updated) => {
-        setForm(updated);
+        setForm({
+          ...updated,
+          currency: form.currency ?? "EUR",
+        });
+
         enqueueSnackbar(t("settings:saved"), { variant: "success" });
       },
       onError: () => {
@@ -346,6 +404,67 @@ export const Settings = () => {
                     {t("settings:changeLanguage")}
                   </Typography>
                   <LanguageSwitcher />
+                </Box>
+
+                <Divider sx={dividerSx} />
+
+                <Box sx={rowSx}>
+                  <Typography
+                    sx={(theme) => ({
+                      fontSize: scaleFont(16, form.textSize),
+                      fontWeight: 700,
+                      color: theme.palette.text.primary,
+                    })}
+                  >
+                    {t("settings:currency")}
+                  </Typography>
+
+                  <FormControl sx={{ minWidth: 150 }}>
+                    <Select
+                      value={form.currency ?? "EUR"}
+                      onChange={(e) =>
+                        updateField(
+                          "currency",
+                          e.target.value as UserSettingsDto["currency"]
+                        )
+                      }
+                      renderValue={(value) =>
+                        value === "RON" ? "💵 RON" : "💶 EUR"
+                      }
+                      sx={(theme) => ({
+                        height: 48,
+                        borderRadius: 999,
+                        backgroundColor:
+                          theme.palette.mode === "dark"
+                            ? "rgba(255,255,255,0.04)"
+                            : "#ffffff",
+                        fontSize: scaleFont(15, form.textSize),
+                        fontWeight: 800,
+                        color: theme.palette.text.primary,
+                        px: 1,
+                        boxShadow:
+                          theme.palette.mode === "dark"
+                            ? "none"
+                            : "0 8px 24px rgba(0,0,0,0.06)",
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          borderColor:
+                            theme.palette.mode === "dark"
+                              ? "rgba(255,255,255,0.10)"
+                              : "rgba(0,0,0,0.10)",
+                        },
+                        "&:hover .MuiOutlinedInput-notchedOutline": {
+                          borderColor: ACCENT,
+                        },
+                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                          borderColor: ACCENT,
+                          borderWidth: 1.5,
+                        },
+                      })}
+                    >
+                      <MenuItem value="EUR">💶 EUR</MenuItem>
+                      <MenuItem value="RON">💵 RON</MenuItem>
+                    </Select>
+                  </FormControl>
                 </Box>
 
                 <Divider sx={dividerSx} />
@@ -455,7 +574,7 @@ export const Settings = () => {
                   </Typography>
                   <FormControl fullWidth>
                     <Select
-                      value={form.dateFormat}
+                      value={form.dateFormat || "DD/MM/YYYY"}
                       onChange={(e) =>
                         updateField(
                           "dateFormat",

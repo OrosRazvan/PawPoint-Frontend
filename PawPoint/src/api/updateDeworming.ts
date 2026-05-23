@@ -1,10 +1,16 @@
 import { apiClient } from "./client";
 import { UPDATE_DEWORMING_ENDPOINT } from "./endpoints/endpoints";
-import type { DewormingDto, DewormingType } from "../pages/Deworming/types/deworming";
+
+import type {
+  DewormingDto,
+  DewormingTypeEnum,
+} from "../pages/Deworming/types/deworming";
 
 export type UpdateDewormingRequest = {
-  type?: DewormingType;
-  intervalDays?: number;
+  animalId?: number;
+  type?: DewormingTypeEnum;
+  vetCabinetId?: number;
+  vetTimeSlotId?: number;
   notes?: string;
 };
 

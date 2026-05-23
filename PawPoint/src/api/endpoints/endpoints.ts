@@ -53,3 +53,9 @@ export const CONTACT_MESSAGES_ENDPOINT = "/contact-messages";
 export const ADMIN_CONTACT_MESSAGES_ENDPOINT = "/admin/contact-messages";
 
 export const ASSISTANT_MESSAGE_ENDPOINT = "/Assistant/message";
+
+export const GET_SERVICE_PRICE_ENDPOINT = "/ServicePrice/price";
+
+export const GET_VACCINATION_AVAILABILITY_ENDPOINT = "/Vaccination/availability";
+
+export const GET_VACCINATION_VET_CABINETS_ENDPOINT = "/Vaccination/vet-cabinets";

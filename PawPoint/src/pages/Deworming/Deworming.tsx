@@ -13,11 +13,9 @@ import ScheduleRoundedIcon from "@mui/icons-material/ScheduleRounded";
 import CheckIcon from "@mui/icons-material/Check";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useSnackbar } from "notistack";
-import { useQueryClient } from "@tanstack/react-query";
 import { alpha } from "@mui/material/styles";
+
 import { useDewormings } from "../../hooks/useDewormings";
-import { useDeleteDeworming } from "../../hooks/useDeleteDeworming";
 import { useSettings } from "../../hooks/useSettings";
 import { scaleFont } from "../../utils/fontScale";
 import { DewormingCard } from "./components/DewormingCard";
@@ -76,92 +74,58 @@ const mapDewormings = (
     const animalName =
       pickFirst(
         item.animalName,
-        raw.AnimalName as string | undefined,
-        raw.petName as string | undefined,
-        raw.PetName as string | undefined
+        raw.animalName as string | undefined,
+        raw.AnimalName as string | undefined
       ) ?? t("deworming:petFallback");
 
     const rawType = pickFirst(
       item.type,
-      raw.Type as number | string | undefined,
-      raw.dewormingType as number | string | undefined,
-      raw.DewormingType as number | string | undefined,
-      raw.dewormingTypeId as number | string | undefined,
-      raw.DewormingTypeId as number | string | undefined
+      raw.type as number | string | undefined,
+      raw.Type as number | string | undefined
     );
 
+    const normalizedType =
+      typeof rawType === "string" ? rawType.toLowerCase() : rawType;
+
     const type =
-      typeof rawType === "string"
-        ? rawType.toLowerCase() === "internal"
-          ? 1
-          : rawType.toLowerCase() === "external"
-          ? 2
-          : rawType.toLowerCase() === "combined"
-          ? 3
-          : rawType.toLowerCase() === "control"
-          ? 4
-          : 0
-        : Number(rawType ?? 0);
+      normalizedType === "internal" || normalizedType === 1
+        ? 1
+        : normalizedType === "external" || normalizedType === 2
+        ? 2
+        : normalizedType === "combined" || normalizedType === 3
+        ? 3
+        : normalizedType === "control" || normalizedType === 4
+        ? 4
+        : 0;
 
     const date =
       pickFirst(
-        item.date,
-        raw.Date as string | undefined,
+        item.dateUtc,
         raw.dateUtc as string | undefined,
         raw.DateUtc as string | undefined,
-        raw.visitDate as string | undefined,
-        raw.VisitDate as string | undefined,
-        raw.dewormingDate as string | undefined,
-        raw.DewormingDate as string | undefined,
-        raw.scheduledDate as string | undefined,
-        raw.ScheduledDate as string | undefined,
-        item.slotStartTimeUtc,
-        raw.SlotStartTimeUtc as string | undefined,
-        raw.slotStartUtc as string | undefined,
-        raw.SlotStartUtc as string | undefined,
-        raw.timeSlotStartTimeUtc as string | undefined,
-        raw.TimeSlotStartTimeUtc as string | undefined,
-        item.startTimeUtc,
-        raw.StartTimeUtc as string | undefined
+        item.date,
+        raw.date as string | undefined,
+        raw.Date as string | undefined
       ) ?? null;
-
-    const intervalDays = Number(
-      pickFirst(
-        item.intervalDays,
-        raw.IntervalDays as number | undefined,
-        raw.interval as number | undefined,
-        raw.Interval as number | undefined,
-        0
-      )
-    );
-
-    const computedNextDate =
-      date && intervalDays > 0
-        ? new Date(
-            new Date(date).getTime() + intervalDays * 24 * 60 * 60 * 1000
-          ).toISOString()
-        : null;
 
     const nextDate =
       pickFirst(
-        item.nextDate,
-        raw.NextDate as string | undefined,
+        item.nextDateUtc,
         raw.nextDateUtc as string | undefined,
         raw.NextDateUtc as string | undefined,
-        raw.nextDue as string | undefined,
-        raw.NextDue as string | undefined,
-        raw.nextDueDate as string | undefined,
-        raw.NextDueDate as string | undefined
-      ) ?? computedNextDate;
+        item.nextDate,
+        raw.nextDate as string | undefined,
+        raw.NextDate as string | undefined
+      ) ?? null;
 
     const slotStartTimeUtc =
       pickFirst(
-        item.slotStartTimeUtc,
-        raw.SlotStartTimeUtc as string | undefined,
+        item.slotStartUtc,
         raw.slotStartUtc as string | undefined,
         raw.SlotStartUtc as string | undefined,
-        raw.timeSlotStartTimeUtc as string | undefined,
-        raw.TimeSlotStartTimeUtc as string | undefined,
+        item.slotStartTimeUtc,
+        raw.slotStartTimeUtc as string | undefined,
+        raw.SlotStartTimeUtc as string | undefined,
         item.startTimeUtc,
         raw.StartTimeUtc as string | undefined,
         date ?? undefined
@@ -169,12 +133,12 @@ const mapDewormings = (
 
     const slotEndTimeUtc =
       pickFirst(
-        item.slotEndTimeUtc,
-        raw.SlotEndTimeUtc as string | undefined,
+        item.slotEndUtc,
         raw.slotEndUtc as string | undefined,
         raw.SlotEndUtc as string | undefined,
-        raw.timeSlotEndTimeUtc as string | undefined,
-        raw.TimeSlotEndTimeUtc as string | undefined,
+        item.slotEndTimeUtc,
+        raw.slotEndTimeUtc as string | undefined,
+        raw.SlotEndTimeUtc as string | undefined,
         item.endTimeUtc,
         raw.EndTimeUtc as string | undefined
       ) ?? "";
@@ -182,44 +146,39 @@ const mapDewormings = (
     const vetCabinetName =
       pickFirst(
         item.vetCabinetName,
-        raw.VetCabinetName as string | undefined,
-        raw.veterinarianName as string | undefined,
-        raw.VeterinarianName as string | undefined,
-        raw.clinicName as string | undefined,
-        raw.ClinicName as string | undefined
+        raw.vetCabinetName as string | undefined,
+        raw.VetCabinetName as string | undefined
       ) ?? "";
 
     const notes = pickFirst(item.notes, raw.Notes as string | undefined) ?? null;
 
     return {
-      id: item.id,
-      animalId: item.animalId,
-      animalName,
-      type,
-      date,
-      nextDate,
-      intervalDays,
-      vetCabinetId: item.vetCabinetId,
-      vetCabinetName,
-      vetTimeSlotId: item.vetTimeSlotId,
-      slotStartTimeUtc,
-      slotEndTimeUtc,
-      notes,
-      status: resolveStatus({
-        ...item,
-        slotStartTimeUtc,
-        date,
-        nextDate,
-      } as DewormingDto),
-    };
+  id: item.id,
+  animalId: item.animalId,
+  animalName,
+  type,
+  date,
+  nextDate,
+  vetCabinetId: item.vetCabinetId,
+  vetCabinetName,
+  vetTimeSlotId: item.vetTimeSlotId,
+  slotStartTimeUtc,
+  slotEndTimeUtc,
+  price: item.price ?? null,
+  currency: item.currency,
+  notes,
+  status: resolveStatus({
+    ...item,
+    slotStartTimeUtc,
+    date,
+    nextDate,
+  } as DewormingDto),
+};
   });
 };
 
 export const Deworming = () => {
   const { t } = useTranslation(["deworming"]);
-  const { enqueueSnackbar } = useSnackbar();
-  const queryClient = useQueryClient();
-  const deleteDewormingMutation = useDeleteDeworming();
   const { data: settings } = useSettings();
 
   const { data = [], isLoading, isError } = useDewormings();
@@ -247,27 +206,6 @@ export const Deworming = () => {
     () => filterCompletedByPeriod(completedItems, completedFilterMonths),
     [completedItems, completedFilterMonths]
   );
-
-  const handleDeleteConfirm = () => {
-    if (!deleteItem) return;
-
-    deleteDewormingMutation.mutate(deleteItem.id, {
-      onSuccess: () => {
-        enqueueSnackbar(t("deworming:deleteSuccess"), {
-          variant: "success",
-        });
-
-        queryClient.invalidateQueries({ queryKey: ["dewormings"] });
-        queryClient.invalidateQueries({ queryKey: ["dashboardData"] });
-        setDeleteItem(null);
-      },
-      onError: () => {
-        enqueueSnackbar(t("deworming:deleteError"), {
-          variant: "error",
-        });
-      },
-    });
-  };
 
   return (
     <Box
@@ -600,8 +538,6 @@ export const Deworming = () => {
         open={!!deleteItem}
         item={deleteItem}
         onClose={() => setDeleteItem(null)}
-        onConfirm={handleDeleteConfirm}
-        isLoading={deleteDewormingMutation.isPending}
       />
     </Box>
   );
