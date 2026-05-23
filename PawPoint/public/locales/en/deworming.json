@@ -67,5 +67,9 @@
     "last3Months": "Last 3 months",
     "last6Months": "3 - 6 months",
     "lastYear": "1 year"
-  } 
+  },
+
+  "priceLabel": "Price: {{price}}",
+  "estimatedPrice": "Estimated price",
+  "timeLabel": "Time: {{time}}"
 }

@@ -67,5 +67,9 @@
     "last3Months": "Ultimele 3 luni",
     "last6Months": "3 - 6 luni",
     "lastYear": "Un an"
-  }
+  },
+
+  "priceLabel": "Preț: {{price}}",
+  "estimatedPrice": "Preț estimativ",
+  "timeLabel": "Ora: {{time}}"
 }

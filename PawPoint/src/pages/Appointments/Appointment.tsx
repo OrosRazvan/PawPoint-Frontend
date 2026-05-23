@@ -53,7 +53,8 @@ const mapAppointments = (
     slotStartTimeUtc: item.slotStartTimeUtc ?? item.startTimeUtc ?? "",
     slotEndTimeUtc: item.slotEndTimeUtc ?? item.endTimeUtc ?? "",
     vetDoctorName: item.vetDoctorName ?? null,
-    priceRon: item.priceRon ?? null,
+    price: item.price ?? null,
+    currency: item.currency,
     notes: item.notes ?? null,
     status: resolveStatus({
       ...item,

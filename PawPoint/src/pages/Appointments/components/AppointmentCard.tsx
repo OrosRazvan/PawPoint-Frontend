@@ -7,6 +7,7 @@ import { alpha } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { Currency } from "../types/appointment";
 
 import { useSettings } from "../../../hooks/useSettings";
 import { scaleFont } from "../../../utils/fontScale";
@@ -55,6 +56,15 @@ const formatTime = (value?: string | null, locale = "en-GB") => {
     minute: "2-digit",
     hour12: false,
   });
+};
+
+const formatCurrency = (
+  value?: number | null,
+  currency?: Currency
+) => {
+  if (value == null) return "—";
+
+  return `${value} ${currency === Currency.Ron ? "RON" : "EUR"}`;
 };
 
 const formatDateTimeBySettings = (
@@ -192,9 +202,7 @@ const downloadAppointmentPdf = (
 
   doc.text(
     `${t("appointment:report.total")}: ${
-      item.priceRon != null
-        ? `${item.priceRon} RON`
-        : "—"
+      formatCurrency(item.price, item.currency)
     }`,
     18,
     finalY + 22
@@ -419,7 +427,7 @@ export const AppointmentCard = ({ item, onEdit }: Props) => {
               fontWeight: 700,
             })}
           >
-            {item.priceRon != null ? `${item.priceRon} RON` : "—"}
+            {formatCurrency(item.price, item.currency)}
           </Typography>
         </Stack>
 

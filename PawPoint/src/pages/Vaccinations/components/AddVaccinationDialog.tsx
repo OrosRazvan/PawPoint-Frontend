@@ -24,17 +24,22 @@ import {
 import { useTranslation } from "react-i18next";
 import { useSnackbar } from "notistack";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
+
 import { useCreateVaccination } from "../../../hooks/useCreateVaccination";
 import { useVaccinations } from "../../../hooks/useVaccinations";
 import { getAnimals } from "../../../api/getAnimal";
 import { useVetCabinets } from "../../../hooks/useVetCabinets";
 import { useVetAvailability } from "../../../hooks/useVetAvailability";
+import { useServicePrice } from "../../../hooks/useServicePrice";
 import { useSettings } from "../../../hooks/useSettings";
 import { scaleFont } from "../../../utils/fontScale";
-import type {
-  VaccinationDto,
-  VaccinationFormValues,
+
+import {
+  VaccineTypeLabels,
+  type VaccinationDto,
+  type VaccinationFormValues,
 } from "../types/vaccination";
+import { formatConvertedPrice } from "../../../utils/price";
 
 type Props = {
   open: boolean;
@@ -95,15 +100,26 @@ const getComparableDate = (item: VaccinationDto) => {
   return Number.isNaN(date.getTime()) ? 0 : date.getTime();
 };
 
+const formatCurrency = (currency?: number) => {
+  return currency === 2 ? "RON" : "EUR";
+};
+
 export const AddVaccinationDialog = ({ open, onClose }: Props) => {
   const { t, i18n } = useTranslation(["vaccination"]);
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
   const createVaccinationMutation = useCreateVaccination();
   const { data: settings } = useSettings();
-  const locale = i18n.language === "ro" ? "ro-RO" : "en-GB";
 
+  const locale = i18n.language === "ro" ? "ro-RO" : "en-GB";
   const dateFormat: AppDateFormat = settings?.dateFormat ?? "DD/MM/YYYY";
+
+  const vaccineTypes = Object.entries(VaccineTypeLabels).map(
+    ([value, label]) => ({
+      value: Number(value),
+      label,
+    })
+  );
 
   const fieldSx = (theme: any) => ({
     "& .MuiOutlinedInput-root": {
@@ -156,7 +172,7 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
     useForm<VaccinationFormValues>({
       defaultValues: {
         animalId: "",
-        vaccineName: "",
+        vaccineType: "",
         vetCabinetId: "",
         visitDate: "",
         vetTimeSlotId: "",
@@ -166,11 +182,18 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
     });
 
   const selectedAnimalId = useWatch({ control, name: "animalId" });
-  const selectedVaccineName = useWatch({ control, name: "vaccineName" });
+  const selectedVaccineType = useWatch({ control, name: "vaccineType" });
   const selectedCabinetId = useWatch({ control, name: "vetCabinetId" });
   const selectedVisitDate = useWatch({ control, name: "visitDate" });
   const currentLastDate = useWatch({ control, name: "lastDate" });
   const currentNextDate = useWatch({ control, name: "nextDate" });
+
+  const { data: servicePrice } = useServicePrice({
+    vetCabinetId: selectedCabinetId,
+    serviceType: "Vaccination",
+    vaccineType: selectedVaccineType,
+    enabled: open,
+  });
 
   const availabilityFrom = useMemo(() => {
     if (selectedVisitDate) return selectedVisitDate;
@@ -196,19 +219,18 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
   });
 
   const matchingPreviousVaccination = useMemo(() => {
-    if (!selectedAnimalId || !selectedVaccineName.trim()) return null;
+    if (!selectedAnimalId || !selectedVaccineType) return null;
 
     const filtered = vaccinations
       .filter(
         (item) =>
           item.animalId === Number(selectedAnimalId) &&
-          item.vaccineName.trim().toLowerCase() ===
-            selectedVaccineName.trim().toLowerCase()
+          Number(item.vaccineType) === Number(selectedVaccineType)
       )
       .sort((a, b) => getComparableDate(b) - getComparableDate(a));
 
     return filtered[0] ?? null;
-  }, [vaccinations, selectedAnimalId, selectedVaccineName]);
+  }, [vaccinations, selectedAnimalId, selectedVaccineType]);
 
   useEffect(() => {
     if (!open) return;
@@ -240,14 +262,19 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
   ]);
 
   const onSubmit: SubmitHandler<VaccinationFormValues> = (values) => {
-    if (!values.animalId || !values.vetCabinetId || !values.vetTimeSlotId) {
+    if (
+      !values.animalId ||
+      !values.vaccineType ||
+      !values.vetCabinetId ||
+      !values.vetTimeSlotId
+    ) {
       return;
     }
 
     createVaccinationMutation.mutate(
       {
         animalId: Number(values.animalId),
-        vaccineName: values.vaccineName.trim(),
+        vaccineType: Number(values.vaccineType),
         vetCabinetId: Number(values.vetCabinetId),
         vetTimeSlotId: Number(values.vetTimeSlotId),
         lastDate: values.lastDate
@@ -430,12 +457,21 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
           </Box>
 
           <Box>
-            <Typography sx={labelSx}>{t("vaccination:vaccineName")}</Typography>
+            <Typography sx={labelSx}>{t("vaccination:vaccineType")}</Typography>
             <Controller
-              name="vaccineName"
+              name="vaccineType"
               control={control}
               render={({ field }) => (
-                <TextField {...field} fullWidth sx={fieldSx} />
+                <TextField {...field} fullWidth select sx={fieldSx}>
+                  <MenuItem value="" disabled>
+                    {t("vaccination:selectVaccineType")}
+                  </MenuItem>
+                  {vaccineTypes.map((type) => (
+                    <MenuItem key={type.value} value={type.value}>
+                      {type.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
               )}
             />
           </Box>
@@ -468,6 +504,50 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
               )}
             />
           </Box>
+
+          {servicePrice && (
+            <Box
+              sx={(theme) => ({
+                mt: -0.5,
+                px: 2,
+                py: 1.5,
+                borderRadius: 2.5,
+                backgroundColor:
+                  theme.palette.mode === "dark"
+                    ? alpha(theme.palette.primary.main, 0.12)
+                    : alpha(theme.palette.primary.main, 0.06),
+                border: `1px solid ${alpha(theme.palette.primary.main, 0.18)}`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              })}
+            >
+              <Typography
+                sx={(theme) => ({
+                  fontSize: scaleFont(13.5, settings?.textSize),
+                  fontWeight: 600,
+                  color: theme.palette.text.secondary,
+                })}
+              >
+                {t("vaccination:estimatedPrice")}
+              </Typography>
+
+              <Typography
+                sx={(theme) => ({
+                  fontSize: scaleFont(15, settings?.textSize),
+                  fontWeight: 800,
+                  color: theme.palette.primary.main,
+                  letterSpacing: "-0.2px",
+                })}
+              >
+                {formatConvertedPrice(
+                  servicePrice.price,
+                  servicePrice.currency,
+                  settings?.currency ?? "EUR"
+                )}
+              </Typography>
+            </Box>
+          )}
 
           <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
             <Box sx={{ flex: 1 }}>
@@ -520,6 +600,7 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
                   </TextField>
                 )}
               />
+
               {Array.isArray(slots) &&
                 slots.length === 0 &&
                 selectedCabinetId &&
@@ -575,7 +656,6 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
               px: 4,
               width: "fit-content",
               alignSelf: "center",
-
               borderRadius: 2.5,
               textTransform: "none",
               fontWeight: 700,

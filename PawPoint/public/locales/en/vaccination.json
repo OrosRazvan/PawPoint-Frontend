@@ -54,5 +54,10 @@
     "last3Months": "Last 3 months",
     "last6Months": "3 - 6 months",
     "lastYear": "1 year"
-  } 
+  },
+
+  "vaccineType": "Vaccine Type",
+  "selectVaccineType": "Select Vaccine Type",
+  "estimatedPrice": "Estimated Price",
+  "priceLabel": "Price: {{price}}"
 }

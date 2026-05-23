@@ -5,7 +5,6 @@ import type { DewormingDto, DewormingType } from "../pages/Deworming/types/dewor
 export type CreateDewormingRequest = {
   animalId: number;
   type: DewormingType;
-  intervalDays: number;
   vetCabinetId: number;
   vetTimeSlotId: number;
   notes?: string;

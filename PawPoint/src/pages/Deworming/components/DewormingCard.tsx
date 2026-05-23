@@ -2,6 +2,7 @@ import { Paper, Stack, Typography, Box, Chip, Button } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import LocalHospitalOutlinedIcon from "@mui/icons-material/LocalHospitalOutlined";
+import PaymentsOutlinedIcon from "@mui/icons-material/PaymentsOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import { useTranslation } from "react-i18next";
@@ -9,6 +10,7 @@ import { useSettings } from "../../../hooks/useSettings";
 import { scaleFont } from "../../../utils/fontScale";
 import type { DewormingCardItem } from "../types/deworming";
 import { DewormingTypeLabels } from "../types/deworming";
+import { formatConvertedPrice } from "../../../utils/price";
 
 type Props = {
   item: DewormingCardItem;
@@ -279,16 +281,32 @@ export const DewormingCard = ({ item, onEdit, onDelete }: Props) => {
             })}
           </Typography>
 
-          <Typography
-            sx={(theme) => ({
-              fontSize: scaleFont(12.5, settings?.textSize),
-              color: theme.palette.text.secondary,
-            })}
-          >
-            {t("deworming:intervalLabel", {
-              days: item.intervalDays,
-            })}
-          </Typography>
+          {item.price != null && (
+            <Stack direction="row" spacing={1.25} alignItems="center">
+              <PaymentsOutlinedIcon
+                sx={(theme) => ({
+                  fontSize: 15,
+                  color: theme.palette.text.disabled,
+                })}
+              />
+
+              <Typography
+                sx={(theme) => ({
+                  fontSize: scaleFont(12.5, settings?.textSize),
+                  color: theme.palette.text.secondary,
+                  fontWeight: 600,
+                })}
+              >
+                {t("deworming:priceLabel", {
+                  price: formatConvertedPrice(
+                    item.price,
+                    item.currency,
+                    settings?.currency ?? "EUR"
+                  ),
+                })}
+              </Typography>
+            </Stack>
+          )}
         </Stack>
 
         {!isCompleted && (

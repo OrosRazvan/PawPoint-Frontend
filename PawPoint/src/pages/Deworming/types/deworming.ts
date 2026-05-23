@@ -15,28 +15,48 @@ export const DewormingTypeLabels: Record<number, string> = {
   4: "Control",
 };
 
+export const Currency = {
+  Ron: 1,
+  Eur: 2,
+} as const;
+
+export type Currency = (typeof Currency)[keyof typeof Currency];
+
 export type DewormingDto = {
   id: number;
   animalId: number;
   animalName: string;
-  type: DewormingTypeEnum | number;
+  type: DewormingTypeEnum | number | string;
+
   date?: string | null;
+  dateUtc?: string | null;
+
   nextDate?: string | null;
-  intervalDays: number;
+  nextDateUtc?: string | null;
+
   vetCabinetId: number;
   vetCabinetName: string;
+
   vetTimeSlotId: number;
+
   slotStartTimeUtc?: string | null;
   slotEndTimeUtc?: string | null;
+
+  slotStartUtc?: string | null;
+  slotEndUtc?: string | null;
+
   startTimeUtc?: string | null;
   endTimeUtc?: string | null;
+
+  price?: number | null;
+  currency?: Currency;
+
   notes?: string | null;
 };
 
 export type DewormingFormValues = {
   animalId: number | "";
   type: DewormingTypeEnum | "";
-  intervalDays: number | "";
   vetCabinetId: number | "";
   visitDate: string;
   vetTimeSlotId: number | "";
@@ -48,14 +68,22 @@ export type DewormingCardItem = {
   animalId: number;
   animalName: string;
   type: DewormingTypeEnum | number;
+
   date?: string | null;
   nextDate?: string | null;
-  intervalDays: number;
+
   vetCabinetId: number;
   vetCabinetName: string;
+
   vetTimeSlotId: number;
+
   slotStartTimeUtc: string;
   slotEndTimeUtc: string;
+
+  price?: number | null;
+  currency?: Currency;
+
   notes?: string | null;
+
   status: "completed" | "upcoming";
 };

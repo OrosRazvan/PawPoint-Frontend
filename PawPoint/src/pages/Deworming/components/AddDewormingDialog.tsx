@@ -24,13 +24,16 @@ import {
 import { useTranslation } from "react-i18next";
 import { useSnackbar } from "notistack";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
+
 import { getAnimals } from "../../../api/getAnimal";
 import { useCreateDeworming } from "../../../hooks/useCreateDeworming";
 import { useDewormingVetCabinets } from "../../../hooks/useDewormingVetCabinets";
 import { useDewormingAvailability } from "../../../hooks/useDewormingAvailability";
+import { useServicePrice } from "../../../hooks/useServicePrice";
 import { useSettings } from "../../../hooks/useSettings";
 import { scaleFont } from "../../../utils/fontScale";
 import type { DewormingFormValues } from "../types/deworming";
+import { formatConvertedPrice } from "../../../utils/price";
 
 type Props = {
   open: boolean;
@@ -102,6 +105,29 @@ export const AddDewormingDialog = ({ open, onClose }: Props) => {
     { value: 4, label: t("deworming:typeControl") },
   ];
 
+  const { control, handleSubmit, reset, setValue } =
+    useForm<DewormingFormValues>({
+      defaultValues: {
+        animalId: "",
+        type: "",
+        vetCabinetId: "",
+        visitDate: "",
+        vetTimeSlotId: "",
+        notes: "",
+      },
+    });
+
+  const selectedType = useWatch({ control, name: "type" });
+  const selectedCabinetId = useWatch({ control, name: "vetCabinetId" });
+  const selectedVisitDate = useWatch({ control, name: "visitDate" });
+
+  const { data: servicePrice } = useServicePrice({
+    vetCabinetId: selectedCabinetId,
+    serviceType: "Deworming",
+    dewormingType: selectedType,
+    enabled: open,
+  });
+
   const fieldSx = (theme: any) => ({
     "& .MuiOutlinedInput-root": {
       borderRadius: 2.5,
@@ -151,22 +177,6 @@ export const AddDewormingDialog = ({ open, onClose }: Props) => {
 
   const { data: cabinets = [] } = useDewormingVetCabinets(open);
 
-  const { control, handleSubmit, reset, setValue } =
-    useForm<DewormingFormValues>({
-      defaultValues: {
-        animalId: "",
-        type: "",
-        intervalDays: "",
-        vetCabinetId: "",
-        visitDate: "",
-        vetTimeSlotId: "",
-
-      },
-    });
-
-  const selectedCabinetId = useWatch({ control, name: "vetCabinetId" });
-  const selectedVisitDate = useWatch({ control, name: "visitDate" });
-
   const availabilityFrom = useMemo(() => {
     if (selectedVisitDate) return selectedVisitDate;
     return toDateOnly(new Date());
@@ -194,7 +204,6 @@ export const AddDewormingDialog = ({ open, onClose }: Props) => {
     if (
       !values.animalId ||
       !values.type ||
-      !values.intervalDays ||
       !values.vetCabinetId ||
       !values.vetTimeSlotId
     ) {
@@ -205,9 +214,9 @@ export const AddDewormingDialog = ({ open, onClose }: Props) => {
       {
         animalId: Number(values.animalId),
         type: values.type,
-        intervalDays: Number(values.intervalDays),
         vetCabinetId: Number(values.vetCabinetId),
         vetTimeSlotId: Number(values.vetTimeSlotId),
+        notes: values.notes?.trim() || undefined,
       },
       {
         onSuccess: () => {
@@ -402,23 +411,6 @@ export const AddDewormingDialog = ({ open, onClose }: Props) => {
           </Box>
 
           <Box>
-            <Typography sx={labelSx}>{t("deworming:intervalDays")}</Typography>
-            <Controller
-              name="intervalDays"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  type="number"
-                  fullWidth
-                  sx={fieldSx}
-                  inputProps={{ min: 1 }}
-                />
-              )}
-            />
-          </Box>
-
-          <Box>
             <Typography sx={labelSx}>{t("deworming:vetCabinet")}</Typography>
             <Controller
               name="vetCabinetId"
@@ -446,6 +438,50 @@ export const AddDewormingDialog = ({ open, onClose }: Props) => {
               )}
             />
           </Box>
+
+          {servicePrice && (
+            <Box
+              sx={(theme) => ({
+                mt: -0.5,
+                px: 2,
+                py: 1.5,
+                borderRadius: 2.5,
+                backgroundColor:
+                  theme.palette.mode === "dark"
+                    ? alpha(theme.palette.primary.main, 0.12)
+                    : alpha(theme.palette.primary.main, 0.06),
+                border: `1px solid ${alpha(theme.palette.primary.main, 0.18)}`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              })}
+            >
+              <Typography
+                sx={(theme) => ({
+                  fontSize: scaleFont(13.5, settings?.textSize),
+                  fontWeight: 600,
+                  color: theme.palette.text.secondary,
+                })}
+              >
+                {t("deworming:estimatedPrice")}
+              </Typography>
+
+              <Typography
+                sx={(theme) => ({
+                  fontSize: scaleFont(15, settings?.textSize),
+                  fontWeight: 800,
+                  color: theme.palette.primary.main,
+                  letterSpacing: "-0.2px",
+                })}
+              >
+                {formatConvertedPrice(
+                  servicePrice.price,
+                  servicePrice.currency,
+                  settings?.currency ?? "EUR"
+                )}
+              </Typography>
+            </Box>
+          )}
 
           <Box>
             <Typography sx={labelSx}>{t("deworming:visitDate")}</Typography>
@@ -528,7 +564,6 @@ export const AddDewormingDialog = ({ open, onClose }: Props) => {
               px: 4,
               width: "fit-content",
               alignSelf: "center",
-
               borderRadius: 2.5,
               textTransform: "none",
               fontWeight: 700,

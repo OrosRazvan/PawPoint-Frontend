@@ -14,7 +14,8 @@ import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined
 import { useTranslation } from "react-i18next";
 import { useSettings } from "../../../hooks/useSettings";
 import { scaleFont } from "../../../utils/fontScale";
-import type { VaccinationCardItem } from "../types/vaccination";
+import { VaccineTypeLabels, type VaccinationCardItem } from "../types/vaccination";
+import { formatConvertedPrice } from "../../../utils/price";
 
 type Props = {
   item: VaccinationCardItem;
@@ -48,7 +49,7 @@ const formatDateBySettings = (
 };
 
 export const VaccinationCard = ({ item, onEdit, onDelete }: Props) => {
-  const { t } = useTranslation(["vaccination"]);
+  const { t, i18n } = useTranslation(["vaccination"]);
   const isCompleted = item.status === "completed";
   const { data: settings } = useSettings();
 
@@ -144,7 +145,9 @@ export const VaccinationCard = ({ item, onEdit, onDelete }: Props) => {
                   fontWeight: 500,
                 })}
               >
-                {item.vaccineName}
+                {typeof item.vaccineType === "number"
+                  ? VaccineTypeLabels[item.vaccineType]
+                  : item.vaccineType}
               </Typography>
             </Box>
           </Stack>
@@ -235,6 +238,58 @@ export const VaccinationCard = ({ item, onEdit, onDelete }: Props) => {
               })}
             </Typography>
           </Stack>
+
+          <Stack direction="row" spacing={1.25} alignItems="center">
+            <CalendarTodayOutlinedIcon
+              sx={(theme) => ({
+                fontSize: 15,
+                color: theme.palette.text.disabled,
+              })}
+            />
+
+            <Typography
+              sx={(theme) => ({
+                fontSize: scaleFont(12.5, settings?.textSize),
+                color: theme.palette.text.secondary,
+              })}
+            >
+              {new Date(item.slotStartTimeUtc).toLocaleTimeString(
+                i18n.language === "ro" ? "ro-RO" : "en-GB",
+                {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }
+              )}
+              {" - "}
+              {new Date(item.slotEndTimeUtc).toLocaleTimeString(
+                i18n.language === "ro" ? "ro-RO" : "en-GB",
+                {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }
+              )}
+            </Typography>
+          </Stack>
+
+          {item.price != null && (
+          <Stack direction="row" spacing={1.25} alignItems="center">
+            <Typography
+              sx={(theme) => ({
+                fontSize: scaleFont(12.5, settings?.textSize),
+                color: theme.palette.text.secondary,
+                fontWeight: 700,
+              })}
+            >
+              {t("vaccination:priceLabel", {
+                price: formatConvertedPrice(
+                  item.price,
+                  item.currency,
+                  settings?.currency ?? "EUR"
+                ),
+              })}
+            </Typography>
+          </Stack>
+        )}
         </Stack>
 
         {/* Action buttons */}

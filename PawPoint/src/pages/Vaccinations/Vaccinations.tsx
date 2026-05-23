@@ -13,6 +13,8 @@ import ScheduleRoundedIcon from "@mui/icons-material/ScheduleRounded";
 import CheckIcon from "@mui/icons-material/Check";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { alpha } from "@mui/material/styles";
+
 import { useVaccinations } from "../../hooks/useVaccinations";
 import { useSettings } from "../../hooks/useSettings";
 import { scaleFont } from "../../utils/fontScale";
@@ -26,7 +28,6 @@ import {
 } from "../../components/CompletedPeriodFilter";
 import { filterCompletedByPeriod } from "../../utils/completedPeriodFilter";
 import type { VaccinationCardItem, VaccinationDto } from "./types/vaccination";
-import { alpha } from "@mui/material/styles";
 
 const pickFirst = <T,>(...values: T[]) => {
   for (const value of values) {
@@ -64,7 +65,7 @@ const resolveStatus = (item: VaccinationDto): "completed" | "upcoming" => {
 const mapVaccinations = (
   items: VaccinationDto[],
   t: (key: string) => string
-): VaccinationCardItem[] => {
+) => {
   return items.map((item) => {
     const raw = item as Record<string, unknown>;
 
@@ -76,34 +77,45 @@ const mapVaccinations = (
         raw.PetName as string | undefined
       ) ?? t("vaccination:petFallback");
 
-    const vaccineName =
+    const vaccineType =
+      Number(
+        pickFirst(
+          item.vaccineType,
+          raw.VaccineType as number | undefined,
+          raw.vaccineType as number | undefined
+        )
+      ) || 1;
+
+    const lastDate =
       pickFirst(
-        item.vaccineName,
-        raw.VaccineName as string | undefined,
-        raw.name as string | undefined,
-        raw.Name as string | undefined
-      ) ?? t("vaccination:vaccinationFallback");
+        item.lastDate,
+        item.lastDateUtc,
+        raw.LastDate as string | undefined,
+        raw.LastDateUtc as string | undefined,
+        raw.date as string | undefined,
+        raw.Date as string | undefined
+      ) ?? null;
 
-    const lastDate = pickFirst(
-      item.lastDate,
-      raw.LastDate as string | undefined,
-      raw.date as string | undefined,
-      raw.Date as string | undefined
-    );
-
-    const nextDate = pickFirst(
-      item.nextDate,
-      raw.NextDate as string | undefined,
-      item.slotStartTimeUtc,
-      raw.SlotStartTimeUtc as string | undefined,
-      item.startTimeUtc,
-      raw.StartTimeUtc as string | undefined
-    );
+    const nextDate =
+      pickFirst(
+        item.nextDate,
+        item.nextDateUtc,
+        raw.NextDate as string | undefined,
+        raw.NextDateUtc as string | undefined,
+        item.slotStartTimeUtc,
+        item.slotStartUtc,
+        raw.SlotStartTimeUtc as string | undefined,
+        raw.SlotStartUtc as string | undefined,
+        item.startTimeUtc,
+        raw.StartTimeUtc as string | undefined
+      ) ?? null;
 
     const slotStartTimeUtc =
       pickFirst(
         item.slotStartTimeUtc,
+        item.slotStartUtc,
         raw.SlotStartTimeUtc as string | undefined,
+        raw.SlotStartUtc as string | undefined,
         item.startTimeUtc,
         raw.StartTimeUtc as string | undefined,
         item.nextDate,
@@ -115,7 +127,9 @@ const mapVaccinations = (
     const slotEndTimeUtc =
       pickFirst(
         item.slotEndTimeUtc,
+        item.slotEndUtc,
         raw.SlotEndTimeUtc as string | undefined,
+        raw.SlotEndUtc as string | undefined,
         item.endTimeUtc,
         raw.EndTimeUtc as string | undefined
       ) ?? "";
@@ -130,24 +144,63 @@ const mapVaccinations = (
         raw.ClinicName as string | undefined
       ) ?? "";
 
-    const notes = pickFirst(item.notes, raw.Notes as string | undefined);
+    const notes =
+      pickFirst(
+        item.notes,
+        raw.Notes as string | undefined
+      ) ?? null;
 
     return {
       id: item.id,
+
       animalId: item.animalId,
       animalName,
-      vaccineName,
-      lastDate: lastDate ?? null,
-      nextDate: nextDate ?? null,
+
+      vaccineType,
+
+      lastDate,
+      nextDate,
+
       vetCabinetId: item.vetCabinetId,
-      vetCabinetName,
+
+      vetCabinetName:
+        vetCabinetName ||
+        item.vetCabinetName ||
+        (raw.VetCabinetName as string | undefined) ||
+        "",
+
       vetTimeSlotId: item.vetTimeSlotId,
-      slotStartTimeUtc,
-      slotEndTimeUtc,
-      notes: notes ?? null,
+
+      slotStartTimeUtc:
+        slotStartTimeUtc ||
+        item.slotStartUtc ||
+        (raw.SlotStartUtc as string | undefined) ||
+        "",
+
+      slotEndTimeUtc:
+        slotEndTimeUtc ||
+        item.slotEndUtc ||
+        (raw.SlotEndUtc as string | undefined) ||
+        "",
+
+      price:
+        item.price ??
+        (raw.Price as number | undefined) ??
+        null,
+
+      currency:
+        item.currency ??
+        (raw.Currency as number | undefined),
+
+      notes,
+
       status: resolveStatus({
         ...item,
-        slotStartTimeUtc,
+        slotStartTimeUtc:
+          slotStartTimeUtc ||
+          item.slotStartUtc ||
+          (raw.SlotStartUtc as string | undefined) ||
+          "",
       } as VaccinationDto),
     };
   });
@@ -168,7 +221,10 @@ export const Vaccinations = () => {
   const [completedFilterMonths, setCompletedFilterMonths] =
     useState<CompletedFilterMonths>(3);
 
-  const items = useMemo(() => mapVaccinations(data, t), [data, t]);
+  const items: VaccinationCardItem[] = useMemo(
+    () => mapVaccinations(data, t) as VaccinationCardItem[],
+    [data, t]
+  );
 
   const completedItems = useMemo(
     () => items.filter((item) => item.status === "completed"),
