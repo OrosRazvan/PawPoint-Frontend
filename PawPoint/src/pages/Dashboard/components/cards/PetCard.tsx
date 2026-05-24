@@ -1,7 +1,5 @@
 import {
   Box,
-  Paper,
-  Stack,
   Typography,
   Button,
   IconButton,
@@ -10,6 +8,8 @@ import { alpha } from "@mui/material/styles";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import PetsRoundedIcon from "@mui/icons-material/PetsRounded";
+
 import { useSettings } from "../../../../hooks/useSettings";
 import { scaleFont } from "../../../../utils/fontScale";
 import { formatWeightByUnit } from "../../../../utils/weight";
@@ -43,7 +43,8 @@ export const PetCard = ({
   const { data: settings } = useSettings();
   const { t } = useTranslation("dashboard");
 
-  const weightUnit: "kg" | "lb" = settings?.weightUnit === "lb" ? "lb" : "kg";
+  const weightUnit: "kg" | "lb" =
+    settings?.weightUnit === "lb" ? "lb" : "kg";
 
   const displayWeight =
     typeof weightKg === "number"
@@ -51,225 +52,336 @@ export const PetCard = ({
       : weight ?? "—";
 
   return (
-    <Paper
-      elevation={0}
+    <Box
       sx={(theme) => ({
-        borderRadius: 5,
-        border: `1px solid ${theme.palette.divider}`,
-        backgroundColor: theme.palette.background.paper,
+        position: "relative",
         overflow: "hidden",
-        transition: "box-shadow 0.22s ease, transform 0.22s ease",
+        borderRadius: "32px",
+        backgroundColor: theme.palette.background.paper,
+        border: `1px solid ${
+          theme.palette.mode === "dark"
+            ? alpha("#fff", 0.08)
+            : "rgba(0,0,0,0.06)"
+        }`,
+        boxShadow:
+          theme.palette.mode === "dark"
+            ? "0 14px 38px rgba(0,0,0,0.34)"
+            : "0 20px 52px rgba(7,28,66,0.08)",
+        transition: "all 0.25s ease",
+        display: "flex",
+        flexDirection: "column",
+        backdropFilter: "blur(12px)",
+        minHeight: 260,
         "&:hover": {
+          transform: "translateY(-5px)",
           boxShadow:
             theme.palette.mode === "dark"
-              ? "0 16px 40px rgba(0,0,0,0.32), 0 2px 8px rgba(0,0,0,0.2)"
-              : "0 16px 40px rgba(7,28,66,0.1), 0 2px 8px rgba(7,28,66,0.05)",
-          transform: "translateY(-3px)",
+              ? "0 24px 58px rgba(0,0,0,0.46)"
+              : "0 28px 70px rgba(245,166,35,0.16)",
         },
       })}
     >
+      {/* Background Glow */}
       <Box
-        sx={(theme) => ({
-          height: 190,
-          background: imageUrl
-            ? "transparent"
-            : theme.palette.mode === "dark"
-            ? `linear-gradient(140deg, ${alpha(
-                theme.palette.primary.main,
-                0.18
-              )} 0%, ${alpha(theme.palette.primary.light, 0.26)} 100%)`
-            : "linear-gradient(140deg, #fff8f0 0%, #fde8c8 100%)",
+        sx={{
+          position: "absolute",
+          top: -100,
+          right: -90,
+          width: 220,
+          height: 220,
+          borderRadius: "50%",
+          background: "rgba(245,166,35,0.12)",
+          filter: "blur(24px)",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Top Content */}
+      <Box
+        sx={{
           display: "flex",
           alignItems: "center",
-          justifyContent: "center",
-          overflow: "hidden",
+          gap: 3.2,
+          p: 3.2,
           position: "relative",
-        })}
+          zIndex: 1,
+        }}
       >
-        {!imageUrl && (
-          <>
+        {/* Pet Image */}
+        <Box
+          sx={(theme) => ({
+            position: "relative",
+            width: 132,
+            height: 132,
+            minWidth: 132,
+            borderRadius: "32px",
+            overflow: "hidden",
+            flexShrink: 0,
+            background:
+              theme.palette.mode === "dark"
+                ? `linear-gradient(145deg, ${alpha(
+                    theme.palette.primary.main,
+                    0.24
+                  )}, ${alpha(theme.palette.primary.light, 0.3)})`
+                : "linear-gradient(145deg, #fff2d8, #ffe2a8)",
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 12px 28px rgba(0,0,0,0.34)"
+                : "0 14px 32px rgba(245,166,35,0.22)",
+          })}
+        >
+          {imageUrl ? (
             <Box
-              sx={(theme) => ({
-                position: "absolute",
-                width: 160,
-                height: 160,
-                borderRadius: "50%",
-                background:
-                  theme.palette.mode === "dark"
-                    ? alpha(theme.palette.primary.main, 0.1)
-                    : "rgba(245,166,35,0.1)",
-                top: -30,
-                right: -20,
-              })}
+              component="img"
+              src={imageUrl}
+              alt={name}
+              sx={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                objectPosition: `center ${imagePositionY ?? 22}%`,
+                transform: "scale(1.08)",
+                transition: "all 0.35s ease",
+                display: "block",
+                "&:hover": {
+                  transform: "scale(1.12)",
+                },
+              }}
             />
-
+          ) : (
             <Box
-              sx={(theme) => ({
-                position: "absolute",
-                width: 80,
-                height: 80,
-                borderRadius: "50%",
-                background:
-                  theme.palette.mode === "dark"
-                    ? alpha(theme.palette.primary.main, 0.08)
-                    : "rgba(245,166,35,0.08)",
-                bottom: -10,
-                left: 10,
-              })}
-            />
-          </>
-        )}
+              sx={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Typography
+                sx={(theme) => ({
+                  fontSize: scaleFont(50, settings?.textSize),
+                  fontWeight: 900,
+                  color: theme.palette.primary.main,
+                  lineHeight: 1,
+                  letterSpacing: "-2px",
+                  userSelect: "none",
+                })}
+              >
+                {imageLetter}
+              </Typography>
+            </Box>
+          )}
 
-        {imageUrl ? (
+          {/* Floating Paw */}
           <Box
-            component="img"
-            src={imageUrl}
-            alt={name}
             sx={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              objectPosition: `center ${imagePositionY ?? 50}%`,
+              position: "absolute",
+              bottom: 10,
+              right: 10,
+              width: 34,
+              height: 34,
+              borderRadius: "50%",
+              background: "rgba(255,255,255,0.92)",
+              backdropFilter: "blur(12px)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 6px 16px rgba(0,0,0,0.14)",
             }}
-          />
-        ) : (
-          <Typography
-            sx={(theme) => ({
-              fontSize: scaleFont(56, settings?.textSize),
-              fontWeight: 900,
-              color: theme.palette.primary.main,
-              lineHeight: 1,
-              position: "relative",
-              zIndex: 1,
-              letterSpacing: "-2px",
-            })}
           >
-            {imageLetter}
-          </Typography>
-        )}
-      </Box>
+            <PetsRoundedIcon
+              sx={{
+                fontSize: 18,
+                color: "#f5a623",
+              }}
+            />
+          </Box>
+        </Box>
 
-      <Box sx={{ p: 2.5 }}>
-        <Stack spacing={0.3} sx={{ mb: 2.5 }}>
+        {/* Pet Info */}
+        <Box sx={{ minWidth: 0, flex: 1 }}>
           <Typography
+            noWrap
             sx={(theme) => ({
-              fontSize: scaleFont(18, settings?.textSize),
-              fontWeight: 800,
+              fontSize: scaleFont(34, settings?.textSize),
+              fontWeight: 900,
               color: theme.palette.text.primary,
-              letterSpacing: "-0.4px",
-              lineHeight: 1.2,
+              letterSpacing: "-1px",
+              lineHeight: 1.05,
             })}
           >
             {name}
           </Typography>
 
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <Typography
-              sx={(theme) => ({
-                fontSize: scaleFont(13, settings?.textSize),
-                color: theme.palette.text.secondary,
-                fontWeight: 500,
-              })}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1.2,
+              mt: 1.5,
+              flexWrap: "wrap",
+            }}
+          >
+            <Box
+              sx={{
+                px: 1.6,
+                py: 0.7,
+                borderRadius: 999,
+                background: "rgba(245,166,35,0.12)",
+                border: "1px solid rgba(245,166,35,0.18)",
+              }}
             >
-              {breed}
-            </Typography>
+              <Typography
+                sx={{
+                  fontSize: scaleFont(14, settings?.textSize),
+                  fontWeight: 800,
+                  color: "#c77900",
+                  lineHeight: 1,
+                }}
+              >
+                {breed}
+              </Typography>
+            </Box>
 
             <Box
               sx={(theme) => ({
-                width: 3,
-                height: 3,
-                borderRadius: "50%",
-                backgroundColor: alpha(theme.palette.text.secondary, 0.4),
-              })}
-            />
-
-            <Typography
-              sx={(theme) => ({
-                fontSize: scaleFont(13, settings?.textSize),
-                color: theme.palette.text.secondary,
-                fontWeight: 500,
+                px: 1.4,
+                py: 0.7,
+                borderRadius: 999,
+                backgroundColor:
+                  theme.palette.mode === "dark"
+                    ? alpha("#fff", 0.06)
+                    : "#f4f6f9",
               })}
             >
-              {displayWeight}
-            </Typography>
-          </Stack>
-        </Stack>
-
-        <Stack direction="row" spacing={1}>
-          <Button
-            fullWidth
-            startIcon={
-              <VisibilityOutlinedIcon sx={{ fontSize: "17px !important" }} />
-            }
-            onClick={onView}
-            sx={{
-              py: 1.25,
-              borderRadius: 3,
-              background: "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
-              color: "#fff",
-              textTransform: "none",
-              fontWeight: 700,
-              fontSize: 14,
-              letterSpacing: "-0.1px",
-              boxShadow: "0 4px 14px rgba(245,166,35,0.3)",
-              "&:hover": {
-                background: "linear-gradient(135deg, #f0981a 0%, #e88510 100%)",
-                boxShadow: "0 6px 20px rgba(245,166,35,0.4)",
-              },
-            }}
-          >
-            {t("view")}
-          </Button>
-
-          <IconButton
-            onClick={onEdit}
-            sx={(theme) => ({
-              width: 50,
-              height: 50,
-              borderRadius: 3,
-              backgroundColor:
-                theme.palette.mode === "dark"
-                  ? alpha("#ffffff", 0.06)
-                  : "#f0f3f8",
-              color: theme.palette.text.secondary,
-              border: `1px solid ${theme.palette.divider}`,
-              transition: "all 0.15s ease",
-              "&:hover": {
-                backgroundColor:
-                  theme.palette.mode === "dark"
-                    ? alpha("#ffffff", 0.1)
-                    : "#e4eaf2",
-              },
-            })}
-          >
-            <EditOutlinedIcon sx={{ fontSize: 18 }} />
-          </IconButton>
-
-          <IconButton
-            onClick={onDelete}
-            sx={(theme) => ({
-              width: 50,
-              height: 50,
-              borderRadius: 3,
-              backgroundColor:
-                theme.palette.mode === "dark"
-                  ? alpha(theme.palette.error.main, 0.12)
-                  : "#fef0f0",
-              color: theme.palette.error.main,
-              border: `1px solid ${alpha(theme.palette.error.main, 0.15)}`,
-              transition: "all 0.15s ease",
-              "&:hover": {
-                backgroundColor:
-                  theme.palette.mode === "dark"
-                    ? alpha(theme.palette.error.main, 0.2)
-                    : alpha(theme.palette.error.main, 0.1),
-              },
-            })}
-          >
-            <DeleteOutlineOutlinedIcon sx={{ fontSize: 18 }} />
-          </IconButton>
-        </Stack>
+              <Typography
+                sx={(theme) => ({
+                  fontSize: scaleFont(14, settings?.textSize),
+                  color: theme.palette.text.secondary,
+                  fontWeight: 800,
+                  lineHeight: 1,
+                })}
+              >
+                {displayWeight}
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
       </Box>
-    </Paper>
+
+      {/* Divider */}
+      <Box
+        sx={(theme) => ({
+          height: "1px",
+          mx: 3.2,
+          backgroundColor:
+            theme.palette.mode === "dark"
+              ? alpha("#fff", 0.06)
+              : "rgba(0,0,0,0.06)",
+        })}
+      />
+
+      {/* Actions */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1.4,
+          p: 2.8,
+          pt: 2.4,
+        }}
+      >
+        <Button
+          fullWidth
+          startIcon={
+            <VisibilityOutlinedIcon
+              sx={{ fontSize: "18px !important" }}
+            />
+          }
+          onClick={onView}
+          sx={{
+            py: 1.45,
+            borderRadius: "18px",
+            background:
+              "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
+            color: "#fff",
+            textTransform: "none",
+            fontWeight: 800,
+            fontSize: scaleFont(15, settings?.textSize),
+            letterSpacing: "-0.2px",
+            boxShadow: "0 8px 20px rgba(245,166,35,0.28)",
+            transition: "all 0.18s ease",
+            "&:hover": {
+              background:
+                "linear-gradient(135deg, #f0981a 0%, #e88510 100%)",
+              boxShadow: "0 12px 28px rgba(245,166,35,0.42)",
+              transform: "translateY(-1px)",
+            },
+            "&:active": {
+              transform: "translateY(0)",
+            },
+          }}
+        >
+          {t("view")}
+        </Button>
+
+        <IconButton
+          onClick={onEdit}
+          sx={(theme) => ({
+            width: 54,
+            height: 54,
+            flexShrink: 0,
+            borderRadius: "18px",
+            backgroundColor:
+              theme.palette.mode === "dark"
+                ? alpha("#fff", 0.07)
+                : "#f4f6f8",
+            color: theme.palette.text.secondary,
+            border: `1px solid ${theme.palette.divider}`,
+            transition: "all 0.18s ease",
+            "&:hover": {
+              backgroundColor:
+                theme.palette.mode === "dark"
+                  ? alpha("#fff", 0.12)
+                  : "#e8edf4",
+              color: theme.palette.text.primary,
+              transform: "translateY(-1px)",
+            },
+          })}
+        >
+          <EditOutlinedIcon sx={{ fontSize: 20 }} />
+        </IconButton>
+
+        <IconButton
+          onClick={onDelete}
+          sx={(theme) => ({
+            width: 54,
+            height: 54,
+            flexShrink: 0,
+            borderRadius: "18px",
+            backgroundColor:
+              theme.palette.mode === "dark"
+                ? alpha(theme.palette.error.main, 0.12)
+                : "#fff1f1",
+            color: theme.palette.error.main,
+            border: `1px solid ${alpha(
+              theme.palette.error.main,
+              0.15
+            )}`,
+            transition: "all 0.18s ease",
+            "&:hover": {
+              backgroundColor:
+                theme.palette.mode === "dark"
+                  ? alpha(theme.palette.error.main, 0.22)
+                  : "#ffe4e4",
+              transform: "translateY(-1px)",
+            },
+          })}
+        >
+          <DeleteOutlineOutlinedIcon sx={{ fontSize: 20 }} />
+        </IconButton>
+      </Box>
+    </Box>
   );
 };

@@ -38,6 +38,7 @@ import {
   type VaccinationCardItem,
 } from "../types/vaccination";
 import { formatConvertedPrice } from "../../../utils/price";
+import { useVaccinations } from "../../../hooks/useVaccinations";
 
 type Props = {
   open: boolean;
@@ -171,6 +172,8 @@ export const EditVaccinationDialog = ({ open, item, onClose }: Props) => {
     data: CabinetOption[];
   };
 
+  const { data: vaccinations = [] } = useVaccinations();
+
   const availabilityFrom = useMemo(() => {
     if (selectedVisitDate) return selectedVisitDate;
     return toDateOnly(new Date());
@@ -191,25 +194,60 @@ export const EditVaccinationDialog = ({ open, item, onClose }: Props) => {
     data: SlotOption[];
   };
 
-  const slotOptions = useMemo<SlotOption[]>(() => {
-    const currentSlot =
-      item?.vetTimeSlotId && item?.slotStartTimeUtc && item?.slotEndTimeUtc
-        ? {
-            id: item.vetTimeSlotId,
-            startTimeUtc: item.slotStartTimeUtc,
-            endTimeUtc: item.slotEndTimeUtc,
-          }
-        : null;
+  const bookedSlotIds = useMemo(() => {
+  return new Set(
+    vaccinations
+      .filter((vaccination) => vaccination.id !== item?.id)
+      .map((vaccination) => Number(vaccination.vetTimeSlotId))
+      .filter(Boolean)
+  );
+}, [vaccinations, item?.id]);
 
-    const merged = currentSlot
-      ? [
-          currentSlot,
-          ...slots.filter((slot) => slot.id !== currentSlot.id),
-        ]
-      : slots;
+const availableSlots = useMemo<SlotOption[]>(() => {
+  if (!Array.isArray(slots)) return [];
 
-    return merged;
-  }, [item, slots]);
+  return slots.filter((slot) => {
+    const startTime = new Date(slot.startTimeUtc).getTime();
+
+    if (Number.isNaN(startTime)) return false;
+    if (startTime <= Date.now()) return false;
+    if (bookedSlotIds.has(Number(slot.id))) return false;
+
+    const slotWithCapacity = slot as SlotOption & {
+      capacity?: number;
+      bookedCount?: number;
+    };
+
+    if (
+      typeof slotWithCapacity.capacity === "number" &&
+      typeof slotWithCapacity.bookedCount === "number"
+    ) {
+      return slotWithCapacity.bookedCount < slotWithCapacity.capacity;
+    }
+
+    return true;
+  });
+}, [slots, bookedSlotIds]);
+
+const slotOptions = useMemo<SlotOption[]>(() => {
+  const currentSlot =
+    item?.vetTimeSlotId && item?.slotStartTimeUtc && item?.slotEndTimeUtc
+      ? {
+          id: item.vetTimeSlotId,
+          startTimeUtc: item.slotStartTimeUtc,
+          endTimeUtc: item.slotEndTimeUtc,
+        }
+      : null;
+
+  const merged = currentSlot
+    ? [
+        currentSlot,
+        ...availableSlots.filter((slot) => slot.id !== currentSlot.id),
+      ]
+    : availableSlots;
+
+  return merged;
+}, [item, availableSlots]);
 
   const { data: servicePrice } = useServicePrice({
     vetCabinetId: selectedCabinetId,

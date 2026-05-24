@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Currency } from "../types/appointment";
+import PaymentsOutlinedIcon from "@mui/icons-material/PaymentsOutlined";
 
 import { useSettings } from "../../../hooks/useSettings";
 import { scaleFont } from "../../../utils/fontScale";
@@ -420,6 +421,14 @@ export const AppointmentCard = ({ item, onEdit }: Props) => {
             {item.vetCabinetAddress || "—"}
           </Typography>
 
+          <Stack direction="row" spacing={1.25} alignItems="center">
+              <PaymentsOutlinedIcon
+                sx={(theme) => ({
+                  fontSize: 15,
+                  color: theme.palette.text.disabled,
+                })}
+              />
+
           <Typography
             sx={(theme) => ({
               fontSize: scaleFont(12.5, settings?.textSize),
@@ -429,6 +438,7 @@ export const AppointmentCard = ({ item, onEdit }: Props) => {
           >
             {formatCurrency(item.price, item.currency)}
           </Typography>
+          </Stack>
         </Stack>
 
         {isCompleted ? (

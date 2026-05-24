@@ -1,4 +1,5 @@
 import { useEffect, useMemo } from "react";
+import { useDewormings } from "../../../hooks/useDewormings";
 import { LoadingButton } from "@mui/lab";
 import {
   Dialog,
@@ -131,6 +132,7 @@ export const EditDewormingDialog = ({ open, item, onClose }: Props) => {
   const queryClient = useQueryClient();
   const updateDewormingMutation = useUpdateDeworming();
   const { data: settings } = useSettings();
+  const { data: dewormings = [] } = useDewormings();
 
   const dateFormat: AppDateFormat = settings?.dateFormat ?? "DD/MM/YYYY";
   const locale = i18n.language === "ro" ? "ro-RO" : "en-GB";
@@ -182,6 +184,59 @@ export const EditDewormingDialog = ({ open, item, onClose }: Props) => {
     to: availabilityTo,
     enabled: open && !!selectedCabinetId && !!selectedVisitDate,
   });
+
+  const bookedSlotIds = useMemo(() => {
+  return new Set(
+    dewormings
+      .filter((deworming) => deworming.id !== item?.id)
+      .map((deworming) => Number(deworming.vetTimeSlotId))
+      .filter(Boolean)
+  );
+}, [dewormings, item?.id]);
+
+const availableSlots = useMemo(() => {
+  if (!Array.isArray(slots)) return [];
+
+  return slots.filter((slot) => {
+    const startTime = new Date(slot.startTimeUtc).getTime();
+
+    if (Number.isNaN(startTime)) return false;
+    if (startTime <= Date.now()) return false;
+    if (bookedSlotIds.has(Number(slot.id))) return false;
+
+    const slotWithCapacity = slot as typeof slot & {
+      capacity?: number;
+      bookedCount?: number;
+    };
+
+    if (
+      typeof slotWithCapacity.capacity === "number" &&
+      typeof slotWithCapacity.bookedCount === "number"
+    ) {
+      return slotWithCapacity.bookedCount < slotWithCapacity.capacity;
+    }
+
+    return true;
+  });
+}, [slots, bookedSlotIds]);
+
+const slotOptions = useMemo(() => {
+  const currentSlot =
+    item?.vetTimeSlotId && item?.slotStartTimeUtc && item?.slotEndTimeUtc
+      ? {
+          id: item.vetTimeSlotId,
+          startTimeUtc: item.slotStartTimeUtc,
+          endTimeUtc: item.slotEndTimeUtc,
+        }
+      : null;
+
+    return currentSlot
+      ? [
+          currentSlot,
+          ...availableSlots.filter((slot) => slot.id !== currentSlot.id),
+        ]
+      : availableSlots;
+  }, [item, availableSlots]);
 
   const { data: servicePrice } = useServicePrice({
     vetCabinetId: selectedCabinetId,
@@ -646,7 +701,7 @@ export const EditDewormingDialog = ({ open, item, onClose }: Props) => {
                     {t("deworming:selectTimeSlot")}
                   </MenuItem>
                   {Array.isArray(slots) &&
-                    slots.map((slot) => (
+                    slotOptions.map((slot) => (
                       <MenuItem key={slot.id} value={slot.id}>
                         {formatSlotLabel(
                           slot.startTimeUtc,

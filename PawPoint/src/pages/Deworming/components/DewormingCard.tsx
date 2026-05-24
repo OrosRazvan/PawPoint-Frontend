@@ -293,8 +293,8 @@ export const DewormingCard = ({ item, onEdit, onDelete }: Props) => {
               <Typography
                 sx={(theme) => ({
                   fontSize: scaleFont(12.5, settings?.textSize),
-                  color: theme.palette.text.secondary,
-                  fontWeight: 600,
+                  color: theme.palette.text.primary,
+                  fontWeight: 700,
                 })}
               >
                 {t("deworming:priceLabel", {
