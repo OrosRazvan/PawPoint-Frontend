@@ -1,13 +1,21 @@
 import { useEffect, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
-import type { CSSProperties } from "react";
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Container,
+  GlobalStyles,
+  Stack,
+  Typography,
+} from "@mui/material";
 
 const ORANGE = "#f7ae1a";
 const ORANGE_DARK = "#e39100";
 const TEXT = "#071c42";
 const SUBTEXT = "#516076";
 const PAGE_BG = "#f7f5f0";
-const CARD_BG = "#ffffff";
 const BORDER = "#ead9b0";
 
 type HeroSlide = {
@@ -91,374 +99,37 @@ const steps: Step[] = [
   },
 ];
 
-const styles = {
-  page: {
-    minHeight: "100vh",
-    backgroundColor: PAGE_BG,
-    fontFamily: "'DM Sans', sans-serif",
-    overflowX: "hidden",
-  } as CSSProperties,
-
-  hero: {
-    position: "relative",
-    height: "100vh",
-    minHeight: 640,
-    overflow: "hidden",
-  } as CSSProperties,
-
-  slide: (active: boolean): CSSProperties => ({
-    position: "absolute",
-    inset: 0,
-    opacity: active ? 1 : 0,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    transform: active ? "scale(1)" : "scale(1.04)",
-    transitionProperty: "opacity, transform",
-    transitionDuration: "1.2s, 7s",
-    transitionTimingFunction: "ease",
-  }),
-
-  heroOverlay: {
-    position: "absolute",
-    inset: 0,
-    background:
-      "linear-gradient(160deg, rgba(7,28,66,0.55) 0%, rgba(7,28,66,0.28) 60%, rgba(247,174,26,0.08) 100%)",
-    zIndex: 1,
-  } as CSSProperties,
-
-  heroContent: {
-    position: "relative",
-    zIndex: 2,
-    height: "100%",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "2rem",
-    textAlign: "center",
-  } as CSSProperties,
-
-  heroBadge: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 8,
-    background: "rgba(247,174,26,0.18)",
-    border: "1px solid rgba(247,174,26,0.5)",
-    borderRadius: 999,
-    padding: "6px 18px",
-    fontSize: "0.8rem",
-    fontWeight: 600,
-    color: ORANGE,
-    letterSpacing: "0.12em",
-    textTransform: "uppercase",
-    marginBottom: "1.6rem",
-    backdropFilter: "blur(8px)",
-  } as CSSProperties,
-
-  heroTitle: {
-    fontFamily: "'Playfair Display', serif",
-    fontSize: "clamp(2.8rem, 7vw, 6rem)",
-    fontWeight: 900,
-    lineHeight: 1,
-    color: "#fff",
-    letterSpacing: "-0.02em",
-    marginBottom: "1.4rem",
-  } as CSSProperties,
-
-  heroTitleSpan: {
-    color: ORANGE,
-    fontStyle: "italic",
-    display: "block",
-  } as CSSProperties,
-
-  heroDesc: {
-    fontSize: "clamp(1rem, 2vw, 1.25rem)",
-    color: "rgba(255,255,255,0.88)",
-    maxWidth: 640,
-    lineHeight: 1.8,
-    marginBottom: "2.4rem",
-    fontWeight: 300,
-  } as CSSProperties,
-
-  heroBtns: {
-    display: "flex",
-    gap: 12,
-    flexWrap: "wrap",
-    justifyContent: "center",
-    marginBottom: "3rem",
-  } as CSSProperties,
-
-  btnPrimary: {
-    padding: "14px 36px",
-    borderRadius: 14,
-    background: ORANGE,
-    color: TEXT,
-    fontFamily: "'DM Sans', sans-serif",
-    fontSize: "1rem",
-    fontWeight: 700,
-    border: "none",
-    cursor: "pointer",
-    boxShadow: "0 8px 28px rgba(247,174,26,0.42)",
-    transition: "all 0.2s",
-    textDecoration: "none",
-  } as CSSProperties,
-
-  btnOutline: {
-    padding: "14px 36px",
-    borderRadius: 14,
-    background: "rgba(255,255,255,0.08)",
-    color: "#fff",
-    fontFamily: "'DM Sans', sans-serif",
-    fontSize: "1rem",
-    fontWeight: 600,
-    border: "1px solid rgba(255,255,255,0.4)",
-    cursor: "pointer",
-    backdropFilter: "blur(8px)",
-    transition: "all 0.2s",
-    textDecoration: "none",
-  } as CSSProperties,
-
-  dots: {
-    display: "flex",
-    gap: 8,
-    justifyContent: "center",
-    alignItems: "center",
-  } as CSSProperties,
-
-  dot: (active: boolean): CSSProperties => ({
-    width: active ? 28 : 8,
-    height: 8,
-    borderRadius: 999,
-    background: active ? ORANGE : "rgba(255,255,255,0.45)",
-    cursor: "pointer",
-    transition: "all 0.3s",
-    border: "none",
-    padding: 0,
-  }),
-
-  slideLabel: (visible: boolean): CSSProperties => ({
-    position: "absolute",
-    bottom: "2.2rem",
-    left: "50%",
-    transform: "translateX(-50%)",
-    zIndex: 3,
-    background: "rgba(7,28,66,0.52)",
-    backdropFilter: "blur(12px)",
-    border: "1px solid rgba(255,255,255,0.18)",
-    borderRadius: 12,
-    padding: "10px 22px",
-    color: "rgba(255,255,255,0.9)",
-    fontSize: "0.85rem",
-    fontWeight: 500,
-    letterSpacing: "0.05em",
-    opacity: visible ? 1 : 0,
-    transition: "opacity 0.5s",
-    pointerEvents: "none",
-    whiteSpace: "nowrap",
-  }),
-
-  featuresSection: {
-    padding: "90px 5vw",
-    backgroundColor: PAGE_BG,
-  } as CSSProperties,
-
-  featuresHeader: {
-    textAlign: "center",
-    marginBottom: "3.5rem",
-  } as CSSProperties,
-
-  featuresGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-    gap: "1.5rem",
-  } as CSSProperties,
-
-  featureCard: {
-    background: CARD_BG,
-    border: `1px solid ${BORDER}`,
-    borderRadius: 24,
-    padding: "2.2rem",
-    transition: "transform 0.25s, box-shadow 0.25s",
-    cursor: "default",
-  } as CSSProperties,
-
-  featureIcon: {
-    width: 58,
-    height: 58,
-    borderRadius: 16,
-    background: `linear-gradient(135deg, ${ORANGE} 0%, #eb8500 100%)`,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: "1.4rem",
-    fontSize: "1.5rem",
-  } as CSSProperties,
-
-  featureTitle: {
-    fontFamily: "'Playfair Display', serif",
-    fontSize: "1.4rem",
-    fontWeight: 700,
-    color: TEXT,
-    marginBottom: "0.7rem",
-  } as CSSProperties,
-
-  featureDesc: {
-    fontSize: "0.97rem",
-    color: SUBTEXT,
-    lineHeight: 1.75,
-  } as CSSProperties,
-
-  statsSection: {
-    padding: "90px 5vw",
-    background: "linear-gradient(110deg, #071c42 0%, #0e2d5e 60%, #1a3a6e 100%)",
-    position: "relative",
-    overflow: "hidden",
-  } as CSSProperties,
-
-  statsGrid: {
-    position: "relative",
-    zIndex: 1,
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-    gap: "2rem",
-    textAlign: "center",
-  } as CSSProperties,
-
-  statNum: {
-    fontFamily: "'Playfair Display', serif",
-    fontSize: "clamp(2.4rem, 5vw, 4rem)",
-    fontWeight: 900,
-    color: ORANGE,
-    lineHeight: 1,
-    marginBottom: "0.5rem",
-  } as CSSProperties,
-
-  statLabel: {
-    fontSize: "1rem",
-    color: "rgba(255,255,255,0.72)",
-    fontWeight: 300,
-  } as CSSProperties,
-
-  howSection: {
-    padding: "90px 5vw",
-    backgroundColor: PAGE_BG,
-  } as CSSProperties,
-
-  howHeader: {
-    textAlign: "center",
-    marginBottom: "3.5rem",
-  } as CSSProperties,
-
-  stepsGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-    gap: "2rem",
-    position: "relative",
-  } as CSSProperties,
-
-  stepCircle: {
-    width: 88,
-    height: 88,
-    borderRadius: "50%",
-    background: `linear-gradient(135deg, ${ORANGE} 0%, #eb8500 100%)`,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    margin: "0 auto 1.4rem",
-    boxShadow: "0 16px 36px rgba(247,174,26,0.28)",
-  } as CSSProperties,
-
-  stepNum: {
-    fontFamily: "'Playfair Display', serif",
-    fontSize: "2.2rem",
-    fontWeight: 900,
-    color: "#fff",
-  } as CSSProperties,
-
-  stepTitle: {
-    fontFamily: "'Playfair Display', serif",
-    fontSize: "1.35rem",
-    fontWeight: 700,
-    color: TEXT,
-    marginBottom: "0.6rem",
-  } as CSSProperties,
-
-  stepDesc: {
-    fontSize: "0.95rem",
-    color: SUBTEXT,
-    lineHeight: 1.75,
-    maxWidth: 280,
-    margin: "0 auto",
-  } as CSSProperties,
-
-  ctaSection: {
-    padding: "90px 5vw",
-    background: `linear-gradient(135deg, ${ORANGE} 0%, #eb8500 100%)`,
-    textAlign: "center",
-    position: "relative",
-    overflow: "hidden",
-  } as CSSProperties,
-
-  ctaTitle: {
-    fontFamily: "'Playfair Display', serif",
-    fontSize: "clamp(2.2rem, 5vw, 3.8rem)",
-    fontWeight: 900,
-    color: "#fff",
-    marginBottom: "1rem",
-    lineHeight: 1.1,
-  } as CSSProperties,
-
-  ctaSub: {
-    fontSize: "1.1rem",
-    color: "rgba(255,255,255,0.9)",
-    maxWidth: 560,
-    margin: "0 auto 2.4rem",
-    lineHeight: 1.75,
-  } as CSSProperties,
-
-  btnCta: {
-    display: "inline-block",
-    padding: "16px 48px",
-    borderRadius: 16,
-    background: "#fff",
-    color: TEXT,
-    fontFamily: "'DM Sans', sans-serif",
-    fontSize: "1.08rem",
-    fontWeight: 700,
-    border: "none",
-    cursor: "pointer",
-    boxShadow: "0 12px 36px rgba(7,28,66,0.18)",
-    transition: "all 0.2s",
-    textDecoration: "none",
-  } as CSSProperties,
-
-  eyebrow: {
-    fontSize: "0.75rem",
-    fontWeight: 700,
-    letterSpacing: "0.18em",
-    textTransform: "uppercase",
-    color: ORANGE_DARK,
-    marginBottom: "1rem",
-  } as CSSProperties,
-
-  sectionTitle: {
-    fontFamily: "'Playfair Display', serif",
-    fontSize: "clamp(2rem, 4.5vw, 3.5rem)",
-    fontWeight: 900,
-    color: TEXT,
-    lineHeight: 1.1,
-    marginBottom: "1rem",
-  } as CSSProperties,
-
-  sectionSub: {
-    fontSize: "1.05rem",
-    color: SUBTEXT,
-    lineHeight: 1.8,
-    maxWidth: 620,
-    fontWeight: 300,
-    margin: "0 auto",
-  } as CSSProperties,
+type FloatingPaw = {
+  top?: string;
+  bottom?: string;
+  left?: string;
+  right?: string;
+  fontSize: number;
+  rotate: number;
+  opacity: number;
 };
+
+type FloatingAnimal = {
+  emoji: string;
+  top?: string;
+  bottom?: string;
+  left?: string;
+  right?: string;
+  fontSize: string;
+};
+
+const floatingPaws: FloatingPaw[] = [
+  { top: "12%", left: "6%", fontSize: 34, rotate: -18, opacity: 0.1 },
+  { top: "28%", right: "8%", fontSize: 42, rotate: 12, opacity: 0.08 },
+  { top: "58%", left: "10%", fontSize: 30, rotate: -10, opacity: 0.07 },
+  { bottom: "18%", right: "12%", fontSize: 38, rotate: 18, opacity: 0.09 },
+];
+
+const floatingAnimals: FloatingAnimal[] = [
+  { emoji: "🐶", top: "22%", right: "5%", fontSize: "4rem" },
+  { emoji: "🐱", bottom: "18%", left: "6%", fontSize: "3.6rem" },
+  { emoji: "🐰", top: "70%", right: "16%", fontSize: "3rem" },
+];
 
 export const PublicHome = () => {
   const [activeIndex, setActiveIndex] = useState<number>(0);
@@ -469,7 +140,7 @@ export const PublicHome = () => {
     const link = document.createElement("link");
     link.rel = "stylesheet";
     link.href =
-      "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap";
+      "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap";
     document.head.appendChild(link);
 
     return () => {
@@ -502,159 +173,316 @@ export const PublicHome = () => {
   };
 
   return (
-    <div style={styles.page}>
-      <div
-        style={styles.hero}
+    <Box
+      sx={{
+        minHeight: "100vh",
+        bgcolor: PAGE_BG,
+        fontFamily: "'DM Sans', sans-serif",
+        overflowX: "hidden",
+      }}
+    >
+      <GlobalStyles
+        styles={{
+          "*": { boxSizing: "border-box" },
+          body: { margin: 0 },
+        }}
+      />
+
+      {floatingPaws.map((paw, index) => (
+        <Box
+          key={index}
+          sx={{
+            position: "fixed",
+            zIndex: 0,
+            pointerEvents: "none",
+            color: `rgba(247,174,26,${paw.opacity})`,
+            fontSize: paw.fontSize,
+            transform: `rotate(${paw.rotate}deg)`,
+            animation: "floatPaw 6s ease-in-out infinite",
+            top: paw.top,
+            bottom: paw.bottom,
+            left: paw.left,
+            right: paw.right,
+          }}
+        >
+          🐾
+        </Box>
+      ))}
+
+      {floatingAnimals.map((animal, index) => (
+        <Box
+          key={index}
+          sx={{
+            position: "fixed",
+            zIndex: 0,
+            pointerEvents: "none",
+            filter: "drop-shadow(0 10px 20px rgba(7,28,66,0.15))",
+            animation: "floatAnimal 7s ease-in-out infinite",
+            top: animal.top,
+            bottom: animal.bottom,
+            left: animal.left,
+            right: animal.right,
+          }}
+        >
+          <Typography sx={{ fontSize: animal.fontSize }}>{animal.emoji}</Typography>
+        </Box>
+      ))}
+
+      <GlobalStyles
+        styles={{
+          "@keyframes floatPaw": {
+            "0%": { transform: "translateY(0px) rotate(0deg)" },
+            "50%": { transform: "translateY(-10px) rotate(6deg)" },
+            "100%": { transform: "translateY(0px) rotate(0deg)" },
+          },
+          "@keyframes floatAnimal": {
+            "0%": { transform: "translateY(0px)" },
+            "50%": { transform: "translateY(-12px)" },
+            "100%": { transform: "translateY(0px)" },
+          },
+        }}
+      />
+
+      <Box
+        component="section"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
+        sx={{ position: "relative", height: "100vh", minHeight: 640, overflow: "hidden" }}
       >
-        {heroSlides.map((slide, i) => (
-          <div
-            key={i}
-            style={{
-              ...styles.slide(activeIndex === i),
-              backgroundImage: `url(${slide.url})`,
-            }}
-          />
-        ))}
+        {heroSlides.map((slide, i) => {
+          const active = activeIndex === i;
 
-        <div style={styles.heroOverlay} />
-
-        <div style={styles.heroContent}>
-          <div style={styles.heroBadge}>
-            <span
-              style={{
-                width: 6,
-                height: 6,
-                borderRadius: "50%",
-                background: ORANGE,
-                display: "inline-block",
+          return (
+            <Box
+              key={slide.label}
+              aria-hidden={!active}
+              sx={{
+                position: "absolute",
+                inset: 0,
+                opacity: active ? 1 : 0,
+                backgroundImage: `url(${slide.url})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                transform: active ? "scale(1)" : "scale(1.04)",
+                transitionProperty: "opacity, transform",
+                transitionDuration: "1.2s, 7s",
+                transitionTimingFunction: "ease",
               }}
             />
-            The #1 platform for pet health
-          </div>
+          );
+        })}
 
-          <h1 style={styles.heroTitle}>
+        <Box
+          sx={{
+            position: "absolute",
+            inset: 0,
+            zIndex: 1,
+            background:
+              "linear-gradient(160deg, rgba(7,28,66,0.55) 0%, rgba(7,28,66,0.28) 60%, rgba(247,174,26,0.08) 100%)",
+          }}
+        />
+
+        <Stack
+          alignItems="center"
+          justifyContent="center"
+          sx={{ position: "relative", zIndex: 2, height: "100%", px: 2, textAlign: "center" }}
+        >
+          <Stack
+            direction="row"
+            alignItems="center"
+            spacing={1}
+            sx={{
+              bgcolor: "rgba(247,174,26,0.18)",
+              border: "1px solid rgba(247,174,26,0.5)",
+              borderRadius: 999,
+              px: "18px",
+              py: "6px",
+              mb: "1.6rem",
+              color: ORANGE,
+              fontSize: "0.8rem",
+              fontWeight: 600,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
+            }}
+          >
+            <Box component="span" sx={{ width: 6, height: 6, borderRadius: "50%", bgcolor: ORANGE }} />
+            <Box component="span">The #1 platform for pet health</Box>
+          </Stack>
+
+          <Typography
+            component="h1"
+            sx={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: "clamp(2.8rem, 7vw, 6rem)",
+              fontWeight: 900,
+              lineHeight: 1,
+              color: "#fff",
+              letterSpacing: "-0.02em",
+              mb: "1.4rem",
+            }}
+          >
             Your pet’s health,
-            <span style={styles.heroTitleSpan}>All in one place</span>
-          </h1>
+            <Box component="span" sx={{ display: "block", color: ORANGE, fontStyle: "italic" }}>
+              All in one place
+            </Box>
+          </Typography>
 
-          <p style={styles.heroDesc}>
-            PawPoint is the complete pet management platform — track medical
-            records, schedule vet appointments, and never miss an important date.
-          </p>
+          <Box
+            sx={{
+              bgcolor: "rgba(255,255,255,0.08)",
+              backdropFilter: "blur(14px)",
+              WebkitBackdropFilter: "blur(14px)",
+              border: "1px solid rgba(255,255,255,0.18)",
+              borderRadius: 6,
+              px: { xs: 2.5, sm: 4 },
+              py: { xs: 2, sm: 2.3 },
+              maxWidth: 760,
+              boxShadow: "0 8px 32px rgba(0,0,0,0.18)",
+              mb: "2.4rem",
+            }}
+          >
+            <Typography sx={{ fontSize: "clamp(1rem, 2vw, 1.25rem)", color: "rgba(255,255,255,0.9)", lineHeight: 1.8, fontWeight: 300 }}>
+              PawPoint is the complete pet management platform — track medical records, schedule vet appointments, and never miss an important date.
+            </Typography>
+          </Box>
 
-          <div style={styles.heroBtns}>
-            <RouterLink to="/register" style={styles.btnPrimary}>
+          <Stack direction="row" useFlexGap flexWrap="wrap" justifyContent="center" spacing={1.5} sx={{ mb: "3rem" }}>
+            <Button component={RouterLink} to="/register" disableElevation sx={{ px: "36px", py: "14px", borderRadius: "14px", bgcolor: ORANGE, color: TEXT, fontFamily: "'DM Sans', sans-serif", fontSize: "1rem", fontWeight: 700, lineHeight: 1.2, textTransform: "none", boxShadow: "0 8px 28px rgba(247,174,26,0.42)", textDecoration: "none", "&:hover": { bgcolor: ORANGE, transform: "translateY(-1px)", boxShadow: "0 12px 32px rgba(247,174,26,0.48)" } }}>
               Create free account →
-            </RouterLink>
+            </Button>
 
-            <RouterLink to="/login" style={styles.btnOutline}>
+            <Button component={RouterLink} to="/login" disableElevation sx={{ px: "36px", py: "14px", borderRadius: "14px", bgcolor: "rgba(255,255,255,0.08)", color: "#fff", fontFamily: "'DM Sans', sans-serif", fontSize: "1rem", fontWeight: 600, lineHeight: 1.2, border: "1px solid rgba(255,255,255,0.4)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", textTransform: "none", textDecoration: "none", "&:hover": { bgcolor: "rgba(255,255,255,0.14)", transform: "translateY(-1px)", border: "1px solid rgba(255,255,255,0.55)" } }}>
               Sign in
-            </RouterLink>
-          </div>
+            </Button>
+          </Stack>
 
-          <div style={styles.dots}>
-            {heroSlides.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                style={styles.dot(activeIndex === i)}
-                onClick={() => goTo(i)}
-              />
-            ))}
-          </div>
-        </div>
+          <Stack direction="row" spacing={1} alignItems="center" justifyContent="center">
+            {heroSlides.map((_, i) => {
+              const active = activeIndex === i;
+              return (
+                <Box key={i} component="button" type="button" aria-label={`Go to slide ${i + 1}`} onClick={() => goTo(i)} sx={{ width: active ? 28 : 8, height: 8, borderRadius: 999, bgcolor: active ? ORANGE : "rgba(255,255,255,0.45)", cursor: "pointer", transition: "all 0.3s", border: "none", p: 0 }} />
+              );
+            })}
+          </Stack>
+        </Stack>
 
-        <div style={styles.slideLabel(showLabel)}>
+        <Box sx={{ position: "absolute", bottom: "2.2rem", left: "50%", transform: "translateX(-50%)", zIndex: 3, bgcolor: "rgba(7,28,66,0.52)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.18)", borderRadius: "12px", px: "22px", py: "10px", color: "rgba(255,255,255,0.9)", fontSize: "0.85rem", fontWeight: 500, letterSpacing: "0.05em", opacity: showLabel ? 1 : 0, transition: "opacity 0.5s", pointerEvents: "none", whiteSpace: "nowrap" }}>
           {heroSlides[activeIndex].label}
-        </div>
-      </div>
+        </Box>
+      </Box>
 
-      <section style={styles.featuresSection}>
-        <div style={styles.featuresHeader}>
-          <div style={styles.eyebrow}>Features</div>
-          <div style={styles.sectionTitle}>
+      <Box component="section" sx={{ py: { xs: "72px", md: "100px" }, px: "5vw", bgcolor: PAGE_BG, position: "relative", overflow: "hidden" }}>
+        <Box sx={{ position: "absolute", width: 260, height: 260, borderRadius: "50%", bgcolor: "rgba(247,174,26,0.16)", filter: "blur(8px)", top: -90, right: -80 }} />
+
+        <Box sx={{ textAlign: "center", mb: "3.5rem", position: "relative", zIndex: 1 }}>
+          <Typography sx={{ fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: ORANGE_DARK, mb: "1rem" }}>
+            Features
+          </Typography>
+          <Typography sx={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(2rem, 4.5vw, 3.5rem)", fontWeight: 900, color: TEXT, lineHeight: 1.1, mb: "1rem" }}>
             Everything you need for pet care
-          </div>
-          <p style={styles.sectionSub}>
+          </Typography>
+          <Typography sx={{ fontSize: "1.05rem", color: SUBTEXT, lineHeight: 1.8, maxWidth: 620, fontWeight: 300, mx: "auto" }}>
             Complete tools to manage your pet’s health and well-being
-          </p>
-        </div>
+          </Typography>
+        </Box>
 
-        <div style={styles.featuresGrid}>
-          {features.map((feature) => (
-            <div key={feature.title} style={styles.featureCard}>
-              <div style={styles.featureIcon}>{feature.icon}</div>
-              <div style={styles.featureTitle}>{feature.title}</div>
-              <p style={styles.featureDesc}>{feature.description}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+        <Container maxWidth="lg" disableGutters sx={{ position: "relative", zIndex: 1 }}>
+          <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "1.5rem" }}>
+            {features.map((feature) => (
+              <Card key={feature.title} elevation={0} sx={{ height: "100%", bgcolor: "rgba(255,255,255,0.84)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: `1px solid ${BORDER}`, borderRadius: 7, transition: "transform 0.25s, box-shadow 0.25s, border-color 0.25s", cursor: "default", overflow: "hidden", position: "relative", "&::before": { content: '""', position: "absolute", inset: "0 0 auto 0", height: 5, background: `linear-gradient(90deg, ${ORANGE} 0%, #eb8500 100%)` }, "&:hover": { transform: "translateY(-8px)", boxShadow: "0 24px 54px rgba(7,28,66,0.12)", borderColor: "rgba(247,174,26,0.65)" } }}>
+                <CardContent sx={{ p: "2.2rem", "&:last-child": { pb: "2.2rem" } }}>
+                  <Box sx={{ width: 62, height: 62, borderRadius: "20px", background: `linear-gradient(135deg, ${ORANGE} 0%, #eb8500 100%)`, display: "flex", alignItems: "center", justifyContent: "center", mb: "1.4rem", fontSize: "1.55rem", boxShadow: "0 14px 30px rgba(247,174,26,0.28)" }}>
+                    {feature.icon}
+                  </Box>
+                  <Typography sx={{ fontFamily: "'Playfair Display', serif", fontSize: "1.4rem", fontWeight: 700, color: TEXT, mb: "0.7rem" }}>
+                    {feature.title}
+                  </Typography>
+                  <Typography sx={{ fontSize: "0.97rem", color: SUBTEXT, lineHeight: 1.75 }}>
+                    {feature.description}
+                  </Typography>
+                </CardContent>
+              </Card>
+            ))}
+          </Box>
+        </Container>
+      </Box>
 
-      <section style={styles.statsSection}>
-        <div style={styles.statsGrid}>
-          <div>
-            <div style={styles.statNum}>10,000+</div>
-            <div style={styles.statLabel}>Happy pet owners</div>
-          </div>
-          <div>
-            <div style={styles.statNum}>25,000+</div>
-            <div style={styles.statLabel}>Pets managed</div>
-          </div>
-          <div>
-            <div style={styles.statNum}>50,000+</div>
-            <div style={styles.statLabel}>Appointments scheduled</div>
-          </div>
-        </div>
-      </section>
+      <Box component="section" sx={{ py: { xs: "72px", md: "100px" }, px: "5vw", background: "linear-gradient(110deg, #071c42 0%, #0e2d5e 58%, #1a3a6e 100%)", position: "relative", overflow: "hidden" }}>
+        <Box sx={{ position: "absolute", inset: 0, background: "radial-gradient(circle at 20% 20%, rgba(247,174,26,0.18), transparent 28%), radial-gradient(circle at 88% 55%, rgba(255,255,255,0.09), transparent 24%)" }} />
+        <Container maxWidth="lg" disableGutters>
+          <Box sx={{ position: "relative", zIndex: 1, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1.2rem", textAlign: "center" }}>
+            {[["10,000+", "Happy pet owners"], ["25,000+", "Pets managed"], ["50,000+", "Appointments scheduled"]].map(([num, label]) => (
+              <Box key={label} sx={{ p: { xs: 3, md: 4 }, borderRadius: 7, bgcolor: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.14)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}>
+                <Typography sx={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(2.4rem, 5vw, 4rem)", fontWeight: 900, color: ORANGE, lineHeight: 1, mb: "0.5rem" }}>
+                  {num}
+                </Typography>
+                <Typography sx={{ fontSize: "1rem", color: "rgba(255,255,255,0.78)", fontWeight: 300 }}>
+                  {label}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        </Container>
+      </Box>
 
-      <section style={styles.howSection}>
-        <div style={styles.howHeader}>
-          <div style={styles.eyebrow}>How it works</div>
-          <div style={{ ...styles.sectionTitle, textAlign: "center" }}>
+      <Box component="section" sx={{ py: { xs: "72px", md: "105px" }, px: "5vw", bgcolor: PAGE_BG, position: "relative", overflow: "hidden" }}>
+        <Box sx={{ position: "absolute", width: 340, height: 340, borderRadius: "50%", bgcolor: "rgba(7,28,66,0.06)", left: -140, bottom: -140 }} />
+        <Box sx={{ textAlign: "center", mb: "3.5rem", position: "relative", zIndex: 1 }}>
+          <Typography sx={{ fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: ORANGE_DARK, mb: "1rem" }}>
+            How it works
+          </Typography>
+          <Typography sx={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(2rem, 4.5vw, 3.5rem)", fontWeight: 900, color: TEXT, lineHeight: 1.1, mb: "1rem", textAlign: "center" }}>
             Three simple steps to get started
-          </div>
-        </div>
+          </Typography>
+        </Box>
 
-        <div style={styles.stepsGrid}>
-          {steps.map((step) => (
-            <div
-              key={step.number}
-              style={{ textAlign: "center", position: "relative", zIndex: 1 }}
-            >
-              <div style={styles.stepCircle}>
-                <span style={styles.stepNum}>{step.number}</span>
-              </div>
-              <div style={styles.stepTitle}>{step.title}</div>
-              <p style={styles.stepDesc}>{step.description}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+        <Container maxWidth="lg" disableGutters sx={{ position: "relative", zIndex: 1 }}>
+          <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "1.5rem", position: "relative" }}>
+            {steps.map((step) => (
+              <Card key={step.number} elevation={0} sx={{ textAlign: "center", borderRadius: 7, bgcolor: "rgba(255,255,255,0.82)", border: `1px solid ${BORDER}`, backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", boxShadow: "0 16px 42px rgba(7,28,66,0.06)" }}>
+                <CardContent sx={{ p: { xs: 3, md: 4 }, "&:last-child": { pb: { xs: 3, md: 4 } } }}>
+                  <Box sx={{ width: 88, height: 88, borderRadius: "50%", background: `linear-gradient(135deg, ${ORANGE} 0%, #eb8500 100%)`, display: "flex", alignItems: "center", justifyContent: "center", mx: "auto", mb: "1.4rem", boxShadow: "0 16px 36px rgba(247,174,26,0.28)", outline: "8px solid rgba(247,174,26,0.13)" }}>
+                    <Typography component="span" sx={{ fontFamily: "'Playfair Display', serif", fontSize: "2.2rem", fontWeight: 900, color: "#fff" }}>
+                      {step.number}
+                    </Typography>
+                  </Box>
+                  <Typography sx={{ fontFamily: "'Playfair Display', serif", fontSize: "1.35rem", fontWeight: 700, color: TEXT, mb: "0.6rem" }}>
+                    {step.title}
+                  </Typography>
+                  <Typography sx={{ fontSize: "0.95rem", color: SUBTEXT, lineHeight: 1.75, maxWidth: 280, mx: "auto" }}>
+                    {step.description}
+                  </Typography>
+                </CardContent>
+              </Card>
+            ))}
+          </Box>
+        </Container>
+      </Box>
 
-      <section style={styles.ctaSection}>
-        <div style={{ position: "relative", zIndex: 1 }}>
-          <div style={{ ...styles.eyebrow, color: "rgba(255,255,255,0.7)" }}>
-            Ready to get started?
-          </div>
-
-          <div style={styles.ctaTitle}>
-            Join thousands of owners
-            <br />
-            who chose PawPoint
-          </div>
-
-          <p style={styles.ctaSub}>
-            The complete platform for managing your pet’s health — free forever.
-          </p>
-
-          <RouterLink to="/register" style={styles.btnCta}>
-            Create free account →
-          </RouterLink>
-        </div>
-      </section>
-    </div>
+      <Box component="section" sx={{ py: { xs: "78px", md: "110px" }, px: "5vw", background: `linear-gradient(135deg, ${ORANGE} 0%, #eb8500 100%)`, textAlign: "center", position: "relative", overflow: "hidden" }}>
+        <Box sx={{ position: "absolute", width: 420, height: 420, borderRadius: "50%", bgcolor: "rgba(255,255,255,0.16)", top: -190, left: -120 }} />
+        <Box sx={{ position: "absolute", width: 300, height: 300, borderRadius: "50%", bgcolor: "rgba(7,28,66,0.12)", right: -110, bottom: -130 }} />
+        <Container maxWidth="md" disableGutters sx={{ position: "relative", zIndex: 1 }}>
+          <Box sx={{ p: { xs: 3, sm: 5, md: 6 }, borderRadius: 8, bgcolor: "rgba(255,255,255,0.14)", border: "1px solid rgba(255,255,255,0.28)", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)", boxShadow: "0 28px 70px rgba(7,28,66,0.16)" }}>
+            <Typography sx={{ fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(255,255,255,0.78)", mb: "1rem" }}>
+              Ready to get started?
+            </Typography>
+            <Typography sx={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(2.2rem, 5vw, 3.8rem)", fontWeight: 900, color: "#fff", mb: "1rem", lineHeight: 1.1 }}>
+              Join thousands of owners
+              <br />
+              who chose PawPoint
+            </Typography>
+            <Typography sx={{ fontSize: "1.1rem", color: "rgba(255,255,255,0.92)", maxWidth: 560, mx: "auto", mb: "2.4rem", lineHeight: 1.75 }}>
+              The complete platform for managing your pet’s health — free forever.
+            </Typography>
+            <Button component={RouterLink} to="/register" disableElevation sx={{ display: "inline-flex", px: "48px", py: "16px", borderRadius: "16px", bgcolor: "#fff", color: TEXT, fontFamily: "'DM Sans', sans-serif", fontSize: "1.08rem", fontWeight: 700, lineHeight: 1.2, boxShadow: "0 12px 36px rgba(7,28,66,0.18)", textTransform: "none", textDecoration: "none", "&:hover": { bgcolor: "#fff", transform: "translateY(-1px)", boxShadow: "0 16px 42px rgba(7,28,66,0.22)" } }}>
+              Create free account →
+            </Button>
+          </Box>
+        </Container>
+      </Box>
+    </Box>
   );
 };

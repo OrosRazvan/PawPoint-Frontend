@@ -2,6 +2,7 @@
   "title": "Settings",
   "appearance": "Appearance",
   "theme": "Theme",
+  "currency": "Currency",
   "themeSubtitle": "Choose your preferred color scheme",
   "textSize": "Text Size",
   "small": "Small",

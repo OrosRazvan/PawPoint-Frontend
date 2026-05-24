@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import {
   Dialog,
@@ -33,13 +33,14 @@ import { useVetAvailability } from "../../../hooks/useVetAvailability";
 import { useServicePrice } from "../../../hooks/useServicePrice";
 import { useSettings } from "../../../hooks/useSettings";
 import { scaleFont } from "../../../utils/fontScale";
+import { formatConvertedPrice } from "../../../utils/price";
 
 import {
   VaccineTypeLabels,
   type VaccinationDto,
   type VaccinationFormValues,
+  type VetAvailabilitySlotDto,
 } from "../types/vaccination";
-import { formatConvertedPrice } from "../../../utils/price";
 
 type Props = {
   open: boolean;
@@ -47,6 +48,8 @@ type Props = {
 };
 
 type AppDateFormat = "DD/MM/YYYY" | "MM/DD/YYYY" | "YYYY-MM-DD";
+
+const LAST_USED_CABINET_KEY = "vaccination:lastUsedCabinetId";
 
 const toDateOnly = (value: Date) => value.toISOString().split("T")[0];
 
@@ -100,16 +103,17 @@ const getComparableDate = (item: VaccinationDto) => {
   return Number.isNaN(date.getTime()) ? 0 : date.getTime();
 };
 
-const formatCurrency = (currency?: number) => {
-  return currency === 2 ? "RON" : "EUR";
-};
-
 export const AddVaccinationDialog = ({ open, onClose }: Props) => {
   const { t, i18n } = useTranslation(["vaccination"]);
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
   const createVaccinationMutation = useCreateVaccination();
   const { data: settings } = useSettings();
+
+  const [lastUsedCabinetId, setLastUsedCabinetId] = useState<number | "">(() => {
+    const saved = localStorage.getItem(LAST_USED_CABINET_KEY);
+    return saved ? Number(saved) : "";
+  });
 
   const locale = i18n.language === "ro" ? "ro-RO" : "en-GB";
   const dateFormat: AppDateFormat = settings?.dateFormat ?? "DD/MM/YYYY";
@@ -120,6 +124,150 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
       label,
     })
   );
+
+  const { data: animals = [] } = useQuery({
+    queryKey: ["animals"],
+    queryFn: getAnimals,
+    enabled: open,
+  });
+
+  const { data: cabinets = [] } = useVetCabinets(open);
+  const { data: vaccinations = [] } = useVaccinations();
+
+  const { control, handleSubmit, reset, setValue } =
+    useForm<VaccinationFormValues>({
+      defaultValues: {
+        animalId: "",
+        vaccineType: "",
+        vetCabinetId: "",
+        visitDate: "",
+        vetTimeSlotId: "",
+        lastDate: "",
+        nextDate: "",
+        notes: "",
+      },
+    });
+
+  useEffect(() => {
+    if (!open) return;
+
+    reset({
+      animalId: "",
+      vaccineType: "",
+      vetCabinetId: lastUsedCabinetId || "",
+      visitDate: "",
+      vetTimeSlotId: "",
+      lastDate: "",
+      nextDate: "",
+      notes: "",
+    });
+  }, [open, lastUsedCabinetId, reset]);
+
+  const selectedAnimalId = useWatch({ control, name: "animalId" });
+  const selectedVaccineType = useWatch({ control, name: "vaccineType" });
+  const selectedCabinetId = useWatch({ control, name: "vetCabinetId" });
+  const selectedVisitDate = useWatch({ control, name: "visitDate" });
+  const currentLastDate = useWatch({ control, name: "lastDate" });
+  const currentNextDate = useWatch({ control, name: "nextDate" });
+
+  const { data: servicePrice } = useServicePrice({
+    vetCabinetId: selectedCabinetId,
+    serviceType: "Vaccination",
+    vaccineType: selectedVaccineType,
+    enabled: open,
+  });
+
+  const availabilityFrom = useMemo(() => {
+    if (selectedVisitDate) return selectedVisitDate;
+    return toDateOnly(new Date());
+  }, [selectedVisitDate]);
+
+  const availabilityTo = useMemo(() => {
+    const base = selectedVisitDate ? new Date(selectedVisitDate) : new Date();
+    base.setDate(base.getDate() + 1);
+    return toDateOnly(base);
+  }, [selectedVisitDate]);
+
+  const { data: slots = [] } = useVetAvailability({
+    vetCabinetId: selectedCabinetId ? Number(selectedCabinetId) : undefined,
+    from: availabilityFrom,
+    to: availabilityTo,
+    enabled: open && !!selectedCabinetId && !!selectedVisitDate,
+  }) as {
+    data: VetAvailabilitySlotDto[];
+  };
+
+  const bookedSlotIds = useMemo(() => {
+  return new Set(
+    vaccinations
+      .map((item) => Number(item.vetTimeSlotId))
+      .filter(Boolean)
+  );
+}, [vaccinations]);
+
+const availableSlots = useMemo(() => {
+  if (!Array.isArray(slots)) return [];
+
+  return slots.filter((slot) => {
+    const startTime = new Date(slot.startTimeUtc).getTime();
+
+    if (Number.isNaN(startTime)) return false;
+    if (startTime <= Date.now()) return false;
+
+    if (bookedSlotIds.has(Number(slot.id))) return false;
+
+    if (
+      typeof slot.capacity === "number" &&
+      typeof slot.bookedCount === "number"
+    ) {
+      return slot.bookedCount < slot.capacity;
+    }
+
+    return true;
+  });
+}, [slots, bookedSlotIds]);
+
+  const matchingPreviousVaccination = useMemo(() => {
+    if (!selectedAnimalId || !selectedVaccineType) return null;
+
+    const filtered = vaccinations
+      .filter(
+        (item) =>
+          item.animalId === Number(selectedAnimalId) &&
+          Number(item.vaccineType) === Number(selectedVaccineType)
+      )
+      .sort((a, b) => getComparableDate(b) - getComparableDate(a));
+
+    return filtered[0] ?? null;
+  }, [vaccinations, selectedAnimalId, selectedVaccineType]);
+
+  useEffect(() => {
+    if (!open || !matchingPreviousVaccination) return;
+
+    if (!currentLastDate) {
+      setValue(
+        "lastDate",
+        matchingPreviousVaccination.lastDate
+          ? matchingPreviousVaccination.lastDate.split("T")[0]
+          : ""
+      );
+    }
+
+    if (!currentNextDate) {
+      setValue(
+        "nextDate",
+        matchingPreviousVaccination.nextDate
+          ? matchingPreviousVaccination.nextDate.split("T")[0]
+          : ""
+      );
+    }
+  }, [
+    open,
+    matchingPreviousVaccination,
+    currentLastDate,
+    currentNextDate,
+    setValue,
+  ]);
 
   const fieldSx = (theme: any) => ({
     "& .MuiOutlinedInput-root": {
@@ -159,108 +307,6 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
     mb: 0.75,
   });
 
-  const { data: animals = [] } = useQuery({
-    queryKey: ["animals"],
-    queryFn: getAnimals,
-    enabled: open,
-  });
-
-  const { data: cabinets = [] } = useVetCabinets(open);
-  const { data: vaccinations = [] } = useVaccinations();
-
-  const { control, handleSubmit, reset, setValue } =
-    useForm<VaccinationFormValues>({
-      defaultValues: {
-        animalId: "",
-        vaccineType: "",
-        vetCabinetId: "",
-        visitDate: "",
-        vetTimeSlotId: "",
-        lastDate: "",
-        nextDate: "",
-      },
-    });
-
-  const selectedAnimalId = useWatch({ control, name: "animalId" });
-  const selectedVaccineType = useWatch({ control, name: "vaccineType" });
-  const selectedCabinetId = useWatch({ control, name: "vetCabinetId" });
-  const selectedVisitDate = useWatch({ control, name: "visitDate" });
-  const currentLastDate = useWatch({ control, name: "lastDate" });
-  const currentNextDate = useWatch({ control, name: "nextDate" });
-
-  const { data: servicePrice } = useServicePrice({
-    vetCabinetId: selectedCabinetId,
-    serviceType: "Vaccination",
-    vaccineType: selectedVaccineType,
-    enabled: open,
-  });
-
-  const availabilityFrom = useMemo(() => {
-    if (selectedVisitDate) return selectedVisitDate;
-    return toDateOnly(new Date());
-  }, [selectedVisitDate]);
-
-  const availabilityTo = useMemo(() => {
-    const base = selectedVisitDate ? new Date(selectedVisitDate) : new Date();
-    base.setDate(base.getDate() + 1);
-    return toDateOnly(base);
-  }, [selectedVisitDate]);
-
-  const { data: slots = [] } = useVetAvailability({
-    vetCabinetId:
-      typeof selectedCabinetId === "number"
-        ? selectedCabinetId
-        : selectedCabinetId
-        ? Number(selectedCabinetId)
-        : undefined,
-    from: availabilityFrom,
-    to: availabilityTo,
-    enabled: open && !!selectedCabinetId && !!selectedVisitDate,
-  });
-
-  const matchingPreviousVaccination = useMemo(() => {
-    if (!selectedAnimalId || !selectedVaccineType) return null;
-
-    const filtered = vaccinations
-      .filter(
-        (item) =>
-          item.animalId === Number(selectedAnimalId) &&
-          Number(item.vaccineType) === Number(selectedVaccineType)
-      )
-      .sort((a, b) => getComparableDate(b) - getComparableDate(a));
-
-    return filtered[0] ?? null;
-  }, [vaccinations, selectedAnimalId, selectedVaccineType]);
-
-  useEffect(() => {
-    if (!open) return;
-    if (!matchingPreviousVaccination) return;
-
-    if (!currentLastDate) {
-      setValue(
-        "lastDate",
-        matchingPreviousVaccination.lastDate
-          ? matchingPreviousVaccination.lastDate.split("T")[0]
-          : ""
-      );
-    }
-
-    if (!currentNextDate) {
-      setValue(
-        "nextDate",
-        matchingPreviousVaccination.nextDate
-          ? matchingPreviousVaccination.nextDate.split("T")[0]
-          : ""
-      );
-    }
-  }, [
-    open,
-    matchingPreviousVaccination,
-    currentLastDate,
-    currentNextDate,
-    setValue,
-  ]);
-
   const onSubmit: SubmitHandler<VaccinationFormValues> = (values) => {
     if (
       !values.animalId ||
@@ -271,11 +317,13 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
       return;
     }
 
+    const cabinetId = Number(values.vetCabinetId);
+
     createVaccinationMutation.mutate(
       {
         animalId: Number(values.animalId),
         vaccineType: Number(values.vaccineType),
-        vetCabinetId: Number(values.vetCabinetId),
+        vetCabinetId: cabinetId,
         vetTimeSlotId: Number(values.vetTimeSlotId),
         lastDate: values.lastDate
           ? `${values.lastDate}T00:00:00.000Z`
@@ -283,6 +331,7 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
         nextDate: values.nextDate
           ? `${values.nextDate}T00:00:00.000Z`
           : undefined,
+        notes: values.notes || undefined,
       },
       {
         onSuccess: () => {
@@ -290,10 +339,27 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
             variant: "success",
           });
 
+          setLastUsedCabinetId(cabinetId);
+          localStorage.setItem(LAST_USED_CABINET_KEY, String(cabinetId));
+
           queryClient.invalidateQueries({ queryKey: ["vaccinations"] });
           queryClient.invalidateQueries({ queryKey: ["dashboardData"] });
+          queryClient.invalidateQueries({ queryKey: ["vetAvailability"] });
+          queryClient.invalidateQueries({
+            queryKey: ["vaccinationAvailability"],
+          });
 
-          reset();
+          reset({
+            animalId: "",
+            vaccineType: "",
+            vetCabinetId: cabinetId,
+            visitDate: "",
+            vetTimeSlotId: "",
+            lastDate: "",
+            nextDate: "",
+            notes: "",
+          });
+
           onClose();
         },
         onError: () => {
@@ -338,27 +404,9 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
                 : "linear-gradient(135deg, #fbf2ea 0%, #fdf7ef 100%)",
             position: "relative",
             overflow: "hidden",
-            "&::after": {
-              content: '""',
-              position: "absolute",
-              bottom: -24,
-              right: -24,
-              width: 100,
-              height: 100,
-              borderRadius: "50%",
-              background:
-                theme.palette.mode === "dark"
-                  ? alpha(theme.palette.primary.main, 0.1)
-                  : "rgba(245,166,35,0.08)",
-              pointerEvents: "none",
-            },
           })}
         >
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="flex-start"
-          >
+          <Stack direction="row" justifyContent="space-between">
             <Stack direction="row" spacing={2} alignItems="center">
               <Box
                 sx={{
@@ -372,7 +420,6 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
                     "linear-gradient(135deg, #f5a623 0%, #f0911a 100%)",
                   color: "#fff",
                   boxShadow: "0 4px 12px rgba(245,166,35,0.32)",
-                  flexShrink: 0,
                 }}
               >
                 <VaccinesRoundedIcon sx={{ fontSize: 22 }} />
@@ -384,8 +431,6 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
                     fontSize: scaleFont(19, settings?.textSize),
                     fontWeight: 800,
                     color: theme.palette.text.primary,
-                    lineHeight: 1.2,
-                    letterSpacing: "-0.3px",
                   })}
                 >
                   {t("vaccination:addDialogTitle")}
@@ -396,7 +441,6 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
                     fontSize: scaleFont(13, settings?.textSize),
                     color: theme.palette.text.secondary,
                     mt: 0.4,
-                    fontWeight: 400,
                   })}
                 >
                   {t("vaccination:addDialogSubtitle")}
@@ -404,28 +448,7 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
               </Box>
             </Stack>
 
-            <IconButton
-              onClick={onClose}
-              size="small"
-              sx={(theme) => ({
-                color: theme.palette.text.secondary,
-                backgroundColor:
-                  theme.palette.mode === "dark"
-                    ? alpha("#ffffff", 0.06)
-                    : "rgba(0,0,0,0.04)",
-                borderRadius: 2,
-                width: 32,
-                height: 32,
-                mt: 0.5,
-                "&:hover": {
-                  backgroundColor:
-                    theme.palette.mode === "dark"
-                      ? alpha("#ffffff", 0.1)
-                      : "rgba(0,0,0,0.08)",
-                  color: theme.palette.text.primary,
-                },
-              })}
-            >
+            <IconButton onClick={onClose} size="small">
               <CloseRoundedIcon sx={{ fontSize: 18 }} />
             </IconButton>
           </Stack>
@@ -477,7 +500,9 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
           </Box>
 
           <Box>
-            <Typography sx={labelSx}>{t("vaccination:vetCabinet")}</Typography>
+            <Typography sx={labelSx}>
+              {t("vaccination:vetCabinet")}
+            </Typography>
             <Controller
               name="vetCabinetId"
               control={control}
@@ -537,7 +562,6 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
                   fontSize: scaleFont(15, settings?.textSize),
                   fontWeight: 800,
                   color: theme.palette.primary.main,
-                  letterSpacing: "-0.2px",
                 })}
               >
                 {formatConvertedPrice(
@@ -551,7 +575,9 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
 
           <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
             <Box sx={{ flex: 1 }}>
-              <Typography sx={labelSx}>{t("vaccination:visitDate")}</Typography>
+              <Typography sx={labelSx}>
+                {t("vaccination:visitDate")}
+              </Typography>
               <Controller
                 name="visitDate"
                 control={control}
@@ -577,7 +603,9 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
             </Box>
 
             <Box sx={{ flex: 1 }}>
-              <Typography sx={labelSx}>{t("vaccination:timeSlot")}</Typography>
+              <Typography sx={labelSx}>
+                {t("vaccination:timeSlot")}
+              </Typography>
               <Controller
                 name="vetTimeSlotId"
                 control={control}
@@ -586,23 +614,21 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
                     <MenuItem value="" disabled>
                       {t("vaccination:selectTimeSlot")}
                     </MenuItem>
-                    {Array.isArray(slots) &&
-                      slots.map((slot) => (
-                        <MenuItem key={slot.id} value={slot.id}>
-                          {formatSlotLabel(
-                            slot.startTimeUtc,
-                            slot.endTimeUtc,
-                            dateFormat,
-                            locale
-                          )}
-                        </MenuItem>
-                      ))}
+                    {availableSlots.map((slot) => (
+                      <MenuItem key={slot.id} value={slot.id}>
+                        {formatSlotLabel(
+                          slot.startTimeUtc,
+                          slot.endTimeUtc,
+                          dateFormat,
+                          locale
+                        )}
+                      </MenuItem>
+                    ))}
                   </TextField>
                 )}
               />
 
-              {Array.isArray(slots) &&
-                slots.length === 0 &&
+              {availableSlots.length === 0 &&
                 selectedCabinetId &&
                 selectedVisitDate && (
                   <Typography
@@ -623,7 +649,9 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
 
           <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
             <Box sx={{ flex: 1 }}>
-              <Typography sx={labelSx}>{t("vaccination:lastDate")}</Typography>
+              <Typography sx={labelSx}>
+                {t("vaccination:lastDate")}
+              </Typography>
               <Controller
                 name="lastDate"
                 control={control}
@@ -634,7 +662,9 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
             </Box>
 
             <Box sx={{ flex: 1 }}>
-              <Typography sx={labelSx}>{t("vaccination:nextDate")}</Typography>
+              <Typography sx={labelSx}>
+                {t("vaccination:nextDate")}
+              </Typography>
               <Controller
                 name="nextDate"
                 control={control}
@@ -644,6 +674,23 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
               />
             </Box>
           </Stack>
+
+          <Box>
+            <Typography sx={labelSx}>{t("vaccination:notes")}</Typography>
+            <Controller
+              name="notes"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  multiline
+                  minRows={2}
+                  sx={fieldSx}
+                />
+              )}
+            />
+          </Box>
 
           <Divider sx={{ my: 0.5 }} />
 
@@ -664,11 +711,6 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
                 "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
               color: "#fff",
               boxShadow: "0 6px 16px rgba(245,166,35,0.28)",
-              "&:hover": {
-                background:
-                  "linear-gradient(135deg, #f0a020 0%, #e08510 100%)",
-                boxShadow: "0 8px 20px rgba(245,166,35,0.36)",
-              },
             }}
           >
             {t("vaccination:save")}

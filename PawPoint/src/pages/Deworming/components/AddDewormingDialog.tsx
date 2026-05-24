@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useDewormings } from "../../../hooks/useDewormings";
 import { LoadingButton } from "@mui/lab";
 import {
   Dialog,
@@ -95,6 +96,15 @@ export const AddDewormingDialog = ({ open, onClose }: Props) => {
   const createDewormingMutation = useCreateDeworming();
   const { data: settings } = useSettings();
 
+  const LAST_USED_CABINET_KEY = "deworming:lastUsedCabinetId";
+
+  const { data: dewormings = [] } = useDewormings();
+
+  const [lastUsedCabinetId, setLastUsedCabinetId] = useState<number | "">(() => {
+    const saved = localStorage.getItem(LAST_USED_CABINET_KEY);
+    return saved ? Number(saved) : "";
+  });
+
   const dateFormat: AppDateFormat = settings?.dateFormat ?? "DD/MM/YYYY";
   const locale = i18n.language === "ro" ? "ro-RO" : "en-GB";
 
@@ -116,6 +126,19 @@ export const AddDewormingDialog = ({ open, onClose }: Props) => {
         notes: "",
       },
     });
+
+    useEffect(() => {
+      if (!open) return;
+
+      reset({
+        animalId: "",
+        type: "",
+        vetCabinetId: lastUsedCabinetId || "",
+        visitDate: "",
+        vetTimeSlotId: "",
+        notes: "",
+      });
+    }, [open, lastUsedCabinetId, reset]);
 
   const selectedType = useWatch({ control, name: "type" });
   const selectedCabinetId = useWatch({ control, name: "vetCabinetId" });
@@ -200,6 +223,40 @@ export const AddDewormingDialog = ({ open, onClose }: Props) => {
     enabled: open && !!selectedCabinetId && !!selectedVisitDate,
   });
 
+  const bookedSlotIds = useMemo(() => {
+  return new Set(
+    dewormings
+      .map((item) => Number(item.vetTimeSlotId))
+      .filter(Boolean)
+  );
+}, [dewormings]);
+
+  const availableSlots = useMemo(() => {
+    if (!Array.isArray(slots)) return [];
+
+    return slots.filter((slot) => {
+      const startTime = new Date(slot.startTimeUtc).getTime();
+
+      if (Number.isNaN(startTime)) return false;
+      if (startTime <= Date.now()) return false;
+      if (bookedSlotIds.has(Number(slot.id))) return false;
+
+      const slotWithCapacity = slot as typeof slot & {
+        capacity?: number;
+        bookedCount?: number;
+      };
+
+      if (
+        typeof slotWithCapacity.capacity === "number" &&
+        typeof slotWithCapacity.bookedCount === "number"
+      ) {
+        return slotWithCapacity.bookedCount < slotWithCapacity.capacity;
+      }
+
+      return true;
+    });
+  }, [slots, bookedSlotIds]);
+
   const onSubmit: SubmitHandler<DewormingFormValues> = (values) => {
     if (
       !values.animalId ||
@@ -227,7 +284,24 @@ export const AddDewormingDialog = ({ open, onClose }: Props) => {
           queryClient.invalidateQueries({ queryKey: ["dewormings"] });
           queryClient.invalidateQueries({ queryKey: ["dashboardData"] });
 
-          reset();
+          const cabinetId = Number(values.vetCabinetId);
+
+          setLastUsedCabinetId(cabinetId);
+          localStorage.setItem(LAST_USED_CABINET_KEY, String(cabinetId));
+
+          queryClient.invalidateQueries({ queryKey: ["dewormings"] });
+          queryClient.invalidateQueries({ queryKey: ["dashboardData"] });
+          queryClient.invalidateQueries({ queryKey: ["dewormingAvailability"] });
+
+          reset({
+            animalId: "",
+            type: "",
+            vetCabinetId: cabinetId,
+            visitDate: "",
+            vetTimeSlotId: "",
+            notes: "",
+          });
+
           onClose();
         },
         onError: () => {
@@ -520,7 +594,7 @@ export const AddDewormingDialog = ({ open, onClose }: Props) => {
                     {t("deworming:selectTimeSlot")}
                   </MenuItem>
                   {Array.isArray(slots) &&
-                    slots.map((slot) => (
+                    availableSlots.map((slot) => (
                       <MenuItem key={slot.id} value={slot.id}>
                         {formatSlotLabel(
                           slot.startTimeUtc,

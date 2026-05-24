@@ -11,13 +11,19 @@ import VaccinesOutlinedIcon from "@mui/icons-material/VaccinesOutlined";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
 import ScheduleRoundedIcon from "@mui/icons-material/ScheduleRounded";
 import CheckIcon from "@mui/icons-material/Check";
+import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { alpha } from "@mui/material/styles";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 import { useVaccinations } from "../../hooks/useVaccinations";
 import { useSettings } from "../../hooks/useSettings";
 import { scaleFont } from "../../utils/fontScale";
+import { formatConvertedPrice } from "../../utils/price";
+import "../../utils/pdfFont";
+
 import { VaccinationCard } from "./components/VaccinationCard";
 import { AddVaccinationDialog } from "./components/AddVaccinationDialog";
 import { EditVaccinationDialog } from "./components/EditVaccinationDialog";
@@ -27,7 +33,11 @@ import {
   type CompletedFilterMonths,
 } from "../../components/CompletedPeriodFilter";
 import { filterCompletedByPeriod } from "../../utils/completedPeriodFilter";
-import type { VaccinationCardItem, VaccinationDto } from "./types/vaccination";
+import {
+  VaccineTypeLabels,
+  type VaccinationCardItem,
+  type VaccinationDto,
+} from "./types/vaccination";
 
 const pickFirst = <T,>(...values: T[]) => {
   for (const value of values) {
@@ -144,70 +154,33 @@ const mapVaccinations = (
         raw.ClinicName as string | undefined
       ) ?? "";
 
-    const notes =
-      pickFirst(
-        item.notes,
-        raw.Notes as string | undefined
-      ) ?? null;
+    const notes = pickFirst(item.notes, raw.Notes as string | undefined) ?? null;
 
     return {
       id: item.id,
-
       animalId: item.animalId,
       animalName,
-
       vaccineType,
-
       lastDate,
       nextDate,
-
       vetCabinetId: item.vetCabinetId,
-
-      vetCabinetName:
-        vetCabinetName ||
-        item.vetCabinetName ||
-        (raw.VetCabinetName as string | undefined) ||
-        "",
-
+      vetCabinetName,
       vetTimeSlotId: item.vetTimeSlotId,
-
-      slotStartTimeUtc:
-        slotStartTimeUtc ||
-        item.slotStartUtc ||
-        (raw.SlotStartUtc as string | undefined) ||
-        "",
-
-      slotEndTimeUtc:
-        slotEndTimeUtc ||
-        item.slotEndUtc ||
-        (raw.SlotEndUtc as string | undefined) ||
-        "",
-
-      price:
-        item.price ??
-        (raw.Price as number | undefined) ??
-        null,
-
-      currency:
-        item.currency ??
-        (raw.Currency as number | undefined),
-
+      slotStartTimeUtc,
+      slotEndTimeUtc,
+      price: item.price ?? (raw.Price as number | undefined) ?? null,
+      currency: item.currency ?? (raw.Currency as number | undefined),
       notes,
-
       status: resolveStatus({
         ...item,
-        slotStartTimeUtc:
-          slotStartTimeUtc ||
-          item.slotStartUtc ||
-          (raw.SlotStartUtc as string | undefined) ||
-          "",
+        slotStartTimeUtc,
       } as VaccinationDto),
     };
   });
 };
 
 export const Vaccinations = () => {
-  const { t } = useTranslation(["vaccination"]);
+  const { t, i18n } = useTranslation(["vaccination"]);
   const { data: settings } = useSettings();
 
   const { data = [], isLoading, isError } = useVaccinations();
@@ -220,6 +193,8 @@ export const Vaccinations = () => {
 
   const [completedFilterMonths, setCompletedFilterMonths] =
     useState<CompletedFilterMonths>(3);
+
+  const locale = i18n.language === "ro" ? "ro-RO" : "en-GB";
 
   const items: VaccinationCardItem[] = useMemo(
     () => mapVaccinations(data, t) as VaccinationCardItem[],
@@ -240,6 +215,130 @@ export const Vaccinations = () => {
     () => filterCompletedByPeriod(completedItems, completedFilterMonths),
     [completedItems, completedFilterMonths]
   );
+
+  const downloadVaccinationReport = () => {
+    const doc = new jsPDF();
+
+    const total = filteredCompletedItems.reduce(
+      (sum, item) => sum + (item.price ?? 0),
+      0
+    );
+
+    const reportDate = new Date().toLocaleDateString(locale);
+
+    doc.setFillColor(245, 166, 35);
+    doc.rect(0, 0, 210, 34, "F");
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("Roboto-Regular", "normal");
+    doc.setFontSize(26);
+    doc.text("PawPoint", 14, 21);
+
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(18);
+    doc.text("Raport vaccinări finalizate", 14, 48);
+
+    doc.setFontSize(11);
+    doc.text(`Perioadă: ultimele ${completedFilterMonths} luni`, 14, 58);
+    doc.text(`Generat la: ${reportDate}`, 14, 65);
+    doc.text(`Total vaccinări: ${filteredCompletedItems.length}`, 14, 72);
+
+    autoTable(doc, {
+      startY: 82,
+      theme: "grid",
+      head: [
+        [
+          "Animal",
+          "Vaccin",
+          "Data",
+          "Veterinar",
+          "Interval",
+          "Preț",
+          "Observații",
+        ],
+      ],
+      body: filteredCompletedItems.map((item) => {
+        const dateSource = item.lastDate || item.slotStartTimeUtc;
+        const date = dateSource
+          ? new Date(dateSource).toLocaleDateString(locale)
+          : "—";
+
+        const start = item.slotStartTimeUtc
+          ? new Date(item.slotStartTimeUtc).toLocaleTimeString(locale, {
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+          : "—";
+
+        const end = item.slotEndTimeUtc
+          ? new Date(item.slotEndTimeUtc).toLocaleTimeString(locale, {
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+          : "—";
+
+        return [
+          item.animalName || "—",
+          typeof item.vaccineType === "number"
+            ? VaccineTypeLabels[item.vaccineType]
+            : item.vaccineType || "—",
+          date,
+          item.vetCabinetName || "—",
+          `${start} - ${end}`,
+          item.price != null
+            ? formatConvertedPrice(
+                item.price,
+                item.currency,
+                settings?.currency ?? "EUR"
+              )
+            : "—",
+          item.notes || "—",
+        ];
+      }),
+      styles: {
+        font: "Roboto-Regular",
+        fontSize: 9,
+        cellPadding: 3,
+        textColor: [40, 40, 40],
+        lineColor: [230, 230, 230],
+        lineWidth: 0.3,
+      },
+      headStyles: {
+        fillColor: [245, 166, 35],
+        textColor: [255, 255, 255],
+        fontStyle: "bold",
+      },
+      alternateRowStyles: {
+        fillColor: [250, 250, 250],
+      },
+    });
+
+    const finalY =
+      (doc as jsPDF & { lastAutoTable?: { finalY: number } }).lastAutoTable
+        ?.finalY ?? 120;
+
+    doc.setFillColor(7, 28, 66);
+    doc.roundedRect(14, finalY + 12, 100, 17, 3, 3, "F");
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("Roboto-Regular", "normal");
+    doc.setFontSize(12);
+    doc.text(
+      `Cost total: ${total.toFixed(2)} ${settings?.currency ?? "EUR"}`,
+      18,
+      finalY + 23
+    );
+
+    doc.setTextColor(120, 120, 120);
+    doc.setFontSize(9);
+    doc.text(
+      "Raport generat automat de PawPoint.",
+      14,
+      finalY + 42
+    );
+
+    doc.save(`pawpoint-vaccinari-${completedFilterMonths}-luni.pdf`);
+  };
 
   return (
     <Box
@@ -486,11 +585,53 @@ export const Vaccinations = () => {
                     </Box>
                   </Stack>
 
-                  <CompletedPeriodFilter
-                    value={completedFilterMonths}
-                    onChange={setCompletedFilterMonths}
-                    namespace="vaccination"
-                  />
+                  <Stack
+                    direction="row"
+                    spacing={1.5}
+                    alignItems="center"
+                    flexWrap="wrap"
+                    useFlexGap
+                  >
+                    <Button
+                      startIcon={<DownloadRoundedIcon />}
+                      disabled={filteredCompletedItems.length === 0}
+                      onClick={downloadVaccinationReport}
+                      sx={(theme) => ({
+                        px: 2,
+                        py: 0.9,
+                        borderRadius: 999,
+                        textTransform: "none",
+                        fontWeight: 700,
+                        fontSize: scaleFont(13, settings?.textSize),
+                        color: theme.palette.success.main,
+                        backgroundColor:
+                          theme.palette.mode === "dark"
+                            ? alpha(theme.palette.success.main, 0.14)
+                            : "#dff4f1",
+                        border: `1px solid ${alpha(
+                          theme.palette.success.main,
+                          0.18
+                        )}`,
+                        "&:hover": {
+                          backgroundColor:
+                            theme.palette.mode === "dark"
+                              ? alpha(theme.palette.success.main, 0.22)
+                              : "#d2efeb",
+                        },
+                        "&.Mui-disabled": {
+                          opacity: 0.55,
+                        },
+                      })}
+                    >
+                      Descarcă raport
+                    </Button>
+
+                    <CompletedPeriodFilter
+                      value={completedFilterMonths}
+                      onChange={setCompletedFilterMonths}
+                      namespace="vaccination"
+                    />
+                  </Stack>
                 </Stack>
 
                 <Grid container spacing={2.5}>

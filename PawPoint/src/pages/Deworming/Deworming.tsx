@@ -11,13 +11,19 @@ import BugReportOutlinedIcon from "@mui/icons-material/BugReportOutlined";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
 import ScheduleRoundedIcon from "@mui/icons-material/ScheduleRounded";
 import CheckIcon from "@mui/icons-material/Check";
+import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { alpha } from "@mui/material/styles";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 import { useDewormings } from "../../hooks/useDewormings";
 import { useSettings } from "../../hooks/useSettings";
 import { scaleFont } from "../../utils/fontScale";
+import { formatConvertedPrice } from "../../utils/price";
+import "../../utils/pdfFont";
+
 import { DewormingCard } from "./components/DewormingCard";
 import { AddDewormingDialog } from "./components/AddDewormingDialog";
 import { EditDewormingDialog } from "./components/EditDewormingDialog";
@@ -28,6 +34,14 @@ import {
 } from "../../components/CompletedPeriodFilter";
 import { filterCompletedByPeriod } from "../../utils/completedPeriodFilter";
 import type { DewormingCardItem, DewormingDto } from "./types/deworming";
+
+const DEWORMING_TYPE_LABELS: Record<number, string> = {
+  0: "Necunoscută",
+  1: "Internă",
+  2: "Externă",
+  3: "Combinată",
+  4: "Control",
+};
 
 const pickFirst = <T,>(
   ...values: Array<T | undefined | null | "">
@@ -153,32 +167,32 @@ const mapDewormings = (
     const notes = pickFirst(item.notes, raw.Notes as string | undefined) ?? null;
 
     return {
-  id: item.id,
-  animalId: item.animalId,
-  animalName,
-  type,
-  date,
-  nextDate,
-  vetCabinetId: item.vetCabinetId,
-  vetCabinetName,
-  vetTimeSlotId: item.vetTimeSlotId,
-  slotStartTimeUtc,
-  slotEndTimeUtc,
-  price: item.price ?? null,
-  currency: item.currency,
-  notes,
-  status: resolveStatus({
-    ...item,
-    slotStartTimeUtc,
-    date,
-    nextDate,
-  } as DewormingDto),
-};
+      id: item.id,
+      animalId: item.animalId,
+      animalName,
+      type,
+      date,
+      nextDate,
+      vetCabinetId: item.vetCabinetId,
+      vetCabinetName,
+      vetTimeSlotId: item.vetTimeSlotId,
+      slotStartTimeUtc,
+      slotEndTimeUtc,
+      price: item.price ?? null,
+      currency: item.currency,
+      notes,
+      status: resolveStatus({
+        ...item,
+        slotStartTimeUtc,
+        date,
+        nextDate,
+      } as DewormingDto),
+    };
   });
 };
 
 export const Deworming = () => {
-  const { t } = useTranslation(["deworming"]);
+  const { t, i18n } = useTranslation(["deworming"]);
   const { data: settings } = useSettings();
 
   const { data = [], isLoading, isError } = useDewormings();
@@ -189,6 +203,8 @@ export const Deworming = () => {
 
   const [completedFilterMonths, setCompletedFilterMonths] =
     useState<CompletedFilterMonths>(3);
+
+  const locale = i18n.language === "ro" ? "ro-RO" : "en-GB";
 
   const items = useMemo(() => mapDewormings(data, t), [data, t]);
 
@@ -206,6 +222,130 @@ export const Deworming = () => {
     () => filterCompletedByPeriod(completedItems, completedFilterMonths),
     [completedItems, completedFilterMonths]
   );
+
+  const downloadDewormingReport = () => {
+    const doc = new jsPDF();
+
+    const total = filteredCompletedItems.reduce(
+      (sum, item) => sum + (item.price ?? 0),
+      0
+    );
+
+    const reportDate = new Date().toLocaleDateString(locale);
+
+    doc.setFillColor(245, 166, 35);
+    doc.rect(0, 0, 210, 34, "F");
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("Roboto-Regular", "normal");
+    doc.setFontSize(26);
+    doc.text("PawPoint", 14, 21);
+
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(18);
+    doc.text("Raport deparazitări finalizate", 14, 48);
+
+    doc.setFontSize(11);
+    doc.text(`Perioadă: ultimele ${completedFilterMonths} luni`, 14, 58);
+    doc.text(`Generat la: ${reportDate}`, 14, 65);
+    doc.text(`Total deparazitări: ${filteredCompletedItems.length}`, 14, 72);
+
+    autoTable(doc, {
+      startY: 82,
+      theme: "grid",
+      head: [
+        [
+          "Animal",
+          "Tip",
+          "Data",
+          "Următoarea",
+          "Veterinar",
+          "Interval",
+          "Preț",
+          "Observații",
+        ],
+      ],
+      body: filteredCompletedItems.map((item) => {
+        const dateSource = item.date || item.slotStartTimeUtc;
+        const date = dateSource
+          ? new Date(dateSource).toLocaleDateString(locale)
+          : "—";
+
+        const nextDate = item.nextDate
+          ? new Date(item.nextDate).toLocaleDateString(locale)
+          : "—";
+
+        const start = item.slotStartTimeUtc
+          ? new Date(item.slotStartTimeUtc).toLocaleTimeString(locale, {
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+          : "—";
+
+        const end = item.slotEndTimeUtc
+          ? new Date(item.slotEndTimeUtc).toLocaleTimeString(locale, {
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+          : "—";
+
+        return [
+          item.animalName || "—",
+          DEWORMING_TYPE_LABELS[item.type] ?? "—",
+          date,
+          nextDate,
+          item.vetCabinetName || "—",
+          `${start} - ${end}`,
+          item.price != null
+            ? formatConvertedPrice(
+                item.price,
+                item.currency,
+                settings?.currency ?? "EUR"
+              )
+            : "—",
+          item.notes || "—",
+        ];
+      }),
+      styles: {
+        font: "Roboto-Regular",
+        fontSize: 8.5,
+        cellPadding: 3,
+        textColor: [40, 40, 40],
+        lineColor: [230, 230, 230],
+        lineWidth: 0.3,
+      },
+      headStyles: {
+        fillColor: [245, 166, 35],
+        textColor: [255, 255, 255],
+        fontStyle: "bold",
+      },
+      alternateRowStyles: {
+        fillColor: [250, 250, 250],
+      },
+    });
+
+    const finalY =
+      (doc as jsPDF & { lastAutoTable?: { finalY: number } }).lastAutoTable
+        ?.finalY ?? 120;
+
+    doc.setFillColor(7, 28, 66);
+    doc.roundedRect(14, finalY + 12, 100, 17, 3, 3, "F");
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("Roboto-Regular", "normal");
+    doc.setFontSize(12);
+    doc.text(
+      `Cost total: ${total.toFixed(2)} ${settings?.currency ?? "EUR"}`,
+      18,
+      finalY + 23
+    );
+
+    doc.setTextColor(120, 120, 120);
+    doc.setFontSize(9);
+    doc.text("Raport generat automat de PawPoint.", 14, finalY + 42);
+
+    doc.save(`pawpoint-deparazitari-${completedFilterMonths}-luni.pdf`);
+  };
 
   return (
     <Box
@@ -452,11 +592,53 @@ export const Deworming = () => {
                     </Box>
                   </Stack>
 
-                  <CompletedPeriodFilter
-                    value={completedFilterMonths}
-                    onChange={setCompletedFilterMonths}
-                    namespace="deworming"
-                  />
+                  <Stack
+                    direction="row"
+                    spacing={1.5}
+                    alignItems="center"
+                    flexWrap="wrap"
+                    useFlexGap
+                  >
+                    <Button
+                      startIcon={<DownloadRoundedIcon />}
+                      disabled={filteredCompletedItems.length === 0}
+                      onClick={downloadDewormingReport}
+                      sx={(theme) => ({
+                        px: 2,
+                        py: 0.9,
+                        borderRadius: 999,
+                        textTransform: "none",
+                        fontWeight: 700,
+                        fontSize: scaleFont(13, settings?.textSize),
+                        color: theme.palette.success.main,
+                        backgroundColor:
+                          theme.palette.mode === "dark"
+                            ? alpha(theme.palette.success.main, 0.14)
+                            : "#dff4f1",
+                        border: `1px solid ${alpha(
+                          theme.palette.success.main,
+                          0.18
+                        )}`,
+                        "&:hover": {
+                          backgroundColor:
+                            theme.palette.mode === "dark"
+                              ? alpha(theme.palette.success.main, 0.22)
+                              : "#d2efeb",
+                        },
+                        "&.Mui-disabled": {
+                          opacity: 0.55,
+                        },
+                      })}
+                    >
+                      Descarcă raport
+                    </Button>
+
+                    <CompletedPeriodFilter
+                      value={completedFilterMonths}
+                      onChange={setCompletedFilterMonths}
+                      namespace="deworming"
+                    />
+                  </Stack>
                 </Stack>
 
                 <Grid container spacing={2.5}>

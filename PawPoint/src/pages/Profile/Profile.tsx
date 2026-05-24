@@ -34,6 +34,7 @@ import { useDashboard } from "../../hooks/useDashboard";
 import { scaleFont } from "../../utils/fontScale";
 import { formatWeightByUnit } from "../../utils/weight";
 import { clearTokens } from "../../auth/tokenStorage";
+import { PetCard } from "../Dashboard/components/cards/PetCard";
 
 type ActivityItem = {
   id: string;
@@ -963,140 +964,23 @@ export const Profile = () => {
                 </Typography>
 
                 {pets.length > 0 ? (
-                  <Grid container spacing={3}>
-                    {pets.map((pet: any) => {
-                      const displayWeight =
-                        typeof pet.weightKg === "number"
-                          ? formatWeightByUnit(pet.weightKg, weightUnit)
-                          : pet.weight ?? "—";
-
-                      return (
-                        <Grid key={pet.id} size={{ xs: 12, sm: 6, lg: 4 }}>
-                          <Paper
-                            elevation={0}
-                            sx={(theme) => ({
-                              borderRadius: 5,
-                              border: `1px solid ${theme.palette.divider}`,
-                              backgroundColor: theme.palette.background.paper,
-                              overflow: "hidden",
-                              transition:
-                                "box-shadow 0.22s ease, transform 0.22s ease",
-                              "&:hover": {
-                                boxShadow:
-                                  theme.palette.mode === "dark"
-                                    ? "0 16px 40px rgba(0,0,0,0.32)"
-                                    : "0 16px 40px rgba(7,28,66,0.1)",
-                                transform: "translateY(-3px)",
-                              },
-                            })}
-                          >
-                            <Box
-                              sx={(theme) => ({
-                                height: 190,
-                                background: pet.imageUrl
-                                  ? "transparent"
-                                  : theme.palette.mode === "dark"
-                                  ? `linear-gradient(140deg, ${alpha(
-                                      theme.palette.primary.main,
-                                      0.18
-                                    )} 0%, ${alpha(
-                                      theme.palette.primary.light,
-                                      0.26
-                                    )} 100%)`
-                                  : "linear-gradient(140deg, #fff8f0 0%, #fde8c8 100%)",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                overflow: "hidden",
-                              })}
-                            >
-                              {pet.imageUrl ? (
-                                <Box
-                                  component="img"
-                                  src={pet.imageUrl}
-                                  alt={pet.name}
-                                  sx={{
-                                    width: "100%",
-                                    height: "100%",
-                                    objectFit: "cover",
-                                    objectPosition: `center ${
-                                      pet.imagePositionY ?? 50
-                                    }%`,
-                                  }}
-                                />
-                              ) : (
-                                <Typography
-                                  sx={(theme) => ({
-                                    fontSize: scaleFont(
-                                      56,
-                                      settings?.textSize
-                                    ),
-                                    fontWeight: 900,
-                                    color: theme.palette.primary.main,
-                                  })}
-                                >
-                                  {pet.imageLetter}
-                                </Typography>
-                              )}
-                            </Box>
-
-                            <Box sx={{ p: 2.5 }}>
-                              <Stack spacing={0.3} sx={{ mb: 2.5 }}>
-                                <Typography
-                                  sx={(theme) => ({
-                                    fontSize: scaleFont(
-                                      18,
-                                      settings?.textSize
-                                    ),
-                                    fontWeight: 800,
-                                    color: theme.palette.text.primary,
-                                  })}
-                                >
-                                  {pet.name}
-                                </Typography>
-
-                                <Typography
-                                  sx={(theme) => ({
-                                    fontSize: scaleFont(
-                                      13,
-                                      settings?.textSize
-                                    ),
-                                    color: theme.palette.text.secondary,
-                                    fontWeight: 500,
-                                  })}
-                                >
-                                  {pet.breed} · {displayWeight}
-                                </Typography>
-                              </Stack>
-
-                              <Button
-                                fullWidth
-                                startIcon={
-                                  <VisibilityOutlinedIcon
-                                    sx={{ fontSize: "17px !important" }}
-                                  />
-                                }
-                                onClick={() => navigate(`/animals/${pet.id}`)}
-                                sx={{
-                                  py: 1.25,
-                                  borderRadius: 3,
-                                  background:
-                                    "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
-                                  color: "#fff",
-                                  textTransform: "none",
-                                  fontSize: scaleFont(14, settings?.textSize),
-                                  fontWeight: 700,
-                                }}
-                              >
-                                {t("view")}
-                              </Button>
-                            </Box>
-                          </Paper>
-                        </Grid>
-                      );
-                    })}
-                  </Grid>
-                ) : (
+                <Grid container spacing={3}>
+                  {pets.map((pet: any) => (
+                    <Grid key={pet.id} size={{ xs: 12, sm: 6, lg: 4 }}>
+                      <PetCard
+                        name={pet.name}
+                        breed={pet.breed}
+                        weight={pet.weight}
+                        weightKg={pet.weightKg}
+                        imageLetter={pet.imageLetter}
+                        imageUrl={pet.imageUrl}
+                        imagePositionY={pet.imagePositionY}
+                        onView={() => navigate(`/animals/${pet.id}`)}
+                      />
+                    </Grid>
+                  ))}
+                </Grid>
+              ) : (
                   <Typography
                     sx={(theme) => ({
                       color: theme.palette.text.secondary,

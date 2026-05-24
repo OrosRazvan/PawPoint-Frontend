@@ -14,6 +14,7 @@ import {
   Grid,
   Button,
   Autocomplete,
+  Slider,
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
@@ -27,13 +28,15 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSnackbar } from "notistack";
 import { useTranslation } from "react-i18next";
+import { useQueryClient } from "@tanstack/react-query";
+import Cropper, { type Area } from "react-easy-crop";
+
 import {
   createAnimalSchema,
   type CreateAnimalFormInput,
   type CreateAnimalFormValues,
 } from "../../../types/createAnimalSchema";
 import { useCreateAnimal } from "../../../hooks/useCreateAnimal";
-import { useQueryClient } from "@tanstack/react-query";
 import { useSettings } from "../../../hooks/useSettings";
 import { scaleFont } from "../../../utils/fontScale";
 
@@ -45,6 +48,7 @@ type Props = {
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_IMAGE_SIZE_MB = 5;
 const MAX_IMAGE_SIZE_BYTES = MAX_IMAGE_SIZE_MB * 1024 * 1024;
+
 const SPECIES_OPTIONS = [
   { value: "Dog", labelKey: "dog" },
   { value: "Cat", labelKey: "cat" },
@@ -77,6 +81,59 @@ const SPECIES_OPTIONS = [
   { value: "Other", labelKey: "other" },
 ];
 
+const createImage = (url: string): Promise<HTMLImageElement> =>
+  new Promise((resolve, reject) => {
+    const image = new Image();
+    image.addEventListener("load", () => resolve(image));
+    image.addEventListener("error", reject);
+    image.setAttribute("crossOrigin", "anonymous");
+    image.src = url;
+  });
+
+const getCroppedImageFile = async (
+  imageSrc: string,
+  pixelCrop: Area,
+  fileName = "pet-image.jpg"
+): Promise<File> => {
+  const image = await createImage(imageSrc);
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+
+  if (!ctx) {
+    throw new Error("Canvas context not available");
+  }
+
+  canvas.width = pixelCrop.width;
+  canvas.height = pixelCrop.height;
+
+  ctx.drawImage(
+    image,
+    pixelCrop.x,
+    pixelCrop.y,
+    pixelCrop.width,
+    pixelCrop.height,
+    0,
+    0,
+    pixelCrop.width,
+    pixelCrop.height
+  );
+
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) {
+          reject(new Error("Crop failed"));
+          return;
+        }
+
+        resolve(new File([blob], fileName, { type: "image/jpeg" }));
+      },
+      "image/jpeg",
+      0.92
+    );
+  });
+};
+
 export const AddPetDialog = ({ open, onClose }: Props) => {
   const { t } = useTranslation(["dashboard"]);
   const { enqueueSnackbar } = useSnackbar();
@@ -86,6 +143,10 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
 
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState("");
+
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
 
   const fieldSx = (theme: any) => ({
     "& .MuiOutlinedInput-root": {
@@ -158,9 +219,14 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
   useEffect(() => {
     if (!open) {
       setSelectedImage(null);
+      setCrop({ x: 0, y: 0 });
+      setZoom(1);
+      setCroppedAreaPixels(null);
+
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl);
       }
+
       setPreviewUrl("");
     }
   }, [open, previewUrl]);
@@ -171,7 +237,7 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
     if (!file) return;
 
     if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
-      enqueueSnackbar("Poți încărca doar JPG, PNG sau WEBP.", {
+      enqueueSnackbar(t("dashboard:imageUploadTypeError"), {
         variant: "error",
       });
       event.target.value = "";
@@ -179,9 +245,14 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
     }
 
     if (file.size > MAX_IMAGE_SIZE_BYTES) {
-      enqueueSnackbar(`Imaginea trebuie să aibă maxim ${MAX_IMAGE_SIZE_MB} MB.`, {
-        variant: "error",
-      });
+      enqueueSnackbar(
+        t("dashboard:imageUploadSizeError", {
+          size: MAX_IMAGE_SIZE_MB,
+        }),
+        {
+          variant: "error",
+        }
+      );
       event.target.value = "";
       return;
     }
@@ -191,12 +262,34 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
     }
 
     const localPreviewUrl = URL.createObjectURL(file);
+
     setSelectedImage(file);
     setPreviewUrl(localPreviewUrl);
+    setCrop({ x: 0, y: 0 });
+    setZoom(1);
+    setCroppedAreaPixels(null);
+
     event.target.value = "";
   };
 
-  const onSubmit: SubmitHandler<CreateAnimalFormValues> = (values) => {
+  const onSubmit: SubmitHandler<CreateAnimalFormValues> = async (values) => {
+    let imageToUpload: File | null = selectedImage;
+
+    try {
+      if (selectedImage && previewUrl && croppedAreaPixels) {
+        imageToUpload = await getCroppedImageFile(
+          previewUrl,
+          croppedAreaPixels,
+          `pet-${Date.now()}.jpg`
+        );
+      }
+    } catch {
+      enqueueSnackbar(t("dashboard:imageCropError"), {
+        variant: "error",
+      });
+      return;
+    }
+
     createAnimalMutation.mutate(
       {
         name: values.name.trim(),
@@ -208,7 +301,7 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
           : undefined,
         sex: values.sex || undefined,
         microchipNumber: values.microchipNumber?.trim() || undefined,
-        image: selectedImage,
+        image: imageToUpload,
       },
       {
         onSuccess: async () => {
@@ -222,9 +315,14 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
 
           reset();
           setSelectedImage(null);
+          setCrop({ x: 0, y: 0 });
+          setZoom(1);
+          setCroppedAreaPixels(null);
+
           if (previewUrl) {
             URL.revokeObjectURL(previewUrl);
           }
+
           setPreviewUrl("");
           onClose();
         },
@@ -286,11 +384,7 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
             },
           })}
         >
-          <Stack
-            direction="row"
-            alignItems="flex-start"
-            justifyContent="space-between"
-          >
+          <Stack direction="row" alignItems="flex-start" justifyContent="space-between">
             <Stack direction="row" spacing={2} alignItems="center">
               <Box
                 sx={{
@@ -300,8 +394,7 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  background:
-                    "linear-gradient(135deg, #f5a623 0%, #f0911a 100%)",
+                  background: "linear-gradient(135deg, #f5a623 0%, #f0911a 100%)",
                   color: "#fff",
                   flexShrink: 0,
                   boxShadow: "0 4px 12px rgba(245,166,35,0.35)",
@@ -322,6 +415,7 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
                 >
                   {t("dashboard:addPetDialogTitle")}
                 </Typography>
+
                 <Typography
                   sx={(theme) => ({
                     fontSize: scaleFont(13, settings?.textSize),
@@ -367,46 +461,57 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
 
       <DialogContent sx={{ px: 3.5, pt: 3, pb: 3.5 }}>
         <Stack component="form" spacing={0} onSubmit={handleSubmit(onSubmit)}>
-          <Box sx={{ mb: 2 }}>
-            <Typography sx={labelSx}>Poză animal</Typography>
+          <Box sx={{ mb: 2, mt: 2 }}>
+            <Typography sx={labelSx}>
+              {t("dashboard:petImage")}
+            </Typography>
 
-            <Stack spacing={1.5} alignItems="center">
+            <Stack spacing={2} alignItems="center">
               <Box
-                sx={(theme) => ({
-                  width: "100%",
-                  height: 180,
-                  borderRadius: 3,
-                  border: `1px dashed ${theme.palette.divider}`,
+                sx={{
+                  position: "relative",
+                  width: 240,
+                  height: 240,
+                  borderRadius: "32px",
                   overflow: "hidden",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  background:
-                    theme.palette.mode === "dark"
-                      ? alpha("#ffffff", 0.03)
-                      : "#faf7f2",
-                })}
+                  backgroundColor: "#111",
+                  boxShadow: "0 14px 32px rgba(245,166,35,0.18)",
+                }}
               >
                 {previewUrl ? (
-                  <Box
-                    component="img"
-                    src={previewUrl}
-                    alt="Preview"
-                    sx={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
+                  <Cropper
+                    image={previewUrl}
+                    crop={crop}
+                    zoom={zoom}
+                    aspect={1}
+                    cropShape="rect"
+                    showGrid={false}
+                    onCropChange={setCrop}
+                    onZoomChange={setZoom}
+                    onCropComplete={(_, croppedPixels: Area) =>
+                      setCroppedAreaPixels(croppedPixels)
+                    }
                   />
                 ) : (
-                  <Typography
-                    sx={(theme) => ({
-                      color: theme.palette.text.secondary,
-                      fontSize: scaleFont(14, settings?.textSize),
-                    })}
+                  <Box
+                    sx={{
+                      height: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      px: 2,
+                    }}
                   >
-                    Nu ai selectat nicio imagine
-                  </Typography>
+                    <Typography
+                      sx={(theme) => ({
+                        color: theme.palette.text.secondary,
+                        textAlign: "center",
+                        fontSize: scaleFont(14, settings?.textSize),
+                      })}
+                    >
+                      {t("dashboard:noImageSelected")}
+                    </Typography>
+                  </Box>
                 )}
               </Box>
 
@@ -418,9 +523,13 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
                   borderRadius: 2.5,
                   textTransform: "none",
                   fontWeight: 700,
+                  color: "#f5a623",
+                  borderColor: "rgba(245,166,35,0.45)",
+                  px: 2.5,
+                  py: 1,
                 }}
               >
-                Alege poză
+                {t("dashboard:uploadImage")}
                 <input
                   hidden
                   type="file"
@@ -428,11 +537,55 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
                   onChange={handleImageChange}
                 />
               </Button>
+
+              {previewUrl && (
+                <Box sx={{ width: "100%" }}>
+                  <Typography sx={labelSx}>
+                    {t("dashboard:zoom")}
+                  </Typography>
+
+                  <Slider
+                    value={zoom}
+                    min={1}
+                    max={3}
+                    step={0.05}
+                    onChange={(_, value) => setZoom(value as number)}
+                    sx={{
+                      color: "#f5a623",
+                      "& .MuiSlider-thumb": {
+                        width: 24,
+                        height: 24,
+                        boxShadow: "0 4px 12px rgba(245,166,35,0.35)",
+                      },
+                      "& .MuiSlider-track": {
+                        height: 5,
+                        border: "none",
+                      },
+                      "& .MuiSlider-rail": {
+                        height: 5,
+                        opacity: 0.35,
+                      },
+                    }}
+                  />
+
+                  <Typography
+                    sx={{
+                      mt: 0.8,
+                      fontSize: 12,
+                      color: "text.secondary",
+                      textAlign: "center",
+                    }}
+                  >
+                    {t("dashboard:imageCropHint")}
+                  </Typography>
+                </Box>
+              )}
             </Stack>
           </Box>
 
           <Box sx={{ mb: 2, pt: 0.4 }}>
             <Typography sx={labelSx}>{t("dashboard:petName")}</Typography>
+
             <Controller
               name="name"
               control={control}
@@ -456,12 +609,14 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
           <Grid container spacing={1.5} sx={{ mb: 2 }}>
             <Grid size={{ xs: 7 }}>
               <Typography sx={labelSx}>{t("dashboard:species")}</Typography>
+
               <Controller
                 name="species"
                 control={control}
                 render={({ field }) => {
                   const selectedOption =
-                    SPECIES_OPTIONS.find((option) => option.value === field.value) ?? null;
+                    SPECIES_OPTIONS.find((option) => option.value === field.value) ??
+                    null;
 
                   return (
                     <Autocomplete
@@ -480,7 +635,9 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
                         if (!input) return options;
 
                         return options.filter((option) => {
-                          const translatedLabel = t(`dashboard:${option.labelKey}`).toLowerCase();
+                          const translatedLabel = t(
+                            `dashboard:${option.labelKey}`
+                          ).toLowerCase();
                           const rawValue = option.value.toLowerCase();
 
                           return (
@@ -522,6 +679,7 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
 
             <Grid size={{ xs: 5 }}>
               <Typography sx={labelSx}>{t("dashboard:sex")}</Typography>
+
               <Controller
                 name="sex"
                 control={control}
@@ -546,6 +704,7 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
 
           <Box sx={{ mb: 2 }}>
             <Typography sx={labelSx}>{t("dashboard:breed")}</Typography>
+
             <Controller
               name="breed"
               control={control}
@@ -563,6 +722,7 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
           <Grid container spacing={1.5} sx={{ mb: 2 }}>
             <Grid size={{ xs: 5 }}>
               <Typography sx={labelSx}>{t("dashboard:weightKg")}</Typography>
+
               <Controller
                 name="weightKg"
                 control={control}
@@ -582,6 +742,7 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
 
             <Grid size={{ xs: 7 }}>
               <Typography sx={labelSx}>{t("dashboard:birthDate")}</Typography>
+
               <Controller
                 name="birthDate"
                 control={control}
@@ -599,7 +760,10 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
           </Grid>
 
           <Box sx={{ mb: 3 }}>
-            <Typography sx={labelSx}>{t("dashboard:microchipNumber")}</Typography>
+            <Typography sx={labelSx}>
+              {t("dashboard:microchipNumber")}
+            </Typography>
+
             <Controller
               name="microchipNumber"
               control={control}
@@ -622,18 +786,22 @@ export const AddPetDialog = ({ open, onClose }: Props) => {
             variant="contained"
             fullWidth
             sx={{
-              py: 1.5,
+              py: 1.45,
+              px: 4,
+              width: "fit-content",
+              alignSelf: "center",
               borderRadius: 2.5,
               textTransform: "none",
               fontWeight: 700,
               fontSize: scaleFont(15, settings?.textSize),
-              letterSpacing: "-0.1px",
-              background: "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
+              background:
+                "linear-gradient(135deg, #f5a623 0%, #f09015 100%)",
               color: "#fff",
-              boxShadow: "0 4px 14px rgba(245,166,35,0.4)",
+              boxShadow: "0 6px 16px rgba(245,166,35,0.28)",
               "&:hover": {
                 background:
-                  "linear-gradient(135deg, #f0981a 0%, #e88510 100%)",
+                  "linear-gradient(135deg, #f0a020 0%, #e08510 100%)",
+                boxShadow: "0 8px 20px rgba(245,166,35,0.36)",
               },
             }}
           >

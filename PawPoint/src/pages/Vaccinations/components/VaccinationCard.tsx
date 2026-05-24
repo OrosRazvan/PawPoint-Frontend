@@ -16,6 +16,7 @@ import { useSettings } from "../../../hooks/useSettings";
 import { scaleFont } from "../../../utils/fontScale";
 import { VaccineTypeLabels, type VaccinationCardItem } from "../types/vaccination";
 import { formatConvertedPrice } from "../../../utils/price";
+import PaymentsOutlinedIcon from "@mui/icons-material/PaymentsOutlined";
 
 type Props = {
   item: VaccinationCardItem;
@@ -273,10 +274,17 @@ export const VaccinationCard = ({ item, onEdit, onDelete }: Props) => {
 
           {item.price != null && (
           <Stack direction="row" spacing={1.25} alignItems="center">
+            <PaymentsOutlinedIcon
+                sx={(theme) => ({
+                  fontSize: 15,
+                  color: theme.palette.text.disabled,
+                })}
+              />
+
             <Typography
               sx={(theme) => ({
                 fontSize: scaleFont(12.5, settings?.textSize),
-                color: theme.palette.text.secondary,
+                color: theme.palette.text.primary,
                 fontWeight: 700,
               })}
             >

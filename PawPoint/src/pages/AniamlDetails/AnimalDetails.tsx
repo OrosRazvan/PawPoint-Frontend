@@ -348,7 +348,12 @@ export const AnimalDetails = () => {
                     component="img"
                     src={data.imageUrl}
                     alt={data.name}
-                    sx={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    sx={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      objectPosition: "50% 22%",
+                    }}
                   />
                 ) : (
                   getInitial(data.name)
