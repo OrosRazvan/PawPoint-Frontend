@@ -71,5 +71,10 @@
 
   "priceLabel": "Price: {{price}}",
   "estimatedPrice": "Estimated price",
-  "timeLabel": "Time: {{time}}"
+  "timeLabel": "Time: {{time}}",
+  "raport": "Download report",
+  "language": {
+    "en": "English",
+    "ro": "Romanian"
+  }
 }

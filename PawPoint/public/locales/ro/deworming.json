@@ -71,5 +71,10 @@
 
   "priceLabel": "Preț: {{price}}",
   "estimatedPrice": "Preț estimativ",
-  "timeLabel": "Ora: {{time}}"
+  "timeLabel": "Ora: {{time}}",
+  "raport": "Descarcă raport",
+  "language": {
+    "en": "Engleză",
+    "ro": "Română"
+  }
 }

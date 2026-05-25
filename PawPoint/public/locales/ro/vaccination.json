@@ -59,5 +59,10 @@
   "vaccineType": "Tip vaccin",
   "selectVaccineType": "Selectează tipul vaccinului",
   "estimatedPrice": "Preț estimativ",
-  "priceLabel": "Preț: {{price}}"
+  "priceLabel": "Preț: {{price}}",
+  "raport": "Descarcă raport",
+  "language": {
+    "en": "Engleză",
+    "ro": "Română"
+  }
 }
