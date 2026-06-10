@@ -144,7 +144,6 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
         vetTimeSlotId: "",
         lastDate: "",
         nextDate: "",
-        notes: "",
       },
     });
 
@@ -159,7 +158,6 @@ export const AddVaccinationDialog = ({ open, onClose }: Props) => {
       vetTimeSlotId: "",
       lastDate: "",
       nextDate: "",
-      notes: "",
     });
   }, [open, lastUsedCabinetId, reset]);
 
@@ -331,7 +329,6 @@ const availableSlots = useMemo(() => {
         nextDate: values.nextDate
           ? `${values.nextDate}T00:00:00.000Z`
           : undefined,
-        notes: values.notes || undefined,
       },
       {
         onSuccess: () => {
@@ -357,7 +354,6 @@ const availableSlots = useMemo(() => {
             vetTimeSlotId: "",
             lastDate: "",
             nextDate: "",
-            notes: "",
           });
 
           onClose();
@@ -674,23 +670,6 @@ const availableSlots = useMemo(() => {
               />
             </Box>
           </Stack>
-
-          <Box>
-            <Typography sx={labelSx}>{t("vaccination:notes")}</Typography>
-            <Controller
-              name="notes"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  multiline
-                  minRows={2}
-                  sx={fieldSx}
-                />
-              )}
-            />
-          </Box>
 
           <Divider sx={{ my: 0.5 }} />
 
