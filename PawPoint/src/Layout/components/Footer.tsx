@@ -86,6 +86,10 @@ export const Footer = () => {
                   label: t("layout:footer.appointments"),
                   to: "/appointments",
                 },
+                {
+                  label: t("layout:footer.deworming"),
+                  to: "/deworming",
+                },
               ]}
               linkSx={linkSx}
               textSize={settings?.textSize}
@@ -138,12 +142,7 @@ type FooterLinksProps = {
   textSize?: string;
 };
 
-const FooterLinks = ({
-  title,
-  links,
-  linkSx,
-  textSize,
-}: FooterLinksProps) => {
+const FooterLinks = ({ title, links, linkSx, textSize }: FooterLinksProps) => {
   return (
     <Stack spacing={2.5}>
       <Typography
@@ -158,12 +157,7 @@ const FooterLinks = ({
 
       <Stack spacing={1.8}>
         {links.map((link) => (
-          <Typography
-            key={link.to}
-            component={Link}
-            to={link.to}
-            sx={linkSx}
-          >
+          <Typography key={link.to} component={Link} to={link.to} sx={linkSx}>
             {link.label}
           </Typography>
         ))}

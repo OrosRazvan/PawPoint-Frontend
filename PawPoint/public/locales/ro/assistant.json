@@ -66,12 +66,17 @@
       "upcomingAppointments": "Ce programări urmează?",
       "healthOverview": "Dă-mi un rezumat general",
       "recommendations": "Ce îmi recomanzi?",
-      "dueVaccinations": "Ce vaccinări sunt scadente?",
-      "dueDewormings": "Ce deparazitări sunt scadente?",
+      "dueVaccinations": "Ce vaccinări urmează?",
+      "dueDewormings": "Ce deparazitări urmează?",
       "petOverview": "Ce urmează pentru {{petName}}?",
       "petVaccinations": "Vaccinări pentru {{petName}}",
       "petDewormings": "Deparazitări pentru {{petName}}",
       "petRecommendations": "Ce îmi recomanzi pentru {{petName}}?"
-    }
+    },
+
+    "noDueVaccinations": "Nu ai vaccinări scadente.",
+    "noDueDewormings": "Nu ai deparazitări scadente.",
+    "scheduledVaccinations": "Vaccinări programate:\n{{vaccinations}}",
+    "scheduledDewormings": "Deparazitări programate:\n{{dewormings}}"
   }
 }

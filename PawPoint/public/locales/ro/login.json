@@ -27,6 +27,7 @@
   },
   "errors": {
     "emailInvalid": "Introduceți un email valid.",
-    "passwordRequired": "Parola este incorectă"
+    "passwordRequired": "Parola este incorectă",
+    "passwordMin8": "Enter a password of at least 8 characters."
   }
 }

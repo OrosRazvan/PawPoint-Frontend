@@ -57,12 +57,17 @@
       "upcomingAppointments": "What appointments are coming up?",
       "healthOverview": "Give me a general summary",
       "recommendations": "What do you recommend?",
-      "dueVaccinations": "Which vaccinations are due?",
-      "dueDewormings": "Which dewormings are due?",
+      "dueVaccinations": "Which vaccinations are coming up?",
+      "dueDewormings": "Which dewormings are coming up?",
       "petOverview": "What’s next for {{petName}}?",
       "petVaccinations": "Vaccinations for {{petName}}",
       "petDewormings": "Dewormings for {{petName}}",
       "petRecommendations": "What do you recommend for {{petName}}?"
-    }
+    },
+
+    "noDueVaccinations": "You have no due vaccinations.",
+    "noDueDewormings": "You have no due dewormings.",
+    "scheduledVaccinations": "Scheduled vaccinations:\n{{vaccinations}}",
+    "scheduledDewormings": "Scheduled dewormings:\n{{dewormings}}"
   }
 }

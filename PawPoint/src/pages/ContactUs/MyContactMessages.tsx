@@ -40,7 +40,13 @@ const StatusBadge = ({
 }) => {
   const map: Record<
     string,
-    { bg: string; text: string; border: string; dot: string; translated: string }
+    {
+      bg: string;
+      text: string;
+      border: string;
+      dot: string;
+      translated: string;
+    }
   > = {
     Open: {
       bg: isDark ? alpha("#22c55e", 0.15) : alpha("#22c55e", 0.1),
@@ -93,7 +99,8 @@ const StatusBadge = ({
           height: 6,
           borderRadius: "50%",
           backgroundColor: s.dot,
-          animation: label === "Open" ? `${pulse} 2.5s ease-in-out infinite` : "none",
+          animation:
+            label === "Open" ? `${pulse} 2.5s ease-in-out infinite` : "none",
           flexShrink: 0,
         }}
       />
@@ -150,16 +157,16 @@ const ReplyBubble = ({
             ? alpha("#f97316", 0.18)
             : "#fff7ed"
           : isDark
-          ? alpha("#3b82f6", 0.18)
-          : "#eff6ff",
+            ? alpha("#3b82f6", 0.18)
+            : "#eff6ff",
         border: `1px solid ${
           isAdmin
             ? isDark
               ? alpha("#f97316", 0.3)
               : alpha("#f97316", 0.2)
             : isDark
-            ? alpha("#3b82f6", 0.3)
-            : alpha("#3b82f6", 0.2)
+              ? alpha("#3b82f6", 0.3)
+              : alpha("#3b82f6", 0.2)
         }`,
         display: "flex",
         alignItems: "center",
@@ -171,8 +178,8 @@ const ReplyBubble = ({
             ? "#fb923c"
             : "#ea580c"
           : isDark
-          ? "#60a5fa"
-          : "#2563eb",
+            ? "#60a5fa"
+            : "#2563eb",
       }}
     >
       {reply.senderName.charAt(0).toUpperCase()}
@@ -205,8 +212,8 @@ const ReplyBubble = ({
                 ? alpha("#f97316", 0.12)
                 : alpha("#f97316", 0.08)
               : isDark
-              ? alpha("#3b82f6", 0.12)
-              : alpha("#3b82f6", 0.08),
+                ? alpha("#3b82f6", 0.12)
+                : alpha("#3b82f6", 0.08),
           }}
         >
           <Typography
@@ -220,8 +227,8 @@ const ReplyBubble = ({
                   ? "#fdba74"
                   : "#c2410c"
                 : isDark
-                ? "#93c5fd"
-                : "#1d4ed8",
+                  ? "#93c5fd"
+                  : "#1d4ed8",
               lineHeight: 1.2,
             }}
           >
@@ -240,16 +247,16 @@ const ReplyBubble = ({
               ? alpha("#f97316", 0.08)
               : alpha("#f97316", 0.06)
             : isDark
-            ? alpha("#3b82f6", 0.1)
-            : alpha("#3b82f6", 0.07),
+              ? alpha("#3b82f6", 0.1)
+              : alpha("#3b82f6", 0.07),
           border: `1px solid ${
             isAdmin
               ? isDark
                 ? alpha("#f97316", 0.15)
                 : alpha("#f97316", 0.12)
               : isDark
-              ? alpha("#3b82f6", 0.15)
-              : alpha("#3b82f6", 0.1)
+                ? alpha("#3b82f6", 0.15)
+                : alpha("#3b82f6", 0.1)
           }`,
         }}
       >
@@ -323,11 +330,11 @@ const MessageCard = ({
             message.status === "Open"
               ? "linear-gradient(90deg, #22c55e, #86efac)"
               : message.status === "Pending"
-              ? "linear-gradient(90deg, #f59e0b, #fcd34d)"
-              : `linear-gradient(90deg, ${alpha("#94a3b8", 0.5)}, ${alpha(
-                  "#cbd5e1",
-                  0.5
-                )})`,
+                ? "linear-gradient(90deg, #f59e0b, #fcd34d)"
+                : `linear-gradient(90deg, ${alpha("#94a3b8", 0.5)}, ${alpha(
+                    "#cbd5e1",
+                    0.5,
+                  )})`,
         }}
       />
 
@@ -397,7 +404,7 @@ const MessageCard = ({
                   wordBreak: "break-word",
                 }}
               >
-                {message.email}
+                {new Date(message.createdAt).toLocaleDateString()}
               </Typography>
             </Box>
           </Stack>
@@ -445,7 +452,9 @@ const MessageCard = ({
                 height: 28,
                 borderRadius: "8px",
                 flexShrink: 0,
-                background: isDark ? alpha("#fff", 0.06) : alpha("#071c42", 0.04),
+                background: isDark
+                  ? alpha("#fff", 0.06)
+                  : alpha("#071c42", 0.04),
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -543,7 +552,9 @@ const MessageCard = ({
                   py: 3,
                   px: 2,
                   borderRadius: "12px",
-                  background: isDark ? alpha("#fff", 0.03) : alpha("#f97316", 0.03),
+                  background: isDark
+                    ? alpha("#fff", 0.03)
+                    : alpha("#f97316", 0.03),
                   border: `1px dashed ${
                     isDark ? alpha("#fff", 0.1) : alpha("#f97316", 0.15)
                   }`,

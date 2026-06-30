@@ -118,30 +118,42 @@ export const Dashboard = () => {
     });
 
   const vaccinationItems = vaccinations
-    .filter((item: any) => !isCompleted(item))
-    .map((item: any) => {
-      const rawDate =
-        item.nextDateUtc ??
-        item.NextDateUtc ??
-        item.nextDate ??
-        item.NextDate ??
-        item.scheduledDateUtc ??
-        item.ScheduledDateUtc ??
-        item.dateUtc ??
-        item.DateUtc ??
-        item.date ??
-        item.Date ??
-        "";
+  .filter((item: any) => !isCompleted(item))
+  .map((item: any) => {
+    const rawDate =
+      item.slotStartUtc ??
+      item.SlotStartUtc ??
+      item.slotStartTimeUtc ??
+      item.SlotStartTimeUtc ??
+      item.startTimeUtc ??
+      item.StartTimeUtc ??
+      item.scheduledDateUtc ??
+      item.ScheduledDateUtc ??
+      item.scheduledDate ??
+      item.ScheduledDate ??
+      item.nextDateUtc ??
+      item.NextDateUtc ??
+      item.nextDate ??
+      item.NextDate ??
+      item.applicationDate ??
+      item.ApplicationDate ??
+      item.lastDate ??
+      item.LastDate ??
+      item.dateUtc ??
+      item.DateUtc ??
+      item.date ??
+      item.Date ??
+      "";
 
-      return {
-        id: `vaccination-${item.id}`,
-        petName: item.animalName ?? item.petName ?? t("dashboard:petFallback"),
-        typeLabel: t("dashboard:vaccinationFallback"),
-        eventType: "vaccination",
-        statusLabel: t("dashboard:upcomingStatus"),
-        rawDate,
-      };
-    });
+    return {
+      id: `vaccination-${item.id}`,
+      petName: item.animalName ?? item.petName ?? t("dashboard:petFallback"),
+      typeLabel: t("dashboard:vaccinationFallback"),
+      eventType: "vaccination",
+      statusLabel: t("dashboard:upcomingStatus"),
+      rawDate,
+    };
+  });
 
   const dewormingItems = dewormings
     .filter((item: any) => !isCompleted(item))
@@ -149,6 +161,8 @@ export const Dashboard = () => {
       const rawDate =
         item.scheduledDateUtc ??
         item.ScheduledDateUtc ??
+        item.administrationDate ??
+        item.AdministrationDate ??
         item.dateUtc ??
         item.DateUtc ??
         item.date ??
