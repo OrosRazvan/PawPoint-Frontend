@@ -31,7 +31,7 @@ import type {
   VetCabinetDto,
   VetAvailabilitySlotDto,
 } from "./types/appointment";
-import { Currency } from "./types/appointment";
+import { formatConvertedPrice } from "../../utils/price";
 
 type EditingAppointment = {
   id: number;
@@ -55,7 +55,7 @@ type AppDateFormat = "DD/MM/YYYY" | "MM/DD/YYYY" | "YYYY-MM-DD";
 
 const formatDateBySettings = (
   value?: string | Date | null,
-  format: AppDateFormat = "DD/MM/YYYY"
+  format: AppDateFormat = "DD/MM/YYYY",
 ) => {
   if (!value) return "—";
 
@@ -89,17 +89,6 @@ const formatTime = (value?: string | null) => {
   });
 };
 
-const formatPrice = (
-    value?: number | null,
-    currency?: Currency
-  ) => {
-    if (value == null) return "—";
-
-    return `${value} ${
-      currency === Currency.Ron ? "RON" : "EUR"
-    }`;
-  };
-
 const getServiceLabel = (serviceType: string, t: (key: string) => string) => {
   switch (serviceType) {
     case "Consult":
@@ -132,7 +121,7 @@ export const BookAppointmentStep3 = () => {
   const selectedSlot = state?.selectedSlot ?? null;
 
   const [selectedAnimalId, setSelectedAnimalId] = useState<number | "">(
-    state?.appointment?.animalId ?? ""
+    state?.appointment?.animalId ?? "",
   );
   const [notify24hInAdvance] = useState(true);
 
@@ -150,9 +139,10 @@ export const BookAppointmentStep3 = () => {
 
   const selectedAnimal = useMemo(
     () =>
-      animals.find((animal: AnimalDto) => animal.id === Number(selectedAnimalId)) ??
-      null,
-    [animals, selectedAnimalId]
+      animals.find(
+        (animal: AnimalDto) => animal.id === Number(selectedAnimalId),
+      ) ?? null,
+    [animals, selectedAnimalId],
   );
 
   if (!selectedCabinet || !selectedSlot) {
@@ -234,7 +224,7 @@ export const BookAppointmentStep3 = () => {
           onSuccess: () => {
             navigate("/appointments");
           },
-        }
+        },
       );
 
       return;
@@ -255,7 +245,7 @@ export const BookAppointmentStep3 = () => {
         onSuccess: () => {
           navigate("/appointments");
         },
-      }
+      },
     );
   };
 
@@ -267,9 +257,11 @@ export const BookAppointmentStep3 = () => {
     backgroundColor: active
       ? theme.palette.primary.main
       : theme.palette.mode === "dark"
-      ? alpha("#ffffff", 0.04)
-      : "#f8f8f8",
-    color: active ? theme.palette.primary.contrastText : theme.palette.text.secondary,
+        ? alpha("#ffffff", 0.04)
+        : "#f8f8f8",
+    color: active
+      ? theme.palette.primary.contrastText
+      : theme.palette.text.secondary,
     fontWeight: active ? 700 : 600,
     textAlign: "center",
     border: active ? "none" : `1px solid ${theme.palette.divider}`,
@@ -432,7 +424,7 @@ export const BookAppointmentStep3 = () => {
               theme.palette.mode === "dark"
                 ? `linear-gradient(135deg, ${alpha(
                     theme.palette.primary.main,
-                    0.08
+                    0.08,
                   )} 0%, ${theme.palette.background.paper} 42%)`
                 : "linear-gradient(135deg, #fff9ef 0%, #ffffff 42%)",
             border: `1px solid ${theme.palette.divider}`,
@@ -469,7 +461,7 @@ export const BookAppointmentStep3 = () => {
                     color: theme.palette.primary.contrastText,
                     boxShadow: `0 10px 22px ${alpha(
                       theme.palette.primary.main,
-                      0.28
+                      0.28,
                     )}`,
                     flexShrink: 0,
                   })}
@@ -539,7 +531,12 @@ export const BookAppointmentStep3 = () => {
               <Box sx={{ flex: 1.05, minWidth: 0 }}>
                 <Stack spacing={2.5}>
                   <Box sx={infoCardSx}>
-                    <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2 }}>
+                    <Stack
+                      direction="row"
+                      spacing={1.5}
+                      alignItems="center"
+                      sx={{ mb: 2 }}
+                    >
                       <Box
                         sx={(theme) => ({
                           width: 42,
@@ -581,11 +578,19 @@ export const BookAppointmentStep3 = () => {
                     </Stack>
 
                     {isAnimalsLoading ? (
-                      <Box sx={{ py: 2, display: "flex", justifyContent: "center" }}>
+                      <Box
+                        sx={{
+                          py: 2,
+                          display: "flex",
+                          justifyContent: "center",
+                        }}
+                      >
                         <CircularProgress size={26} />
                       </Box>
                     ) : isAnimalsError ? (
-                      <Typography color="error">{t("loadAnimalsError")}</Typography>
+                      <Typography color="error">
+                        {t("loadAnimalsError")}
+                      </Typography>
                     ) : (
                       <TextField
                         select
@@ -593,7 +598,9 @@ export const BookAppointmentStep3 = () => {
                         value={selectedAnimalId}
                         onChange={(e) => {
                           const value = e.target.value;
-                          setSelectedAnimalId(value === "" ? "" : Number(value));
+                          setSelectedAnimalId(
+                            value === "" ? "" : Number(value),
+                          );
                         }}
                         sx={selectFieldSx}
                       >
@@ -726,7 +733,10 @@ export const BookAppointmentStep3 = () => {
                   <SummaryRow
                     icon={<CalendarMonthRoundedIcon sx={{ fontSize: 20 }} />}
                     label={t("date")}
-                    value={formatDateBySettings(selectedSlot.startTimeUtc, dateFormat)}
+                    value={formatDateBySettings(
+                      selectedSlot.startTimeUtc,
+                      dateFormat,
+                    )}
                   />
 
                   <SummaryRow
@@ -744,7 +754,7 @@ export const BookAppointmentStep3 = () => {
                         theme.palette.mode === "dark"
                           ? `linear-gradient(135deg, ${alpha(
                               theme.palette.primary.main,
-                              0.16
+                              0.16,
                             )}, ${alpha(theme.palette.primary.dark, 0.08)})`
                           : "linear-gradient(135deg, #fff3d8, #fffaf0)",
                       border: `1px solid ${alpha(theme.palette.primary.main, 0.16)}`,
@@ -798,7 +808,11 @@ export const BookAppointmentStep3 = () => {
                           whiteSpace: "nowrap",
                         })}
                       >
-                        {formatPrice(estimatedPrice)}
+                        {formatConvertedPrice(
+                          estimatedPrice,
+                          selectedCabinet.currency,
+                          settings?.currency ?? "EUR",
+                        )}
                       </Typography>
                     </Stack>
                   </Box>
@@ -857,14 +871,14 @@ export const BookAppointmentStep3 = () => {
                     selectedAnimal && !isCreating && !isUpdating
                       ? `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`
                       : theme.palette.mode === "dark"
-                      ? alpha(theme.palette.primary.main, 0.25)
-                      : "#f4d28a",
+                        ? alpha(theme.palette.primary.main, 0.25)
+                        : "#f4d28a",
                   color:
                     selectedAnimal && !isCreating && !isUpdating
                       ? theme.palette.primary.contrastText
                       : theme.palette.mode === "dark"
-                      ? alpha("#ffffff", 0.45)
-                      : "#8c7a4e",
+                        ? alpha("#ffffff", 0.45)
+                        : "#8c7a4e",
                   boxShadow:
                     selectedAnimal && !isCreating && !isUpdating
                       ? `0 10px 22px ${alpha(theme.palette.primary.main, 0.28)}`
@@ -874,8 +888,8 @@ export const BookAppointmentStep3 = () => {
                       selectedAnimal && !isCreating && !isUpdating
                         ? `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`
                         : theme.palette.mode === "dark"
-                        ? alpha(theme.palette.primary.main, 0.25)
-                        : "#f4d28a",
+                          ? alpha(theme.palette.primary.main, 0.25)
+                          : "#f4d28a",
                   },
                   "&.Mui-disabled": {
                     backgroundColor:

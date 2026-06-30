@@ -20,7 +20,7 @@ import { useTranslation } from "react-i18next";
 import { useAppointmentVetCabinets } from "../../hooks/useAppointmentVetCabinets";
 import { useSettings } from "../../hooks/useSettings";
 import { scaleFont } from "../../utils/fontScale";
-import { Currency } from "./types/appointment";
+import { formatConvertedPrice } from "../../utils/price";
 
 const sortOptions = [
   { value: "priceAsc", labelKey: "sortPriceAsc" },
@@ -113,8 +113,8 @@ export const BookAppointmentStep1 = () => {
         ? alpha(theme.palette.primary.main, 0.18)
         : alpha(theme.palette.primary.main, 0.18)
       : theme.palette.mode === "dark"
-      ? alpha("#ffffff", 0.03)
-      : "#faf8f5",
+        ? alpha("#ffffff", 0.03)
+        : "#faf8f5",
     transition: "all 0.2s ease",
     cursor: "pointer",
     "&:hover": {
@@ -134,8 +134,8 @@ export const BookAppointmentStep1 = () => {
     backgroundColor: active
       ? theme.palette.primary.main
       : theme.palette.mode === "dark"
-      ? alpha("#ffffff", 0.04)
-      : "#f8f8f8",
+        ? alpha("#ffffff", 0.04)
+        : "#f8f8f8",
     color: active
       ? theme.palette.primary.contrastText
       : theme.palette.text.secondary,
@@ -155,26 +155,15 @@ export const BookAppointmentStep1 = () => {
     lineHeight: 1.2,
   });
 
-  const formatPrice = (
-    value?: number | null,
-    currency?: Currency
-  ) => {
-    if (value == null) return "—";
-
-    return `${value} ${
-      currency === Currency.Ron ? "RON" : "EUR"
-    }`;
-  };
-
   const navState = (location.state ?? null) as Step1LocationState | null;
 
   const [serviceType] = useState(
-    navState?.appointment?.serviceType ?? "Consultation"
+    navState?.appointment?.serviceType ?? "Consultation",
   );
   const [sortBy, setSortBy] = useState("priceAsc");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCabinetId, setSelectedCabinetId] = useState<number | null>(
-    navState?.appointment?.vetCabinetId ?? null
+    navState?.appointment?.vetCabinetId ?? null,
   );
 
   const {
@@ -237,9 +226,9 @@ export const BookAppointmentStep1 = () => {
   const selectedCabinet = useMemo(
     () =>
       filteredAndSortedCabinets.find(
-        (cabinet) => cabinet.id === selectedCabinetId
+        (cabinet) => cabinet.id === selectedCabinetId,
       ) ?? null,
-    [filteredAndSortedCabinets, selectedCabinetId]
+    [filteredAndSortedCabinets, selectedCabinetId],
   );
 
   const handleNext = () => {
@@ -353,77 +342,77 @@ export const BookAppointmentStep1 = () => {
                   size="small"
                   fullWidth
                   sx={(theme) => ({
-                  width: { xs: "100%", md: 300 },
-                  minWidth: { md: 300 },
+                    width: { xs: "100%", md: 300 },
+                    minWidth: { md: 300 },
 
-                  "& .MuiOutlinedInput-root": {
-                    height: 44,
-                    borderRadius: 999,
-                    backgroundColor:
-                      theme.palette.mode === "dark"
-                        ? alpha(theme.palette.primary.main, 0.12)
-                        : "#ffffff",
-
-                    fontSize: scaleFont(13, settings?.textSize),
-                    fontWeight: 500,
-                    color: theme.palette.text.primary,
-
-                    px: 1.25,
-
-                    transition: "all 0.18s ease",
-
-                    "& fieldset": {
-                      borderWidth: "1px",
-                      borderColor: alpha(theme.palette.primary.main, 0.18),
-                    },
-
-                    "&:hover": {
+                    "& .MuiOutlinedInput-root": {
+                      height: 44,
+                      borderRadius: 999,
                       backgroundColor:
                         theme.palette.mode === "dark"
-                          ? alpha(theme.palette.primary.main, 0.18)
+                          ? alpha(theme.palette.primary.main, 0.12)
                           : "#ffffff",
-                    },
 
-                    "&:hover fieldset": {
-                      borderColor: alpha(theme.palette.primary.main, 0.4),
-                    },
-
-                    "&.Mui-focused": {
-                      backgroundColor: theme.palette.background.paper,
-                      boxShadow: `0 0 0 4px ${alpha(
-                        theme.palette.primary.main,
-                        0.12
-                      )}`,
-                    },
-
-                    "&.Mui-focused fieldset": {
-                      borderWidth: "1px",
-                      borderColor: theme.palette.primary.main,
-                    },
-
-                    "& input": {
-                      py: 1.15,
-                    },
-
-                    "& input::placeholder": {
-                      color: theme.palette.text.secondary,
-                      opacity: 0.9,
+                      fontSize: scaleFont(13, settings?.textSize),
                       fontWeight: 500,
+                      color: theme.palette.text.primary,
+
+                      px: 1.25,
+
+                      transition: "all 0.18s ease",
+
+                      "& fieldset": {
+                        borderWidth: "1px",
+                        borderColor: alpha(theme.palette.primary.main, 0.18),
+                      },
+
+                      "&:hover": {
+                        backgroundColor:
+                          theme.palette.mode === "dark"
+                            ? alpha(theme.palette.primary.main, 0.18)
+                            : "#ffffff",
+                      },
+
+                      "&:hover fieldset": {
+                        borderColor: alpha(theme.palette.primary.main, 0.4),
+                      },
+
+                      "&.Mui-focused": {
+                        backgroundColor: theme.palette.background.paper,
+                        boxShadow: `0 0 0 4px ${alpha(
+                          theme.palette.primary.main,
+                          0.12,
+                        )}`,
+                      },
+
+                      "&.Mui-focused fieldset": {
+                        borderWidth: "1px",
+                        borderColor: theme.palette.primary.main,
+                      },
+
+                      "& input": {
+                        py: 1.15,
+                      },
+
+                      "& input::placeholder": {
+                        color: theme.palette.text.secondary,
+                        opacity: 0.9,
+                        fontWeight: 500,
+                      },
                     },
-                  },
-                })}
+                  })}
                   InputProps={{
                     startAdornment: (
                       <SearchRoundedIcon
-                  sx={(theme) => ({
-                    mr: 1,
-                    fontSize: 19,
-                    color: searchQuery
-                      ? theme.palette.primary.main
-                      : alpha(theme.palette.text.primary, 0.55),
-                    transition: "color 0.15s ease",
-                  })}
-                />
+                        sx={(theme) => ({
+                          mr: 1,
+                          fontSize: 19,
+                          color: searchQuery
+                            ? theme.palette.primary.main
+                            : alpha(theme.palette.text.primary, 0.55),
+                          transition: "color 0.15s ease",
+                        })}
+                      />
                     ),
                     endAdornment: searchQuery ? (
                       <IconButton
@@ -611,7 +600,11 @@ export const BookAppointmentStep1 = () => {
                                   color: theme.palette.text.secondary,
                                 })}
                               >
-                                • {formatPrice(cabinet.price, cabinet.currency)}
+                                • {formatConvertedPrice(
+                                  cabinet.price,
+                                  cabinet.currency,
+                                  settings?.currency ?? "EUR",
+                                )}
                               </Typography>
                             </Stack>
                           </Box>
@@ -632,8 +625,8 @@ export const BookAppointmentStep1 = () => {
                             backgroundColor: isSelected
                               ? theme.palette.primary.main
                               : theme.palette.mode === "dark"
-                              ? alpha("#ffffff", 0.05)
-                              : "#f3eee7",
+                                ? alpha("#ffffff", 0.05)
+                                : "#f3eee7",
                             color: isSelected
                               ? theme.palette.primary.contrastText
                               : theme.palette.text.primary,
@@ -641,8 +634,8 @@ export const BookAppointmentStep1 = () => {
                               backgroundColor: isSelected
                                 ? theme.palette.primary.dark
                                 : theme.palette.mode === "dark"
-                                ? alpha("#ffffff", 0.08)
-                                : "#ece4d8",
+                                  ? alpha("#ffffff", 0.08)
+                                  : "#ece4d8",
                             },
                           })}
                         >
@@ -676,19 +669,19 @@ export const BookAppointmentStep1 = () => {
                   backgroundColor: selectedCabinet
                     ? theme.palette.primary.main
                     : theme.palette.mode === "dark"
-                    ? alpha(theme.palette.primary.main, 0.25)
-                    : "#f4d28a",
+                      ? alpha(theme.palette.primary.main, 0.25)
+                      : "#f4d28a",
                   color: selectedCabinet
                     ? theme.palette.primary.contrastText
                     : theme.palette.mode === "dark"
-                    ? alpha("#ffffff", 0.45)
-                    : "#8c7a4e",
+                      ? alpha("#ffffff", 0.45)
+                      : "#8c7a4e",
                   "&:hover": {
                     backgroundColor: selectedCabinet
                       ? theme.palette.primary.dark
                       : theme.palette.mode === "dark"
-                      ? alpha(theme.palette.primary.main, 0.25)
-                      : "#f4d28a",
+                        ? alpha(theme.palette.primary.main, 0.25)
+                        : "#f4d28a",
                   },
                   "&.Mui-disabled": {
                     backgroundColor:

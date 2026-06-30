@@ -50,10 +50,32 @@ const translateSpecies = (
   species: string | null | undefined,
   t: (key: string, options?: Record<string, unknown>) => string
 ) => {
-  if (!species) return t("unknown");
+  if (!species) {
+    return t("unknown");
+  }
 
-  return t(`values.species.${species}`, {
-    defaultValue: species,
+  const normalizedSpecies: Record<string, string> = {
+    Câine: "Dog",
+    Caine: "Dog",
+    Pisică: "Cat",
+    Pisica: "Cat",
+    Pasăre: "Bird",
+    Pasare: "Bird",
+    Iepure: "Rabbit",
+    Altul: "Other",
+
+    Dog: "Dog",
+    Cat: "Cat",
+    Bird: "Bird",
+    Rabbit: "Rabbit",
+    Other: "Other",
+  };
+
+  const mappedSpecies =
+    normalizedSpecies[species] ?? species;
+
+  return t(`values.species.${mappedSpecies}`, {
+    defaultValue: mappedSpecies,
   });
 };
 

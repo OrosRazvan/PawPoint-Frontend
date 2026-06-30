@@ -7,8 +7,8 @@ import { alpha } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { Currency } from "../types/appointment";
 import PaymentsOutlinedIcon from "@mui/icons-material/PaymentsOutlined";
+import { formatConvertedPrice } from "../../../utils/price";
 
 import { useSettings } from "../../../hooks/useSettings";
 import { scaleFont } from "../../../utils/fontScale";
@@ -25,7 +25,7 @@ type AppDateFormat = "DD/MM/YYYY" | "MM/DD/YYYY" | "YYYY-MM-DD";
 
 const formatDateBySettings = (
   value?: string | Date | null,
-  format: AppDateFormat = "DD/MM/YYYY"
+  format: AppDateFormat = "DD/MM/YYYY",
 ) => {
   if (!value) return "—";
 
@@ -59,20 +59,11 @@ const formatTime = (value?: string | null, locale = "en-GB") => {
   });
 };
 
-const formatCurrency = (
-  value?: number | null,
-  currency?: Currency
-) => {
-  if (value == null) return "—";
-
-  return `${value} ${currency === Currency.Ron ? "RON" : "EUR"}`;
-};
-
 const formatDateTimeBySettings = (
   value: string | null | undefined,
   format: AppDateFormat,
   t: (key: string, options?: Record<string, unknown>) => string,
-  locale: string
+  locale: string,
 ) => {
   if (!value) return "—";
 
@@ -86,7 +77,8 @@ const downloadAppointmentPdf = (
   item: AppointmentCardItem,
   t: (key: string, options?: Record<string, unknown>) => string,
   dateFormat: AppDateFormat,
-  locale: string
+  locale: string,
+  selectedCurrency: "EUR" | "RON",
 ) => {
   const doc = new jsPDF();
 
@@ -94,7 +86,7 @@ const downloadAppointmentPdf = (
     item.slotStartTimeUtc,
     dateFormat,
     t,
-    locale
+    locale,
   );
 
   const issuedAt = new Date().toLocaleDateString(locale);
@@ -115,17 +107,9 @@ const downloadAppointmentPdf = (
   doc.setFontSize(11);
   doc.setFont("Roboto-Regular", "normal");
 
-  doc.text(
-    `${t("appointment:report.number")}: #APT-${item.id}`,
-    14,
-    56
-  );
+  doc.text(`${t("appointment:report.number")}: #APT-${item.id}`, 14, 56);
 
-  doc.text(
-    `${t("appointment:report.issuedAt")}: ${issuedAt}`,
-    14,
-    63
-  );
+  doc.text(`${t("appointment:report.issuedAt")}: ${issuedAt}`, 14, 63);
 
   autoTable(doc, {
     startY: 74,
@@ -152,38 +136,14 @@ const downloadAppointmentPdf = (
     },
 
     body: [
-      [
-        t("appointment:report.pet"),
-        item.animalName || "—",
-      ],
-      [
-        t("appointment:report.service"),
-        item.serviceType || "—",
-      ],
-      [
-        t("appointment:report.clinic"),
-        item.vetCabinetName || "—",
-      ],
-      [
-        t("appointment:report.address"),
-        item.vetCabinetAddress || "—",
-      ],
-      [
-        t("appointment:report.doctor"),
-        item.vetDoctorName || "—",
-      ],
-      [
-        t("appointment:report.date"),
-        appointmentDate,
-      ],
-      [
-        t("appointment:report.status"),
-        t(`appointment:status.${item.status}`),
-      ],
-      [
-        t("appointment:report.notes"),
-        item.notes || "—",
-      ],
+      [t("appointment:report.pet"), item.animalName || "—"],
+      [t("appointment:report.service"), item.serviceType || "—"],
+      [t("appointment:report.clinic"), item.vetCabinetName || "—"],
+      [t("appointment:report.address"), item.vetCabinetAddress || "—"],
+      [t("appointment:report.doctor"), item.vetDoctorName || "—"],
+      [t("appointment:report.date"), appointmentDate],
+      [t("appointment:report.status"), t(`appointment:status.${item.status}`)],
+      [t("appointment:report.notes"), item.notes || "—"],
     ],
   });
 
@@ -202,11 +162,13 @@ const downloadAppointmentPdf = (
   doc.setFontSize(13);
 
   doc.text(
-    `${t("appointment:report.total")}: ${
-      formatCurrency(item.price, item.currency)
-    }`,
+    `${t("appointment:report.total")}: ${formatConvertedPrice(
+      item.price,
+      item.currency,
+      selectedCurrency,
+    )}`,
     18,
-    finalY + 22
+    finalY + 22,
   );
 
   doc.save(`pawpoint-appointment-${item.id}.pdf`);
@@ -249,11 +211,11 @@ export const AppointmentCard = ({ item, onEdit }: Props) => {
           background: isCompleted
             ? `linear-gradient(90deg, ${theme.palette.success.main}, ${alpha(
                 theme.palette.success.main,
-                0.4
+                0.4,
               )})`
             : `linear-gradient(90deg, ${theme.palette.warning.main}, ${alpha(
                 theme.palette.warning.main,
-                0.4
+                0.4,
               )})`,
         })}
       />
@@ -281,15 +243,15 @@ export const AppointmentCard = ({ item, onEdit }: Props) => {
                   ? theme.palette.mode === "dark"
                     ? `linear-gradient(135deg, ${alpha(
                         theme.palette.success.main,
-                        0.22
+                        0.22,
                       )} 0%, ${alpha(theme.palette.success.light, 0.14)} 100%)`
                     : "linear-gradient(135deg, #dff4f1 0%, #c8ede8 100%)"
                   : theme.palette.mode === "dark"
-                  ? `linear-gradient(135deg, ${alpha(
-                      theme.palette.warning.main,
-                      0.22
-                    )} 0%, ${alpha(theme.palette.warning.light, 0.14)} 100%)`
-                  : "linear-gradient(135deg, #fef3e2 0%, #fde8c8 100%)",
+                    ? `linear-gradient(135deg, ${alpha(
+                        theme.palette.warning.main,
+                        0.22,
+                      )} 0%, ${alpha(theme.palette.warning.light, 0.14)} 100%)`
+                    : "linear-gradient(135deg, #fef3e2 0%, #fde8c8 100%)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -347,8 +309,8 @@ export const AppointmentCard = ({ item, onEdit }: Props) => {
                   ? alpha(theme.palette.success.main, 0.18)
                   : "#dff4f1"
                 : theme.palette.mode === "dark"
-                ? alpha(theme.palette.warning.main, 0.18)
-                : "#f8ecd8",
+                  ? alpha(theme.palette.warning.main, 0.18)
+                  : "#f8ecd8",
               color: isCompleted
                 ? theme.palette.success.main
                 : theme.palette.warning.main,
@@ -387,7 +349,7 @@ export const AppointmentCard = ({ item, onEdit }: Props) => {
                 item.slotStartTimeUtc,
                 dateFormat,
                 t,
-                locale
+                locale,
               )}
             </Typography>
           </Stack>
@@ -422,22 +384,26 @@ export const AppointmentCard = ({ item, onEdit }: Props) => {
           </Typography>
 
           <Stack direction="row" spacing={1.25} alignItems="center">
-              <PaymentsOutlinedIcon
-                sx={(theme) => ({
-                  fontSize: 15,
-                  color: theme.palette.text.disabled,
-                })}
-              />
+            <PaymentsOutlinedIcon
+              sx={(theme) => ({
+                fontSize: 15,
+                color: theme.palette.text.disabled,
+              })}
+            />
 
-          <Typography
-            sx={(theme) => ({
-              fontSize: scaleFont(12.5, settings?.textSize),
-              color: theme.palette.text.primary,
-              fontWeight: 700,
-            })}
-          >
-            {formatCurrency(item.price, item.currency)}
-          </Typography>
+            <Typography
+              sx={(theme) => ({
+                fontSize: scaleFont(12.5, settings?.textSize),
+                color: theme.palette.text.primary,
+                fontWeight: 700,
+              })}
+            >
+              {formatConvertedPrice(
+                item.price,
+                item.currency,
+                settings?.currency ?? "EUR",
+              )}
+            </Typography>
           </Stack>
         </Stack>
 
@@ -446,7 +412,13 @@ export const AppointmentCard = ({ item, onEdit }: Props) => {
             <Button
               fullWidth
               onClick={() =>
-                downloadAppointmentPdf(item, t, dateFormat, locale)
+                downloadAppointmentPdf(
+                  item,
+                  t,
+                  dateFormat,
+                  locale,
+                  settings?.currency ?? "EUR",
+                )
               }
               startIcon={
                 <DownloadRoundedIcon sx={{ fontSize: "17px !important" }} />

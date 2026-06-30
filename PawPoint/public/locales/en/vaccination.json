@@ -59,5 +59,10 @@
   "vaccineType": "Vaccine Type",
   "selectVaccineType": "Select Vaccine Type",
   "estimatedPrice": "Estimated Price",
-  "priceLabel": "Price: {{price}}"
+  "priceLabel": "Price: {{price}}",
+  "raport": "Download report",
+  "language": {
+    "en": "English",
+    "ro": "Romanian"
+  }
 }
